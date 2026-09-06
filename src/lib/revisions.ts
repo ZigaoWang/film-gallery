@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db'
 import { Prisma, type EntityType, type ValueSource } from '@prisma/client'
 import { ADMIN_RESOURCES, coerceField, type ResourceName, type ResourceSpec } from '@/lib/admin/resources'
+import { summaryFromDescription } from '@/lib/catalogForm'
 import { reslugIfRenamed } from '@/lib/seo/rename'
 
 /**
@@ -217,6 +218,28 @@ export async function reviewRevision(
       }
     }
     survivingClaims.set(row.fieldName, survivors)
+  }
+
+  /**
+   * An approved description fills the summary, when there is not one already.
+   *
+   * The summary is the identifying sentence, and no contributor form has ever
+   * offered a field for it, so an entry written by anyone but an administrator
+   * had none at all. Deriving it here means an approved edit populates it the
+   * same way creating the record does.
+   *
+   * Only when the column is empty. A summary an administrator wrote to the
+   * standard is house voice and outranks anything a first line implies, so it
+   * is never overwritten by this.
+   */
+  if (typeof data.description === 'string' && !('summary' in data)) {
+    const current = revision.entityType === 'FILM_STOCK'
+      ? await prisma.filmStock.findUnique({ where: { id: revision.entityId }, select: { summary: true } })
+      : await prisma.camera.findUnique({ where: { id: revision.entityId }, select: { summary: true } })
+    if (!current?.summary) {
+      const derived = summaryFromDescription(data.description)
+      if (derived) data.summary = derived
+    }
   }
 
   await prisma.$transaction(async tx => {

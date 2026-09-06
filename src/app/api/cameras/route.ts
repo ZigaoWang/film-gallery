@@ -5,6 +5,8 @@ import { prisma } from '@/lib/db'
 import { allocateSlug } from '@/lib/seo/ensureSlug'
 import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
 import { toBodyType } from '@/lib/cameraFields'
+import { normalizeAliases } from '@/lib/filmFields'
+import { summaryFromDescription } from '@/lib/catalogForm'
 import { resolveBrand } from '@/lib/brands'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
@@ -56,6 +58,7 @@ export async function POST(req: NextRequest) {
     let format: string | undefined
     let year: number | undefined
     let defaultFilmStockId: string | undefined
+    let aliasesInput: string | undefined
 
     // Check if it's FormData (with image) or JSON (without image)
     if (contentType.includes('multipart/form-data')) {
@@ -68,6 +71,7 @@ export async function POST(req: NextRequest) {
       format = (formData.get('format') as string) || undefined
       year = asInt(formData.get('year'))
       defaultFilmStockId = (formData.get('defaultFilmStockId') as string) || undefined
+      aliasesInput = (formData.get('aliases') as string) || undefined
       hasImageData = !!imageFile
     } else {
       const body = await readJsonObject(req)
@@ -78,6 +82,9 @@ export async function POST(req: NextRequest) {
       format = asString(body.format)
       year = asInt(body.year)
       defaultFilmStockId = asString(body.defaultFilmStockId) || undefined
+      aliasesInput = Array.isArray(body.aliases)
+        ? body.aliases.filter((a): a is string => typeof a === 'string').join(',')
+        : asString(body.aliases)
     }
 
     if (!name) {
@@ -106,7 +113,15 @@ export async function POST(req: NextRequest) {
         bodyType,
         format,
         year,
-        defaultFilmStockId
+        defaultFilmStockId,
+        // Offered by the add dialog, so it has to be read here. A field a form
+        // collects and an endpoint ignores is discarded without a word, which
+        // this codebase has been caught doing before.
+        aliases: normalizeAliases(aliasesInput ? aliasesInput.split(',') : []),
+        // The identifying sentence, taken from the first line of what was
+        // written. No contributor form has ever offered a summary field, so
+        // without this every entry added through the site has none.
+        summary: summaryFromDescription(description)
       }
     })
 

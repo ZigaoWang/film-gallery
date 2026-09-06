@@ -13,6 +13,15 @@ export interface NewItemPayload {
   name: string
   description?: string
   image?: File
+  /**
+   * Who makes it. A camera stores this as `brand` and a film stock as
+   * `manufacturer`, so the form asks once and the two endpoints read the name
+   * each of them uses. The add dialog never asked a camera for one at all,
+   * which is why every body added through the site arrived unattributed and
+   * unfindable by its maker.
+   */
+  brand?: string
+  manufacturer?: string
 
   // Camera
   cameraType?: string
@@ -21,7 +30,6 @@ export interface NewItemPayload {
 
   // Film stock
   iso?: string
-  manufacturer?: string
   process?: string
   colorBalance?: string
   /** Comma separated; the API splits and normalizes. */
@@ -35,7 +43,7 @@ export interface NewItemPayload {
 
 /** Fields sent for each kind, so neither can leak the other's. */
 const FIELDS = {
-  camera: ['cameraType', 'format', 'year', 'defaultFilmStockId'],
+  camera: ['brand', 'cameraType', 'format', 'year', 'defaultFilmStockId', 'aliases'],
   film: ['format', 'iso', 'exposures', 'manufacturer', 'process', 'colorBalance', 'aliases'],
 } as const satisfies Record<'camera' | 'film', readonly (keyof NewItemPayload)[]>
 
