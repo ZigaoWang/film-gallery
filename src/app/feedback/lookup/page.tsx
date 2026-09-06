@@ -40,8 +40,8 @@ export default async function ReportLookupPage({
     // reference does not exist" would turn this box into an oracle for
     // guessing them; an unknown-but-well-formed code lands on the same 404
     // page as a malformed one.
-    if (!normalized) redirect('/report/lookup?error=1')
-    redirect(`/report/${normalized}`)
+    if (!normalized) redirect('/feedback/lookup?error=1')
+    redirect(`/feedback/${normalized}`)
   }
 
   return (
