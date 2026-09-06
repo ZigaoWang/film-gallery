@@ -65,8 +65,7 @@ export async function POST(req: NextRequest) {
       description = (formData.get('description') as string) || undefined
       cameraType = (formData.get('cameraType') as string) || undefined
       format = (formData.get('format') as string) || undefined
-      const yearStr = formData.get('year') as string
-      year = yearStr ? parseInt(yearStr, 10) : undefined
+      year = asInt(formData.get('year'))
       defaultFilmStockId = (formData.get('defaultFilmStockId') as string) || undefined
       hasImageData = !!imageFile
     } else {

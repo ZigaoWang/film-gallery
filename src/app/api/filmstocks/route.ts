@@ -75,8 +75,7 @@ export async function POST(req: NextRequest) {
       const formData = await req.formData()
       name = formData.get('name') as string
       brand = (formData.get('brand') as string) || undefined
-      const isoStr = formData.get('iso') as string
-      iso = isoStr ? parseInt(isoStr, 10) : undefined
+      iso = asInt(formData.get('iso'))
       imageFile = formData.get('image') as File | null
       description = (formData.get('description') as string) || undefined
       format = (formData.get('format') as string) || undefined
