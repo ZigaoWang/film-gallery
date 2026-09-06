@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import ClientHeader from '@/components/ClientHeader'
 import Footer from '@/components/Footer'
 import FieldLabel from '@/components/ui/FieldLabel'
@@ -11,6 +12,7 @@ import Button, { ButtonLink } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { apiErrorMessage } from '@/lib/apiError'
+import { textLinkClass } from '@/components/ui/TextLink'
 
 type Photo = {
   id: string
@@ -46,6 +48,7 @@ export default function EditAlbumPage() {
   const [currentPhotoIds, setCurrentPhotoIds] = useState<string[]>([])
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -55,9 +58,15 @@ export default function EditAlbumPage() {
     }
 
     if (status === 'authenticated' && albumId) {
+      // A 404 from this endpoint is still JSON, and `{ error: 'Album not
+      // found' }` is truthy. Unchecked it reached setAlbum, and a deleted
+      // album, a mistyped id or somebody else's private album all rendered as
+      // "Edit Album" over a blank name, no description and no photos, with
+      // nothing on the page saying the album had never loaded. The photo
+      // editor beside it already fails this case properly.
       Promise.all([
-        fetch(`/api/albums/${albumId}`).then(r => r.json()),
-        fetch('/api/photos/mine?pageSize=200').then(r => r.json())
+        fetch(`/api/albums/${albumId}`).then(r => (r.ok ? r.json() : Promise.reject(new Error()))),
+        fetch('/api/photos/mine?pageSize=200').then(r => (r.ok ? r.json() : { photos: [] }))
       ]).then(([albumData, photosData]) => {
         setAlbum(albumData)
         setAlbumName(albumData.name || '')
@@ -70,7 +79,7 @@ export default function EditAlbumPage() {
         setLoading(false)
       }).catch(() => {
         setLoading(false)
-        router.push('/albums')
+        setLoadFailed(true)
       })
     }
   }, [status, albumId, router])
@@ -131,6 +140,18 @@ export default function EditAlbumPage() {
       toast('Could not reach the server', 'error')
     }
     setConfirmingDelete(false)
+  }
+
+  if (loadFailed) {
+    return (
+      <div className="min-h-dvh bg-[#0a0a0a] flex items-center justify-center px-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-2">This album could not be opened</h1>
+          <p className="text-neutral-500 mb-6">It may have been deleted, or it may not be yours to edit.</p>
+          <Link href="/albums" className={textLinkClass}>Back to your albums</Link>
+        </div>
+      </div>
+    )
   }
 
   if (status === 'loading' || loading) {
