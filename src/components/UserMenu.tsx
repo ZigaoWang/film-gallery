@@ -129,7 +129,7 @@ export default function UserMenu({ username, name, avatar }: UserMenuProps) {
                          hover:bg-neutral-800 hover:text-[#D32F2F]
                          focus:bg-neutral-800 focus:text-[#D32F2F] focus:outline-none"
             >
-              Sign Out
+              Sign out
             </button>
           </div>
         </div>
