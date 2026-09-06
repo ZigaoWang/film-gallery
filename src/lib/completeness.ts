@@ -152,8 +152,11 @@ export function completenessOf(
  * field is mostly populated, at which point its absence becomes worth saying.
  */
 export const NOT_YET_STARTED: ReadonlySet<string> = new Set([
-  // Added with the writing standard; the rewrite pass fills it entry by entry.
-  'summary',
+  // Nothing. `summary` was here because no form collected it, so every entry
+  // lacked one and saying so on all of them carried no information. The
+  // contributor forms derive it from the description now and the catalog was
+  // backfilled, so an entry without one is the exception again, which is
+  // exactly when its absence is worth reporting.
 ])
 
 /**
