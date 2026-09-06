@@ -60,19 +60,14 @@ export async function PATCH(
       return NextResponse.json({ error: 'Film stock not found' }, { status: 404 })
     }
 
-    // Check if user is admin or the one who uploaded the image
+    // Every field on a film stock is a catalog field, so the whole edit goes
+    // through the revision pipeline, exactly as it does for cameras. Whoever
+    // happened to upload the image has no special claim on the record: the
+    // gate that checked for it here refused everyone else with a 403 before
+    // the code below could ever file their edit for review.
     const user = await prisma.user.findUnique({
       where: { id: userId }
     })
-
-    const canEdit = user?.isAdmin || filmStock.imageUploadedBy === userId
-
-    if (!canEdit) {
-      return NextResponse.json(
-        { error: 'You can only update film stocks you created or as an admin' },
-        { status: 403 }
-      )
-    }
 
     const body = await readJsonObject(req)
 
@@ -94,10 +89,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Nothing to change' }, { status: 400 })
     }
 
-    // A film stock has no owner at all, so this route previously let any signed
-    // in account write to a shared catalog record directly. It goes through
-    // the pipeline now: an administrator's edit applies immediately, anyone
-    // else's waits for review.
+    // An administrator's edit applies immediately, anyone else's waits for
+    // review.
     if (user?.isAdmin) {
       const result = await applyAdminEdit('FILM_STOCK', filmStockId, payload, userId)
       if ('error' in result) return NextResponse.json({ error: result.error }, { status: 400 })
