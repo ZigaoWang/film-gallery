@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ADMIN_RESOURCES, VALUE_LABELS, displayValue, type BulkAction, type ResourceName, type ResourceSpec } from '@/lib/admin/resources'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import EditRecordModal from './EditRecordModal'
 import BulkEditModal from './BulkEditModal'
 import { textLinkClass } from '@/components/ui/TextLink'
@@ -76,6 +77,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkEditing, setBulkEditing] = useState(false)
   const [confirmingBulkDelete, setConfirmingBulkDelete] = useState(false)
+  const [confirmingBulkAction, setConfirmingBulkAction] = useState<BulkAction | null>(null)
 
   // Guards against an out-of-order response overwriting a newer one: typing
   // quickly starts several requests and they do not necessarily return in the
@@ -85,6 +87,10 @@ export default function ResourceTable<F extends string>({ resource, filters, def
   const load = useCallback(async () => {
     const id = ++requestId.current
     setLoading(true)
+    // Set when the response shows this page no longer exists, so the table
+    // keeps saying it is loading instead of flashing an empty state that the
+    // immediate refetch replaces.
+    let clamping = false
     try {
       const params = new URLSearchParams({
         page: String(page),
@@ -107,10 +113,20 @@ export default function ResourceTable<F extends string>({ resource, filters, def
       setRows(data.rows ?? [])
       setTotal(data.total ?? 0)
       setError(null)
+      // Deleting rows shrinks the count under the page being read: clearing
+      // the last matches on page 2 of a filtered queue leaves "Page 2 of 1"
+      // and an empty table, which reads as nothing left to do while page 1
+      // still holds rows. Clamping on the response covers every path that can
+      // shrink the total, rather than each of the handlers separately.
+      const last = Math.max(1, Math.ceil((data.total ?? 0) / pageSize))
+      if (page > last) {
+        clamping = true
+        setPage(last)
+      }
     } catch {
       if (id === requestId.current) setError('Could not reach the server')
     } finally {
-      if (id === requestId.current) setLoading(false)
+      if (id === requestId.current && !clamping) setLoading(false)
     }
   }, [resource, page, pageSize, search, filter])
 
@@ -234,7 +250,10 @@ export default function ResourceTable<F extends string>({ resource, filters, def
   }
 
   const runBulkAction = async (action: BulkAction) => {
-    if (action.confirm && !window.confirm(`${action.confirm}\n\n${selected.size} selected.`)) return
+    if (action.confirm) {
+      setConfirmingBulkAction(action)
+      return
+    }
     await bulkSave(action.patch)
   }
 
@@ -407,7 +426,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
               </th>
               {spec.columns.map(col => (
                 <th key={col} className="px-3 py-2 font-medium text-neutral-400 text-xs uppercase tracking-wide whitespace-nowrap">
-                  {humanise(col)}
+                  {humanize(col)}
                 </th>
               ))}
               <th className="px-3 py-2 w-px" />
@@ -546,6 +565,24 @@ export default function ResourceTable<F extends string>({ resource, filters, def
         />
       )}
 
+      {confirmingBulkAction && (
+        <ConfirmDialog
+          open
+          title={`${confirmingBulkAction.label} ${selected.size} ${selected.size === 1 ? spec.label.toLowerCase() : spec.plural.toLowerCase()}?`}
+          confirmLabel={`${confirmingBulkAction.label} ${selected.size}`}
+          busyLabel="Applying…"
+          destructive
+          // Left open when the request fails, so the toast explaining why sits
+          // next to the action that produced it.
+          onConfirm={async () => {
+            if (await bulkSave(confirmingBulkAction.patch)) setConfirmingBulkAction(null)
+          }}
+          onClose={() => setConfirmingBulkAction(null)}
+        >
+          {confirmingBulkAction.confirm}
+        </ConfirmDialog>
+      )}
+
       {confirmingBulkDelete && (
         <ConfirmBulkDelete
           resource={resource}
@@ -658,7 +695,7 @@ function relativeDate(date: Date): string {
   return formatDate(date)
 }
 
-function humanise(column: string): string {
+function humanize(column: string): string {
   if (column === 'madeBy') return 'Made by'
   return column
     .replace(/([A-Z])/g, ' $1')
