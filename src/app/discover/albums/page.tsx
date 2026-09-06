@@ -8,6 +8,9 @@ import type { Metadata } from 'next'
 import { blurPlaceholder, BLUR_SIZE, CARD_PREVIEW_BLUR_COUNT } from '@/lib/blurhash'
 import { SITE_URL } from '@/lib/seo/site'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
+import { parseIntParam } from '@/lib/validation'
+import EmptyState from '@/components/ui/EmptyState'
+import { ButtonLink } from '@/components/ui/Button'
 
 export const metadata: Metadata = {
   title: 'Discover Albums',
@@ -18,19 +21,51 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic'
 
-export default async function DiscoverAlbumsPage() {
-  const albums = await prisma.collection.findMany({
-    where: { public: true },
-    include: {
-      user: { select: { id: true, username: true, name: true, avatar: true } },
-      // Counts only what a stranger can see, matching the previews below and
-      // the album page itself. Counting every row advertised a photo count
-      // nobody browsing here could reach, and disclosed how many photos an
-      // album was holding back.
-      _count: { select: { photos: { where: { photo: PUBLIC_PHOTO } } } }
-    },
-    orderBy: { createdAt: 'desc' }
-  })
+/**
+ * Albums are written by users, so this list grows forever, unlike the film and
+ * camera indexes whose catalogues are a fixed size. This page had no `take` at
+ * all: every visit loaded every public album, then ran a window function over
+ * every photo in all of them to pick the previews. Divides by the 1, 2 and 3
+ * column grid below so the last row is never short.
+ */
+const ALBUMS_PER_PAGE = 24
+
+/** Page one keeps the bare path, so the first page is not two URLs. */
+function pageHref(page: number) {
+  return page <= 1 ? '/discover/albums' : `/discover/albums?page=${page}`
+}
+
+export default async function DiscoverAlbumsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const { page: pageParam } = await searchParams
+  const page = parseIntParam(pageParam ?? null, { fallback: 1, min: 1, max: 100_000 })
+
+  const [albums, totalAlbums] = await Promise.all([
+    prisma.collection.findMany({
+      where: { public: true },
+      include: {
+        user: { select: { id: true, username: true, name: true, avatar: true } },
+        // Counts only what a stranger can see, matching the previews below and
+        // the album page itself. Counting every row advertised a photo count
+        // nobody browsing here could reach, and disclosed how many photos an
+        // album was holding back.
+        _count: { select: { photos: { where: { photo: PUBLIC_PHOTO } } } }
+      },
+      // `id` breaks the tie for the same reason feedOrderBy does it: albums
+      // created in the same import share a createdAt, and without a total
+      // order Postgres may return them differently per query, which makes
+      // offset paging drop some albums and repeat others.
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      skip: (page - 1) * ALBUMS_PER_PAGE,
+      take: ALBUMS_PER_PAGE
+    }),
+    prisma.collection.count({ where: { public: true } })
+  ])
+
+  const lastPage = Math.max(1, Math.ceil(totalAlbums / ALBUMS_PER_PAGE))
 
   // Get 4 random photos for each album using raw SQL
   const albumIds = albums.map(a => a.id)
@@ -67,12 +102,18 @@ export default async function DiscoverAlbumsPage() {
         </div>
 
         {albums.length === 0 ? (
-          <div className="text-center py-24 border border-dashed border-neutral-800">
-            <svg className="w-16 h-16 mx-auto mb-4 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            <p className="text-neutral-500">No public albums yet</p>
-          </div>
+          <EmptyState
+            icon={
+              <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            }
+            // A page number past the end is reachable by typing one, and by
+            // following a link to a page that has since emptied out. Without
+            // the way back it is a dead end with no albums and no pager.
+            message={page > 1 ? 'No albums on this page' : 'No public albums yet'}
+            action={page > 1 ? { href: pageHref(1), label: 'First page' } : undefined}
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {albums.map((album, cardIndex) => {
@@ -133,6 +174,23 @@ export default async function DiscoverAlbumsPage() {
               )
             })}
           </div>
+        )}
+
+        {/* Suppressed when the grid is empty: a page past the end would read
+            "Page 7 of 3", and the empty state above already carries the way
+            back. */}
+        {albums.length > 0 && lastPage > 1 && (
+          <nav className="flex items-center justify-between mt-8" aria-label="Pagination">
+            <p className="text-xs text-neutral-600 tabular-nums">Page {page} of {lastPage}</p>
+            <div className="flex gap-2">
+              {page > 1 && (
+                <ButtonLink href={pageHref(page - 1)} variant="outline" size="sm">Previous</ButtonLink>
+              )}
+              {page < lastPage && (
+                <ButtonLink href={pageHref(page + 1)} variant="outline" size="sm">Next</ButtonLink>
+              )}
+            </div>
+          </nav>
         )}
       </main>
 
