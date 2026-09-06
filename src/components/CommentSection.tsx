@@ -122,7 +122,7 @@ export default function CommentSection({ photoId }: { photoId: string }) {
             // off every other control on the site.
             className={`${fieldClass} flex-1`}
           />
-          <Button type="submit" disabled={loading || !content.trim()} size="sm">
+          <Button type="submit" disabled={loading || !content.trim()} size="md">
             {loading ? 'Posting…' : 'Post'}
           </Button>
         </form>

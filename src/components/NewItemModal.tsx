@@ -8,7 +8,7 @@ import { BODY_TYPES, BODY_TYPE_LABELS } from '@/lib/cameraFields'
 import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import type { NewItemPayload } from '@/lib/newItemForm'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import type { FilmStockOption } from '@/lib/filmSearch'
 
@@ -198,7 +198,7 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={`Tell users about this ${type}…`}
-                className={`${fieldClass} resize-none`}
+                className={`${fieldClassMultiline} resize-none`}
                 rows={4}
                 disabled={loading}
               />

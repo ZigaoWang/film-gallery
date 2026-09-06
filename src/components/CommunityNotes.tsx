@@ -10,7 +10,7 @@ import { linkify } from '@/lib/linkify'
 import ItemActions from './ItemActions'
 import ConfirmDialog from './ui/ConfirmDialog'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { formatDate } from '@/lib/formatDate'
 import { apiErrorMessage } from '@/lib/apiError'
@@ -425,7 +425,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
                         value={editContent}
                         onChange={e => setEditContent(e.target.value.slice(0, MAX_LEN))}
                         rows={3}
-                        className={`${fieldClass} resize-y`}
+                        className={`${fieldClassMultiline} resize-y`}
                       />
                       <div className="flex items-center gap-2 mt-2">
                         <button
@@ -540,7 +540,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
                     ? `e.g. Meter tends to overexpose by half a stop. Shoot at box speed +0.5 EV for shadow detail.`
                     : `e.g. This stock is overrated. Shoot at ISO 100, not box speed. Exposure latitude is poor, overexpose by a stop.`}
                   rows={6}
-                  className={`${fieldClass} resize-y min-h-[140px]`}
+                  className={`${fieldClassMultiline} resize-y min-h-[140px]`}
                 />
 
                 <div className="flex items-center justify-between mt-2 mb-6 gap-2">

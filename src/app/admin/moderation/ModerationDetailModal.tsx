@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 
 type Submission = {
@@ -271,7 +271,7 @@ export default function ModerationDetailModal({
                           value={currentValue !== undefined && currentValue !== null ? String(currentValue) : ''}
                           onChange={(e) => handleFieldChange(key, e.target.value)}
                           disabled={processing}
-                          className={`${fieldClass} resize-none focus:border-yellow-500 focus:ring-yellow-500`}
+                          className={`${fieldClassMultiline} resize-none focus:border-yellow-500 focus:ring-yellow-500`}
                           rows={3}
                           placeholder="Enter description…"
                         />

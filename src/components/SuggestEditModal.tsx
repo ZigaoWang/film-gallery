@@ -9,7 +9,7 @@ import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import { useRouter } from 'next/navigation'
 import { useToast } from './ui/Toast'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import type { FilmStockOption } from '@/lib/filmSearch'
 
@@ -408,7 +408,7 @@ export default function SuggestEditModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={`Tell users about this ${type}…`}
-              className={`${fieldClass} resize-none`}
+              className={`${fieldClassMultiline} resize-none`}
               rows={4}
             />
           </div>

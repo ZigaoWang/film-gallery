@@ -25,14 +25,31 @@ const BASE =
   'disabled:text-neutral-500 disabled:border-neutral-800 disabled:cursor-not-allowed ' +
   'transition-colors'
 
+/**
+ * Single-line controls carry a fixed height, and it is the same height as a
+ * medium Button.
+ *
+ * Without it a field is as tall as its padding and line-height make it, which
+ * is 42px, and no button size is 42px. Any form that puts a button beside an
+ * input — the comment box, the profile handles — had the two disagree by ten
+ * pixels, and there was no combination of the shared primitives that lined
+ * them up. A field and a `size="md"` Button now match exactly.
+ *
+ * Deliberately not on BASE: a textarea with a fixed height is one line tall.
+ */
+const SINGLE_LINE = `${BASE} h-10`
+
 /** For the few controls that need the look without the component. */
-export const fieldClass = BASE
+export const fieldClass = SINGLE_LINE
+
+/** The same look for a textarea, which must grow rather than sit at one height. */
+export const fieldClassMultiline = BASE
 
 export function FieldInput({
   className = '',
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={`${BASE} ${className}`.trim()} {...props} />
+  return <input className={`${SINGLE_LINE} ${className}`.trim()} {...props} />
 }
 
 export function FieldTextarea({
@@ -48,7 +65,7 @@ export function FieldSelect({
   ...props
 }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select className={`${BASE} ${className}`.trim()} {...props}>
+    <select className={`${SINGLE_LINE} ${className}`.trim()} {...props}>
       {children}
     </select>
   )

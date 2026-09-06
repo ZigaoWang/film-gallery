@@ -6,7 +6,7 @@ import Image from 'next/image'
 import ClientHeader from '@/components/ClientHeader'
 import Footer from '@/components/Footer'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button, { ButtonLink } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -170,7 +170,7 @@ export default function EditAlbumPage() {
                     onChange={e => setDescription(e.target.value)}
                     placeholder="Optional description…"
                     rows={3}
-                    className={`${fieldClass} resize-none`}
+                    className={`${fieldClassMultiline} resize-none`}
                   />
                 </div>
 

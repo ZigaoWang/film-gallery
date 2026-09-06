@@ -8,7 +8,7 @@ import Footer from '@/components/Footer'
 import { useToast } from '@/components/ui/Toast'
 import { apiErrorMessage } from '@/lib/apiError'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password'
 
@@ -240,7 +240,7 @@ export default function SettingsPage() {
 
             <div>
               <FieldLabel>Bio</FieldLabel>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Tell us about yourself…" className={`${fieldClass} resize-none`} />
+              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Tell us about yourself…" className={`${fieldClassMultiline} resize-none`} />
             </div>
 
             <div>

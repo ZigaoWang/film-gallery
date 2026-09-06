@@ -6,7 +6,7 @@ import { REPORT_REASONS, REPORT_TARGET_NOUNS, type ReportTarget } from '@/lib/re
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from './ui/Toast'
 import Button, { ButtonLink } from './ui/Button'
-import { fieldClass } from './ui/Field'
+import { fieldClass, fieldClassMultiline } from './ui/Field'
 
 /**
  * The report dialog, opened from an item's overflow menu.
@@ -129,7 +129,7 @@ export default function ReportDialog({
                     value={detail}
                     onChange={e => setDetail(e.target.value)}
                     placeholder="Context that would help a moderator."
-                    className={`${fieldClass} resize-y`}
+                    className={`${fieldClassMultiline} resize-y`}
                   />
                 </div>
 
