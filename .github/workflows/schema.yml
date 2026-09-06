@@ -43,7 +43,7 @@ jobs:
 
     env:
       ADMIN_URL: postgresql://postgres:postgres@localhost:5432/postgres
-      # A database that only migrate deploy ever writes to.
+      # The database migrate deploy builds, and the only one any step here uses.
       #
       # This previously pointed at the service container's own database, which
       # was also passed as --shadow-database-url. migrate diff replays into its
@@ -70,6 +70,20 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # Neither needs a database, so both run before one exists and a failure is
+      # reported without first waiting on migrations and a build. The suite
+      # covers the open redirect guard, EXIF and GPS stripping, the rate
+      # limiter's handling of a forged client address, the feed's scope SQL, the
+      # duplicate-detection thresholds and the catalog write funnel. Until it
+      # ran here it ran only on whichever machine a contributor chose to run it
+      # on, so a regression in any of those merged and deployed behind a green
+      # check.
+      - name: Source passes the linter
+        run: npm run lint
+
+      - name: Tests pass
+        run: npm test
 
       - name: Create the migration database
         run: |
@@ -101,6 +115,35 @@ jobs:
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f prisma/tests/constraints.sql
           echo "Constraints behave as specified."
+
+      # scripts/test/revisionPipeline.test.ts is deliberately absent from
+      # `npm test`, because it is the one test that needs a live database and
+      # that script has to run on a machine without one. It is also the only
+      # check on the claim that an admin edit, its version bump and its
+      # provenance row land in a single transaction, which is the entire
+      # argument for having removed the immediate write path. Run nowhere, that
+      # claim was being assumed rather than proved.
+      #
+      # It reads one film stock and one administrator, and a database built from
+      # migrations alone has neither: the migrations seed brands and nothing
+      # else. Hence the fixture, which is written after the constraints file so
+      # that file keeps asserting against a database holding only what the
+      # migrations put there.
+      - name: Rows the revision pipeline test reads
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+          INSERT INTO "User" (id, email, "passwordHash", username, "isAdmin")
+          VALUES ('ci_admin', 'ci-admin@example.invalid', 'not-a-password-hash', 'ci_admin', true);
+
+          INSERT INTO "FilmStock"
+            (id, name, process, chromaticity, polarity, "colorBalance",
+             "brandId", "manufacturerStatus")
+          VALUES ('ci_stock', 'CI Revision Pipeline 400', 'C-41', 'COLOR', 'NEGATIVE',
+                  'Daylight', 'brand_kodak', 'SAME_AS_BRAND');
+          SQL
+
+      - name: An admin edit and its provenance land together
+        run: npx tsx scripts/test/revisionPipeline.test.ts
 
       # The build itself runs this through postbuild. Repeated here so a change
       # that puts the database client in the browser fails the pull request
