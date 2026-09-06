@@ -212,11 +212,44 @@ export default function SuggestEditModal({
     const trimmedName = editedName.trim()
     const trimmedBrand = editedBrand.trim()
     const nameChanged = trimmedName !== name || (type === 'camera' && trimmedBrand !== (brand || ''))
-    const hasCategorizationChanges = type === 'camera'
-      ? (cameraType || format || year || defaultFilmStockId || aliases)
-      : (format || iso || exposures || filmProcess || colorBalance || manufacturer || aliases)
 
-    if (!imageFile && !descriptionChanged && !nameChanged && !hasCategorizationChanges) {
+    // Each field against the value it was opened with, the way the name above
+    // is already checked. Testing them for truthiness instead asked "is this
+    // field filled in", which on an already-categorized record is yes for all
+    // of them: changing only the description proposed the body type, the
+    // format, the year and the aliases as edits too, and a reviewer had to
+    // adjudicate five fields nobody had touched.
+    // Checked before the no-changes test below, which would otherwise answer
+    // "make some changes" to someone who picked Other and left the box empty.
+    if (format === 'Other' && !customFormat.trim()) {
+      toast('Please specify the custom format', 'error')
+      return
+    }
+
+    const finalFormat = format === 'Other' ? customFormat.trim() : format
+    const changedFields: Array<[string, string]> = (
+      type === 'camera'
+        ? [
+            ['bodyType', cameraType, initialCameraType || ''],
+            ['format', finalFormat, initialFormat || ''],
+            ['year', year, initialYear?.toString() || ''],
+            ['defaultFilmStockId', defaultFilmStockId, initialDefaultFilmStockId || ''],
+            ['aliases', aliases.trim(), (initialAliases ?? []).join(', ')],
+          ]
+        : [
+            ['format', finalFormat, initialFormat || ''],
+            ['iso', iso, initialIso?.toString() || ''],
+            ['exposures', exposures.trim(), initialExposures || ''],
+            ['process', filmProcess, initialProcess || ''],
+            ['colorBalance', colorBalance, initialColorBalance || ''],
+            ['manufacturer', manufacturer.trim(), initialManufacturer || ''],
+            ['aliases', aliases.trim(), (initialAliases ?? []).join(', ')],
+          ]
+    )
+      .filter(([, value, initial]) => value !== initial)
+      .map(([key, value]) => [key, value])
+
+    if (!imageFile && !descriptionChanged && !nameChanged && changedFields.length === 0) {
       toast('Please make some changes to submit', 'error')
       return
     }
@@ -226,19 +259,6 @@ export default function SuggestEditModal({
     if (!trimmedName) {
       toast('Please give this a name', 'error')
       return
-    }
-
-    // Validate "Other" custom fields
-    if (type === 'camera') {
-      if (format === 'Other' && !customFormat.trim()) {
-        toast('Please specify the custom format', 'error')
-        return
-      }
-    } else {
-      if (format === 'Other' && !customFormat.trim()) {
-        toast('Please specify the custom format', 'error')
-        return
-      }
     }
 
     setUploading(true)
@@ -258,28 +278,11 @@ export default function SuggestEditModal({
       if (type === 'camera') {
         if (trimmedBrand !== (brand || '')) formData.append('brand', trimmedBrand)
       }
-      if (type === 'camera') {
-        const finalFormat = format === 'Other' ? customFormat : format
-
-        // The key has to be the column name: the handler reads the fields it
-        // accepts by name, so 'cameraType' was collected by nothing and a
-        // contributor changing only the body type got "No changes detected".
-        if (cameraType) formData.append('bodyType', cameraType)
-        if (finalFormat) formData.append('format', finalFormat)
-        if (year) formData.append('year', year)
-        if (aliases.trim()) formData.append('aliases', aliases.trim())
-        if (defaultFilmStockId) formData.append('defaultFilmStockId', defaultFilmStockId)
-      } else {
-        const finalFormat = format === 'Other' ? customFormat : format
-
-        if (finalFormat) formData.append('format', finalFormat)
-        if (iso) formData.append('iso', iso)
-        if (exposures.trim()) formData.append('exposures', exposures.trim())
-        if (filmProcess) formData.append('process', filmProcess)
-        if (colorBalance) formData.append('colorBalance', colorBalance)
-        if (manufacturer.trim()) formData.append('manufacturer', manufacturer.trim())
-        if (aliases.trim()) formData.append('aliases', aliases.trim())
-      }
+      // Only what actually changed. The key has to be the column name: the
+      // handler reads the fields it accepts by name, so 'cameraType' was
+      // collected by nothing and a contributor changing only the body type got
+      // "No changes detected".
+      for (const [key, value] of changedFields) formData.append(key, value)
 
       const endpoint = type === 'camera' ? `/api/cameras/${id}/image` : `/api/filmstocks/${id}/image`
       const res = await fetch(endpoint, {
