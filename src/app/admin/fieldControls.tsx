@@ -17,6 +17,7 @@ export interface Option { id: string; label: string }
 const REFERENCE_ENDPOINTS: Record<ReferenceSource, string> = {
   cameras: '/api/cameras',
   films: '/api/filmstocks',
+  brands: '/api/brands',
 }
 
 /**

@@ -20,6 +20,7 @@
 import { readFileSync } from 'node:fs'
 import { PrismaClient, type EntityType } from '@prisma/client'
 import { submitRevision } from '../src/lib/revisions'
+import { ADMIN_RESOURCES } from '../src/lib/admin/resources'
 
 const prisma = new PrismaClient()
 
@@ -65,10 +66,33 @@ if (!file) {
   process.exit(1)
 }
 
+/**
+ * `manufacturedBy` arrives as a brand name because a researcher cannot know our
+ * ids. The column takes an id, so the name is resolved before submitting and an
+ * unrecognised one is refused rather than dropped.
+ */
+async function resolveBrandId(name: string): Promise<string | null> {
+  const brand = await prisma.brand.findFirst({
+    where: { name: { equals: name, mode: 'insensitive' } },
+    select: { id: true },
+  })
+  return brand?.id ?? null
+}
+
 function problemsWith(entry: Result): string[] {
   const problems: string[] = []
+  // The allowlist every write path checks against. A field missing from it is
+  // discarded at review with nothing said, which is how a whole research pass
+  // could appear to load and change nothing.
+  const editable = ADMIN_RESOURCES[entry.entityType === 'FILM_STOCK' ? 'films' : 'cameras'].editable
 
   for (const [field, cited] of Object.entries(entry.fields ?? {})) {
+    // manufacturedBy is a name here and becomes manufacturedByBrandId below.
+    const column = field === 'manufacturedBy' ? 'manufacturedByBrandId' : field
+    if (!(column in editable)) {
+      problems.push(`${field}: not a field this catalogue can write`)
+      continue
+    }
     if (cited.editorial) {
       problems.push(`${field}: a specification cannot be house voice`)
       continue
@@ -132,11 +156,28 @@ async function main() {
     const payload: Record<string, unknown> = {}
     const sourceUrls: Record<string, Array<{ claim: string; passage?: string; url?: string; editorial?: true }>> = {}
 
+    let unresolved: string | null = null
     for (const [field, cited] of Object.entries(entry.fields ?? {})) {
-      payload[field] = cited.value
-      sourceUrls[field] = [
+      let column = field
+      let value: unknown = cited.value
+
+      if (field === 'manufacturedBy') {
+        const id = await resolveBrandId(String(cited.value))
+        if (!id) { unresolved = String(cited.value); break }
+        column = 'manufacturedByBrandId'
+        value = id
+      }
+
+      payload[column] = value
+      sourceUrls[column] = [
         { claim: String(cited.value).slice(0, 60), passage: cited.passage, url: cited.source },
       ]
+    }
+
+    if (unresolved) {
+      console.error(`  SKIP  ${entry.name}: no brand named "${unresolved}"`)
+      skipped++
+      continue
     }
 
     if (entry.description?.length) {
