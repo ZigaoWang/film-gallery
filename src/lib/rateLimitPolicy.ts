@@ -184,6 +184,23 @@ export const LIMITS = {
   },
 
   /**
+   * Adding a camera or a film stock to the catalog.
+   *
+   * The only write path in the app that had no limit at all, and the most
+   * consequential one to leave open: each call creates a row every reader
+   * sees, allocates a slug, and can carry an image that is processed through
+   * sharp and written to the bucket. The duplicate check that runs
+   * immediately before it was already limited, so the expensive half was
+   * guarded and the permanent half was not.
+   *
+   * Set alongside duplicateCheck, since the two are made by the same act.
+   * Someone cataloging a shelf of bodies in one sitting stays inside it.
+   */
+  catalogCreate: {
+    perUser: { limit: 30, windowMs: HOUR },
+  },
+
+  /**
    * The duplicate check behind the add-film and add-camera dialogs.
    *
    * It reads the entire film stock or camera table and scores every row

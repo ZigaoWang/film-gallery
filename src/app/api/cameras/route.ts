@@ -5,6 +5,8 @@ import { prisma } from '@/lib/db'
 import { allocateSlug } from '@/lib/seo/ensureSlug'
 import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
 import { toBodyType } from '@/lib/cameraFields'
+import { enforceLimit } from '@/lib/rateLimit'
+import { LIMITS } from '@/lib/rateLimitPolicy'
 
 export async function GET() {
   const cameras = await prisma.camera.findMany()
@@ -28,6 +30,14 @@ export async function POST(req: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const userId = (session.user as { id: string }).id
+
+  const limited = enforceLimit(
+    'catalogCreate', userId, LIMITS.catalogCreate.perUser,
+    'Too many new catalog entries in a short time. Please wait a moment.'
+  )
+  if (limited) return limited
 
   const contentLength = req.headers.get('content-length')
   if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
@@ -73,8 +83,6 @@ export async function POST(req: NextRequest) {
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
     }
-
-    const userId = (session.user as { id: string }).id
 
     // An unrecognised value becomes null rather than an error: the body type is
     // optional, and null means "not yet classified" rather than "invalid".

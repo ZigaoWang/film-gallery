@@ -16,6 +16,8 @@ import {
 } from '@/lib/filmFields'
 import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
 import { resolveBrand } from '@/lib/brands'
+import { enforceLimit } from '@/lib/rateLimit'
+import { LIMITS } from '@/lib/rateLimitPolicy'
 
 export async function GET() {
   const filmStocks = await prisma.filmStock.findMany()
@@ -39,6 +41,12 @@ export async function POST(req: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const limited = enforceLimit(
+    'catalogCreate', (session.user as { id: string }).id, LIMITS.catalogCreate.perUser,
+    'Too many new catalog entries in a short time. Please wait a moment.'
+  )
+  if (limited) return limited
 
   const contentLength = req.headers.get('content-length')
   if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
