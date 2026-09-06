@@ -145,6 +145,12 @@ jobs:
       - name: An admin edit and its provenance land together
         run: npx tsx scripts/test/revisionPipeline.test.ts
 
+      # Also needs a database, and for the same reason: what it checks is
+      # authorize() answering against real rows. It creates its own account and
+      # removes it again, so it needs no fixture.
+      - name: The credentials gate refuses what it should
+        run: npx tsx scripts/test/authGate.test.ts
+
       # The build itself runs this through postbuild. Repeated here so a change
       # that puts the database client in the browser fails the pull request
       # rather than only the deploy.
