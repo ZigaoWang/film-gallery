@@ -58,6 +58,63 @@ const ENUMS: Record<string, readonly string[]> = {
   frameFormat: ['FULL_FRAME', 'HALF_FRAME', 'PANORAMIC', 'SPROCKET_HOLE'],
 }
 
+/**
+ * Words that would appear in a passage genuinely stating each value.
+ *
+ * A citation exists so a reader can check a claim without trusting us. One
+ * whose passage never mentions the value fails at that even when the value is
+ * right: hovering "full frame" and reading a sentence about a zoom lens teaches
+ * nothing. Such a field is refused and reported, leaving the value uncited
+ * rather than wrongly cited.
+ */
+const SUPPORTING_WORDS: Record<string, readonly string[]> = {
+  COLOR: ['color', 'colour'],
+  MONOCHROME: ['black and white', 'black & white', 'monochrome', 'panchromatic', 'b&w'],
+  TUNGSTEN: ['tungsten', '3200k'],
+  DAYLIGHT: ['daylight', '5500k', 'luz día', 'luz dia'],
+  NA: ['black and white', 'monochrome', 'panchromatic'],
+  C41: ['c-41', 'c41'],
+  E6: ['e-6', 'e6'],
+  ECN2: ['ecn-2', 'ecn2'],
+  BW: ['black and white', 'black & white', 'monochrome', 'panchromatic'],
+  NEGATIVE: ['negativ'],
+  POSITIVE: ['positive', 'slide', 'reversal'],
+  DIRECT_POSITIVE: ['instant', 'diffusion transfer'],
+  SLR: ['single-lens reflex', 'single lens reflex', ' slr', 'reflex'],
+  RANGEFINDER: ['rangefinder'],
+  COMPACT: ['compact', 'point-and-shoot', 'point and shoot'],
+  TLR: ['twin-lens', 'twin lens', 'tlr'],
+  FOLDING: ['folding'],
+  VIEW: ['view camera'],
+  INSTANT: ['instant'],
+  DISPOSABLE: ['single-use', 'single use', 'disposable', 'one-time-use', 'one time use'],
+  FULL_FRAME: ['35 mm', '35mm', '24x36', '24 x 36', 'full frame', 'full-frame', '135'],
+  HALF_FRAME: ['half-frame', 'half frame'],
+  PANORAMIC: ['panoram'],
+  SPROCKET_HOLE: ['sprocket'],
+}
+
+/**
+ * Whether the passage visibly carries the value.
+ *
+ * Deliberately crude. It cannot judge meaning, so it only asks whether the
+ * words are there at all, and a claim it cannot see is reported rather than
+ * loaded. Free text and the maker's confidence are exempt: a summary is our own
+ * sentence, and no phrasing of "reported" appears in a source verbatim.
+ */
+function passageSupports(field: string, value: unknown, passage: string): boolean {
+  if (field === 'summary' || field === 'manufacturerStatus' || field === 'manufacturedBy') return true
+  const text = passage.toLowerCase()
+  if (typeof value === 'number') return text.includes(String(value))
+  const words = SUPPORTING_WORDS[String(value)]
+  if (words) return words.some(w => text.includes(w))
+  return String(value)
+    .toLowerCase()
+    .split(/[\s,]+/)
+    .filter(w => w.length > 3)
+    .some(w => text.includes(w))
+}
+
 const [, , file, ...flags] = process.argv
 const apply = flags.includes('--apply')
 
@@ -157,6 +214,7 @@ async function main() {
     const sourceUrls: Record<string, Array<{ claim: string; passage?: string; url?: string; editorial?: true }>> = {}
 
     let unresolved: string | null = null
+    const unsupported: string[] = []
     for (const [field, cited] of Object.entries(entry.fields ?? {})) {
       let column = field
       let value: unknown = cited.value
@@ -166,6 +224,11 @@ async function main() {
         if (!id) { unresolved = String(cited.value); break }
         column = 'manufacturedByBrandId'
         value = id
+      }
+
+      if (!passageSupports(field, cited.value, cited.passage ?? '')) {
+        unsupported.push(`${field} = ${cited.value}`)
+        continue
       }
 
       payload[column] = value
@@ -187,6 +250,10 @@ async function main() {
           ? { claim: p.text.slice(0, 60), editorial: true as const }
           : { claim: p.text.slice(0, 60), passage: p.passage, url: p.source }
       )
+    }
+
+    for (const u of unsupported) {
+      console.error(`  DROP  ${entry.name}: ${u} — the passage does not state it`)
     }
 
     if (Object.keys(payload).length === 0) {
