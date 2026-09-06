@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -32,6 +32,7 @@ export default function NotificationBell() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelId = useId()
 
   useEffect(() => {
     if (!session) return
@@ -139,13 +140,29 @@ export default function NotificationBell() {
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div
+      ref={ref}
+      className="relative"
+      // Tab is how you move between notifications, so this cannot close on Tab
+      // the way the account menu does. It closes once focus leaves the bell and
+      // the panel together, which otherwise left the panel sitting open over
+      // the page with the cursor already somewhere behind it, and Escape
+      // pulling focus back to a bell nobody was on.
+      onBlur={e => {
+        if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) setOpen(false)
+      }}
+    >
       <button
         ref={triggerRef}
         type="button"
         onClick={handleOpen}
-        aria-haspopup="menu"
+        // Not a menu. The panel is a scrollable list of links to photos and
+        // profiles rather than a list of commands, and aria-haspopup="menu"
+        // promised a screen reader arrow key navigation and menu items that a
+        // feed of notifications has no business implementing. aria-expanded
+        // with aria-controls describes what this actually is.
         aria-expanded={open}
+        aria-controls={panelId}
         // The badge is the only thing that distinguished this button, and a
         // screen reader was told neither that it was a bell nor that anything
         // was waiting behind it.
@@ -178,7 +195,10 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 animate-slide-down border border-neutral-800 bg-neutral-900 shadow-xl">
+        <div
+          id={panelId}
+          className="absolute right-0 top-full z-50 mt-2 w-80 animate-slide-down border border-neutral-800 bg-neutral-900 shadow-xl"
+        >
           <div className="border-b border-neutral-800 px-4 py-3">
             <h3 className="text-sm font-bold text-white">Notifications</h3>
           </div>
@@ -188,53 +208,59 @@ export default function NotificationBell() {
                 No notifications yet
               </div>
             ) : (
-            notifications.filter(n => n.actor).map(n => (
-                /*
-                  One link per row, and nothing clickable inside it.
+              // A list, and announced as one, so a reader is told how many
+              // notifications there are and where each row ends. That is the
+              // structure the menu roles were standing in for.
+              <ul>
+                {notifications.filter(n => n.actor).map(n => (
+                  /*
+                    One link per row, and nothing clickable inside it.
 
-                  The avatar and the name were spans carrying their own onClick
-                  and pushing to the actor's profile. A span is not focusable
-                  and not operable by Enter, so those two targets did not exist
-                  for anyone using a keyboard — and nesting them inside an <a>
-                  is markup a browser is free to reparent, which is how the
-                  same row ends up behaving differently in different browsers.
+                    The avatar and the name were spans carrying their own onClick
+                    and pushing to the actor's profile. A span is not focusable
+                    and not operable by Enter, so those two targets did not exist
+                    for anyone using a keyboard — and nesting them inside an <a>
+                    is markup a browser is free to reparent, which is how the
+                    same row ends up behaving differently in different browsers.
 
-                  The row goes to the thing the notification is about, which is
-                  what someone opening a notification is asking for. The actor's
-                  profile is one tap further on, from the photo or from the
-                  follow itself.
-                */
-                <Link
-                  key={n.id}
-                  href={n.photo ? `/photos/${n.photo.id}` : `/${n.actor!.username}`}
-                  onClick={() => setOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-neutral-800
-                              focus-visible:bg-neutral-800 focus-visible:outline-none
-                              ${!n.read ? 'bg-neutral-800/50' : ''}`}
-                >
-                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden bg-neutral-800 text-xs font-bold">
-                    {n.actor!.avatar ? (
-                      <Image src={n.actor!.avatar} alt="" width={32} height={32} className="h-full w-full object-cover" />
-                    ) : (
-                      (n.actor!.name || n.actor!.username).charAt(0).toUpperCase()
-                    )}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-white">
-                      <span className="font-medium">{n.actor!.name || n.actor!.username}</span>{' '}
-                      <span className="text-neutral-400">{getMessage(n)}</span>
-                    </p>
-                    <time dateTime={n.createdAt} className="text-xs text-neutral-600">
-                      {formatDate(n.createdAt)}
-                    </time>
-                  </div>
-                  {n.photo && (
-                    <div className="h-10 w-10 flex-shrink-0">
-                      <Image src={n.photo.thumbnailPath} alt="" aria-hidden width={40} height={40} className="h-full w-full object-cover" />
-                    </div>
-                  )}
-                </Link>
-              ))
+                    The row goes to the thing the notification is about, which is
+                    what someone opening a notification is asking for. The actor's
+                    profile is one tap further on, from the photo or from the
+                    follow itself.
+                  */
+                  <li key={n.id}>
+                    <Link
+                      href={n.photo ? `/photos/${n.photo.id}` : `/${n.actor!.username}`}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-neutral-800
+                                  focus-visible:bg-neutral-800 focus-visible:outline-none
+                                  ${!n.read ? 'bg-neutral-800/50' : ''}`}
+                    >
+                      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden bg-neutral-800 text-xs font-bold">
+                        {n.actor!.avatar ? (
+                          <Image src={n.actor!.avatar} alt="" width={32} height={32} className="h-full w-full object-cover" />
+                        ) : (
+                          (n.actor!.name || n.actor!.username).charAt(0).toUpperCase()
+                        )}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-white">
+                          <span className="font-medium">{n.actor!.name || n.actor!.username}</span>{' '}
+                          <span className="text-neutral-400">{getMessage(n)}</span>
+                        </p>
+                        <time dateTime={n.createdAt} className="text-xs text-neutral-600">
+                          {formatDate(n.createdAt)}
+                        </time>
+                      </div>
+                      {n.photo && (
+                        <div className="h-10 w-10 flex-shrink-0">
+                          <Image src={n.photo.thumbnailPath} alt="" aria-hidden width={40} height={40} className="h-full w-full object-cover" />
+                        </div>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
