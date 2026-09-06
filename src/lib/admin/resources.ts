@@ -304,7 +304,6 @@ export const ADMIN_RESOURCES = {
       // was the one field an admin could not correct.
       manufacturerStatus: { kind: 'enum', label: 'Maker is', options: MANUFACTURER_STATUS, help: 'KNOWN needs a source stating it outright. ATTRIBUTED is reported but unconfirmed, and is the honest answer more often.' },
       manufacturedByBrandId: { kind: 'reference', label: 'Made by', source: 'brands', help: 'Required for KNOWN and ATTRIBUTED. Must be empty for the other two.' },
-      filmType: { kind: 'text', label: 'Type', maxLength: 60 },
       // A stock can be sold in more than one gauge, so this column is a list.
       format: { kind: 'stringList', label: 'Format', help: 'Comma separated. 35mm, 120, sheet sizes.' },
       exposures: { kind: 'text', label: 'Exposures', maxLength: 40 },

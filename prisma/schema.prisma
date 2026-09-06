@@ -349,7 +349,6 @@ model FilmStock {
   /// Superseded by `chromaticity` + `polarity`, which say the same thing
   /// without collapsing two independent axes into one. Retained until the
   /// readers have moved across; do not write to it in new code.
-  filmType          String? // Color Negative (C-41), Slide/Transparency (E-6), Black & White, Instant, Specialty
   /// Colour or monochrome. Required and undefaulted: it is a claim about the
   /// film, and a default would let a future row inherit one nobody made.
   chromaticity      Chromaticity

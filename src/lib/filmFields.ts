@@ -142,10 +142,8 @@ export interface ProcessInference {
  */
 export function inferProcessFields(film: {
   name: string
-  filmType: string | null
   description: string | null
 }): ProcessInference {
-  const type = (film.filmType ?? '').toLowerCase()
   const haystack = `${film.name} ${film.description ?? ''}`.toLowerCase()
 
   const looksCine =
@@ -154,15 +152,15 @@ export function inferProcessFields(film: {
     /motion picture/.test(haystack) ||
     /\bcine(ma)?\b/.test(haystack)
 
-  if (/black\s*(&|and)?\s*white|b\s*&\s*w|monochrome/.test(type)) {
+  if (/black\s*(&|and)?\s*white|b\s*&\s*w|monochrome|panchromatic/.test(haystack)) {
     return { process: 'B&W', colorBalance: 'N/A' }
   }
 
-  if (/reversal|slide|transparency/.test(type)) {
+  if (/reversal|slide|transparency|chrome\b/.test(haystack)) {
     return { process: 'E-6', colorBalance: null, note: 'color balance needs confirming' }
   }
 
-  if (/negative/.test(type)) {
+  {
     if (looksCine) {
       return {
         process: null,
@@ -178,7 +176,6 @@ export function inferProcessFields(film: {
     }
   }
 
-  return { process: null, colorBalance: null, note: `unrecognized film type ${film.filmType ?? '(none)'}` }
 }
 
 /**
@@ -209,27 +206,37 @@ export function inferAliases(name: string): string[] {
  * COLOR for it and a human has to say otherwise.
  */
 export function defaultFilmAxes(
-  process: FilmProcess | null,
-  filmType: string | null
+  process: FilmProcess | null
 ): { chromaticity: Chromaticity; polarity: Polarity } {
-  const type = (filmType ?? '').toLowerCase()
-
-  // The submitted film type is the better signal where it exists, because it
-  // is the one field that already spoke about appearance rather than chemistry.
-  if (/black\s*(&|and)?\s*white|b\s*&\s*w|monochrome/.test(type)) {
-    return { chromaticity: 'MONOCHROME', polarity: 'NEGATIVE' }
-  }
-  if (/instant/.test(type)) {
-    return { chromaticity: 'COLOR', polarity: 'DIRECT_POSITIVE' }
-  }
-  if (/slide|reversal|transparency/.test(type)) {
-    return { chromaticity: 'COLOR', polarity: 'POSITIVE' }
-  }
-
-  // Otherwise fall back to the process, which is a weaker signal.
   if (process === 'BW') return { chromaticity: 'MONOCHROME', polarity: 'NEGATIVE' }
   if (process === 'E6') return { chromaticity: 'COLOR', polarity: 'POSITIVE' }
   return { chromaticity: 'COLOR', polarity: 'NEGATIVE' }
+}
+
+/**
+ * What a stock is, in one phrase, derived rather than stored.
+ *
+ * This replaces the free-text `filmType` column. That column held "Color
+ * Negative" beside `chromaticity` and `polarity` saying the same thing, and two
+ * places recording one fact is an invitation for them to disagree: a stock
+ * could read "Color Negative" while its axes said monochrome, and nothing would
+ * notice. Deriving it means the phrase cannot contradict the fields it is
+ * built from.
+ *
+ * Returns null when the axes are not both known, because a partial guess here
+ * would be the free-text column again.
+ */
+export function filmTypeLabel(
+  chromaticity: Chromaticity | null,
+  polarity: Polarity | null
+): string | null {
+  if (!chromaticity || !polarity) return null
+
+  if (polarity === 'DIRECT_POSITIVE') return 'Instant'
+
+  const tone = chromaticity === 'MONOCHROME' ? 'Black & white' : 'Color'
+  const kind = polarity === 'POSITIVE' ? 'slide' : 'negative'
+  return `${tone} ${kind}`
 }
 
 /** Trim, drop blanks, and de-duplicate case-insensitively, preserving order. */

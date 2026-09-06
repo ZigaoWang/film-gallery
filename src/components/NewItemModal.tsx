@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Combobox from '@/components/Combobox'
-import { FILM_TYPES, FORMATS } from '@/lib/constants'
+import { FORMATS } from '@/lib/constants'
 import { BODY_TYPES, BODY_TYPE_LABELS } from '@/lib/cameraFields'
 import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import type { NewItemPayload } from '@/lib/newItemForm'
@@ -35,7 +35,6 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
   const [year, setYear] = useState('')
 
   // Film fields
-  const [filmType, setFilmType] = useState('')
   const [iso, setIso] = useState('')
   const [manufacturer, setManufacturer] = useState('')
   const [filmProcess, setFilmProcess] = useState('')
@@ -48,7 +47,6 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
 
   // Custom "Other" values
   const [customFormat, setCustomFormat] = useState('')
-  const [customFilmType, setCustomFilmType] = useState('')
 
   const typeLabel = type === 'camera' ? 'Camera' : 'Film Stock'
 
@@ -94,7 +92,6 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
     if (!canSubmit) return
 
     const finalFormat = format === 'Other' ? customFormat : format
-    const finalFilmType = filmType === 'Other' ? customFilmType : filmType
 
     onSubmit({
       name: name.trim(),
@@ -108,7 +105,6 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
             defaultFilmStockId: defaultFilmStockId || undefined,
           }
         : {
-            filmType: finalFilmType || undefined,
             format: finalFormat || undefined,
             iso: iso || undefined,
             manufacturer: manufacturer || undefined,
@@ -354,31 +350,6 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
                         disabled={loading}
                         className={`${fieldClass}`}
                       />
-                    </div>
-                    <div>
-                      <FieldLabel>Type</FieldLabel>
-                      <select
-                        value={filmType}
-                        onChange={(e) => setFilmType(e.target.value)}
-                        disabled={loading}
-                        className={`${fieldClass}`}
-                      >
-                        <option value="">Select type…</option>
-                        {FILM_TYPES.map((t) => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                        <option value="Other">Other</option>
-                      </select>
-                      {filmType === 'Other' && (
-                        <input
-                          type="text"
-                          value={customFilmType}
-                          onChange={(e) => setCustomFilmType(e.target.value)}
-                          placeholder="e.g. Infrared"
-                          disabled={loading}
-                          className={`${fieldClass} mt-2`}
-                        />
-                      )}
                     </div>
                     <div>
                       <FieldLabel>Format</FieldLabel>

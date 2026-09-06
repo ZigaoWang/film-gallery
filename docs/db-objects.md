@@ -106,6 +106,17 @@ The second exists because a CHECK cannot contain a subquery and comparing two
 JSON key sets needs one. It is `IMMUTABLE` and reads only its arguments, which
 is what makes it legal inside a constraint.
 
+## Removed
+
+| Object | Replaced by | Removed in |
+|---|---|---|
+| `FilmStock.filmType` | `chromaticity` + `polarity`, displayed via `filmTypeLabel()` | `20260906120000` |
+
+The free-text type recorded the same fact as the two axes and nothing checked
+that they agreed, so a stock could read "Color Negative" while its axes said
+monochrome. The phrase is derived for display instead, which is what stops it
+contradicting the fields it is built from.
+
 ## Scheduled removals
 
 | Object | Replaced by | Remove after |

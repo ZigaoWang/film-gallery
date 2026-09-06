@@ -53,7 +53,6 @@ export async function POST(req: NextRequest) {
     let hasImageData = false
     let imageFile: File | null = null
     let description: string | undefined
-    let filmType: string | undefined
     // Single value from the form, stored as an array. The field is multi-valued
     // in the schema; the form stays single-select for now.
     let format: string | undefined
@@ -72,7 +71,6 @@ export async function POST(req: NextRequest) {
       iso = isoStr ? parseInt(isoStr, 10) : undefined
       imageFile = formData.get('image') as File | null
       description = (formData.get('description') as string) || undefined
-      filmType = (formData.get('filmType') as string) || undefined
       format = (formData.get('format') as string) || undefined
       manufacturer = (formData.get('manufacturer') as string) || undefined
       processValue = (formData.get('process') as string) || undefined
@@ -86,7 +84,6 @@ export async function POST(req: NextRequest) {
       name = asString(body.name) ?? ''
       brand = asString(body.brand)
       iso = asInt(body.iso)
-      filmType = asString(body.filmType)
       format = asString(body.format)
       manufacturer = asString(body.manufacturer)
       processValue = asString(body.process)
@@ -129,7 +126,7 @@ export async function POST(req: NextRequest) {
     const resolvedProcess =
       process ??
       toFilmProcess(
-        inferProcessFields({ name, filmType: filmType ?? null, description: null }).process
+        inferProcessFields({ name, description: null }).process
       )
     if (!resolvedProcess) {
       return NextResponse.json(
@@ -152,7 +149,7 @@ export async function POST(req: NextRequest) {
     // arrive with a claim about them. The form does not ask yet, so this
     // proposes a starting point from what it does collect — see
     // defaultFilmAxes, which is explicitly a default and not an answer.
-    const axes = defaultFilmAxes(resolvedProcess, filmType ?? null)
+    const axes = defaultFilmAxes(resolvedProcess)
 
     // The form collects one name and calls it the manufacturer. That name is
     // what appears on the box, so it is the brand.
@@ -176,7 +173,6 @@ export async function POST(req: NextRequest) {
         manufacturerStatus: 'UNKNOWN',
         slug: await allocateSlug('filmstock', name, brand),
         iso,
-        filmType,
         chromaticity: axes.chromaticity,
         polarity: axes.polarity,
         exposures,

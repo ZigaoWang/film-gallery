@@ -16,7 +16,7 @@ import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld
 import { displayName, gearImageAlt } from '@/lib/seo/alt'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
-import { colorBalanceLabel, filmFormatLabel, filmProcessLabel } from '@/lib/filmFields'
+import { colorBalanceLabel, filmFormatLabel, filmProcessLabel, filmTypeLabel } from '@/lib/filmFields'
 import { usefulAliases } from '@/lib/filmSearch'
 import type { FilmProcess } from '@prisma/client'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     ? `${filmStock.summary} ${photoCount} sample ${photoCount === 1 ? 'photograph' : 'photographs'} from the AvoidXray community.`
     : `${name} sample photos: ${photoCount} real film ${photoCount === 1 ? 'photograph' : 'photographs'} ` +
       `shot on ${name} by the AvoidXray community. See how this ${
-        filmStock.filmType?.toLowerCase() ?? 'film'
+        filmTypeLabel(filmStock.chromaticity, filmStock.polarity)?.toLowerCase() ?? 'film'
       } stock renders color, grain, and contrast before you buy a roll.`
 
   const canonical = `${SITE_URL}/films/${filmStock.slug ?? filmStock.id}`
@@ -247,14 +247,16 @@ export default async function FilmDetailPage({ params }: Params) {
   //  - A bare "N/A" told the reader nothing. Color balance is not applicable
   //    to black and white, and the absence of the chip says that better than
   //    the words do.
-  //  - "B&W" (process) next to "Black & White" (the older free-text type) said
-  //    the same thing twice, so the type is dropped when the process already
-  //    covers it.
+  //  - "B&W" (process) next to "Black & white negative" (the type) said the
+  //    same thing twice, so the type is dropped when the process covers it.
   //  - Values that are not self-describing carry their label; "C-41", "35mm"
   //    and "ISO 400" do not need one.
+  //
+  // The type is derived from chromaticity and polarity rather than stored, so
+  // it cannot contradict the two fields it is built from.
+  const typeLabel = filmTypeLabel(filmStock.chromaticity, filmStock.polarity)
   const typeIsRedundant =
-    !filmStock.filmType ||
-    (processLabel === 'B&W' && /black\s*&?\s*(and)?\s*white/i.test(filmStock.filmType))
+    !typeLabel || (processLabel === 'B&W' && /black\s*&\s*white/i.test(typeLabel))
 
   const specs = [
     processLabel && { label: 'Process', value: processLabel, showLabel: false },
@@ -269,7 +271,7 @@ export default async function FilmDetailPage({ params }: Params) {
           sourceUrl: sourceFor.get('colorBalance') ?? null,
         }
       : null,
-    !typeIsRedundant && { label: 'Type', value: filmStock.filmType!, showLabel: false },
+    !typeIsRedundant && { label: 'Type', value: typeLabel!, showLabel: false },
     filmStock.format.length > 0 && {
       label: 'Format',
       value: filmStock.format.join(', '),
@@ -461,7 +463,7 @@ export default async function FilmDetailPage({ params }: Params) {
 
                 <div className="space-y-3 text-sm leading-relaxed text-neutral-400">
                   {(displayDescription ||
-                    `${name} is a ${filmStock.filmType?.toLowerCase() ?? 'film'} stock${
+                    `${name} is a ${typeLabel?.toLowerCase() ?? 'film'} stock${
                       filmStock.iso ? ` rated at ISO ${filmStock.iso}` : ''
                     }${
                       // format became an array, and an empty one is still
@@ -496,7 +498,6 @@ export default async function FilmDetailPage({ params }: Params) {
                   brand={filmStock.brand}
                   currentImage={displayImage}
                   currentDescription={displayDescription}
-                  filmType={filmStock.filmType}
                   format={filmStock.format[0] ?? null}
                   iso={filmStock.iso}
                   exposures={filmStock.exposures}

@@ -44,7 +44,6 @@ const { POST, DELETE } = createImageRouteHandler<FilmStock>({
     // Editable here now; correcting a misspelt stock previously meant asking an
     // administrator to open the database.
     'name',
-    'filmType',
     'format',
     'process',
     'colorBalance',

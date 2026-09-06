@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import { FILM_TYPES, FORMATS } from '@/lib/constants'
+import { FORMATS } from '@/lib/constants'
 import { BODY_TYPES, BODY_TYPE_LABELS } from '@/lib/cameraFields'
 import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import { useRouter } from 'next/navigation'
@@ -22,15 +22,13 @@ import type { FilmStockOption } from '@/lib/filmSearch'
  * one. Asking for all three made the form demand two answers it already had —
  * pick B&W and it still wanted "Black & White" and "Not applicable (B&W)".
  *
- * These are the same mappings inferProcessFields uses when it derives the
- * fields from existing data, so a stock filled in by hand and one filled in by
- * the backfill agree.
+ * Only black and white implies a colour balance, and it implies the absence of
+ * one. The old free-text type this also carried is gone: the page derives that
+ * phrase from chromaticity and polarity rather than storing a third spelling of
+ * the same fact.
  */
-const PROCESS_IMPLIES: Record<string, { filmType: string; colorBalance?: string }> = {
-  'B&W': { filmType: 'Black & White', colorBalance: 'N/A' },
-  'C-41': { filmType: 'Color Negative' },
-  'ECN-2': { filmType: 'Color Negative' },
-  'E-6': { filmType: 'Slide' },
+const PROCESS_IMPLIES: Record<string, { colorBalance?: string }> = {
+  'B&W': { colorBalance: 'N/A' },
 }
 
 /**
@@ -67,7 +65,6 @@ type SuggestEditModalProps = {
   year?: number | null
   defaultFilmStockId?: string | null
   // Film props
-  filmType?: string | null
   iso?: number | null
   exposures?: string | null
   process?: string | null
@@ -88,7 +85,6 @@ export default function SuggestEditModal({
   format: initialFormat,
   year: initialYear,
   defaultFilmStockId: initialDefaultFilmStockId,
-  filmType: initialFilmType,
   iso: initialIso,
   exposures: initialExposures,
   process: initialProcess,
@@ -117,7 +113,6 @@ export default function SuggestEditModal({
   const [filmStocks, setFilmStocks] = useState<FilmStockOption[]>([])
 
   // Film fields
-  const [filmType, setFilmType] = useState(initialFilmType || '')
   const [iso, setIso] = useState(initialIso?.toString() || '')
   const [exposures, setExposures] = useState(initialExposures || '')
   const [filmProcess, setFilmProcess] = useState(initialProcess || '')
@@ -127,7 +122,6 @@ export default function SuggestEditModal({
 
   // Custom "Other" values
   const [customFormat, setCustomFormat] = useState('')
-  const [customFilmType, setCustomFilmType] = useState('')
 
   const isDisposable = cameraType === 'DISPOSABLE' || initialCameraType === 'DISPOSABLE'
 
@@ -147,7 +141,6 @@ export default function SuggestEditModal({
     setFilmProcess(value)
     const next = PROCESS_IMPLIES[value]
     if (!next) return
-    setFilmType(next.filmType)
     if (next.colorBalance) setColorBalance(next.colorBalance)
     else if (colorBalance === 'N/A') setColorBalance('')
   }
@@ -207,7 +200,7 @@ export default function SuggestEditModal({
     const nameChanged = trimmedName !== name || (type === 'camera' && trimmedBrand !== (brand || ''))
     const hasCategorizationChanges = type === 'camera'
       ? (cameraType || format || year || defaultFilmStockId || aliases)
-      : (filmType || format || iso || exposures || filmProcess || colorBalance || manufacturer || aliases)
+      : (format || iso || exposures || filmProcess || colorBalance || manufacturer || aliases)
 
     if (!imageFile && !descriptionChanged && !nameChanged && !hasCategorizationChanges) {
       toast('Please make some changes to submit', 'error')
@@ -228,10 +221,6 @@ export default function SuggestEditModal({
         return
       }
     } else {
-      if (filmType === 'Other' && !customFilmType.trim()) {
-        toast('Please specify the custom film type', 'error')
-        return
-      }
       if (format === 'Other' && !customFormat.trim()) {
         toast('Please specify the custom format', 'error')
         return
@@ -267,10 +256,8 @@ export default function SuggestEditModal({
         if (aliases.trim()) formData.append('aliases', aliases.trim())
         if (defaultFilmStockId) formData.append('defaultFilmStockId', defaultFilmStockId)
       } else {
-        const finalFilmType = filmType === 'Other' ? customFilmType : filmType
         const finalFormat = format === 'Other' ? customFormat : format
 
-        if (finalFilmType) formData.append('filmType', finalFilmType)
         if (finalFormat) formData.append('format', finalFormat)
         if (iso) formData.append('iso', iso)
         if (exposures.trim()) formData.append('exposures', exposures.trim())
@@ -607,40 +594,6 @@ export default function SuggestEditModal({
                       Alternate names and product codes, separated by commas
                     </p>
                   </div>
-                  {/* The type follows from the process for every process that
-                      names one, so it is only a question for "Other". */}
-                  {implied ? (
-                    <DerivedField
-                      label="Type"
-                      value={implied.filmType}
-                      from={`Follows from a ${filmProcess} process.`}
-                    />
-                  ) : (
-                    <div>
-                      <FieldLabel>Type</FieldLabel>
-                      <select
-                        value={filmType}
-                        onChange={(e) => setFilmType(e.target.value)}
-                        className={`${fieldClass}`}
-                      >
-                        <option value="">Select type…</option>
-                        {FILM_TYPES.map((t) => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                        <option value="Other">Other</option>
-                      </select>
-                      {filmType === 'Other' && (
-                        <input
-                          type="text"
-                          value={customFilmType}
-                          onChange={(e) => setCustomFilmType(e.target.value)}
-                          placeholder="e.g. Infrared"
-                          className={`${fieldClass} mt-2`}
-                        />
-                      )}
-                    </div>
-                  )}
-
                   <div>
                     <FieldLabel>Format</FieldLabel>
                     <select

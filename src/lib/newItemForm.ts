@@ -20,7 +20,6 @@ export interface NewItemPayload {
   defaultFilmStockId?: string
 
   // Film stock
-  filmType?: string
   iso?: string
   manufacturer?: string
   process?: string
@@ -37,7 +36,7 @@ export interface NewItemPayload {
 /** Fields sent for each kind, so neither can leak the other's. */
 const FIELDS = {
   camera: ['cameraType', 'format', 'year', 'defaultFilmStockId'],
-  film: ['filmType', 'format', 'iso', 'exposures', 'manufacturer', 'process', 'colorBalance', 'aliases'],
+  film: ['format', 'iso', 'exposures', 'manufacturer', 'process', 'colorBalance', 'aliases'],
 } as const satisfies Record<'camera' | 'film', readonly (keyof NewItemPayload)[]>
 
 export function buildNewItemFormData(

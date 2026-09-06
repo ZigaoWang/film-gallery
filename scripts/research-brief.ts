@@ -56,7 +56,6 @@ async function main() {
     ['chromaticity', f => f.chromaticity],
     ['polarity', f => f.polarity],
     ['colorBalance', f => f.colorBalance],
-    ['filmType', f => f.filmType],
     ['format', f => f.format],
     ['exposures', f => f.exposures],
     ['aliases', f => f.aliases],

@@ -16,7 +16,6 @@ type SuggestEditButtonProps = {
   format?: string | null
   year?: number | null
   defaultFilmStockId?: string | null
-  filmType?: string | null
   iso?: number | null
   exposures?: string | null
   process?: string | null
@@ -28,7 +27,7 @@ type SuggestEditButtonProps = {
 
 export default function SuggestEditButton({
   type, id, name, brand, currentImage, currentDescription,
-  cameraType, format, year, defaultFilmStockId, filmType, iso, exposures, noDescription,
+  cameraType, format, year, defaultFilmStockId, iso, exposures, noDescription,
   process, colorBalance, manufacturer, aliases
 }: SuggestEditButtonProps) {
   const [showModal, setShowModal] = useState(false)
@@ -56,7 +55,7 @@ export default function SuggestEditButton({
           currentImage={currentImage} currentDescription={currentDescription}
           cameraType={cameraType} format={format} year={year}
           defaultFilmStockId={defaultFilmStockId}
-          filmType={filmType} iso={iso} exposures={exposures}
+          iso={iso} exposures={exposures}
           process={process} colorBalance={colorBalance}
           manufacturer={manufacturer} aliases={aliases}
           onClose={() => setShowModal(false)}

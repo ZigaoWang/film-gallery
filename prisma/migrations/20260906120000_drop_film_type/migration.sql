@@ -1,0 +1,22 @@
+-- Drops the free-text film type.
+--
+-- The column held "Color Negative" beside chromaticity=COLOR and
+-- polarity=NEGATIVE, which is the same fact written twice. Two places recording
+-- one thing is an invitation for them to disagree, and nothing checked: a stock
+-- could read "Color Negative" while its axes said monochrome and no constraint,
+-- test or page would have noticed.
+--
+-- The axes replaced it deliberately. Ilford XP2 Super is a black and white film
+-- developed in C-41, and the single free-text type could not say that without
+-- either lying about the chemistry or lying about the appearance. That case is
+-- the reason chromaticity and polarity exist.
+--
+-- The phrase itself is not lost. It is derived for display by filmTypeLabel()
+-- from the two axes, so a page can still show "Black & white negative" as one
+-- string, and that string can no longer contradict the fields under it.
+--
+-- Contract step. Every writer stopped writing this column first: the create
+-- route, the suggest-edit form, the new-item form, the admin allowlist and the
+-- research loader.
+
+ALTER TABLE "FilmStock" DROP COLUMN "filmType";

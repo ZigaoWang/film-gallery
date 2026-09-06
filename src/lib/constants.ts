@@ -1,10 +1,3 @@
-export const FILM_TYPES = [
-  'Color Negative',
-  'Black & White',
-  'Slide',
-  'Instant',
-] as const
-
 export const FORMATS = [
   '35mm',
   '120',

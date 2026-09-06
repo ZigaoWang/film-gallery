@@ -59,7 +59,6 @@ interface FilmRow {
   slug: string | null
   brand: string | null
   manufacturer: string | null
-  filmType: string | null
   description: string | null
   process: string | null
   colorBalance: string | null
@@ -69,7 +68,7 @@ interface FilmRow {
 
 async function main() {
   const films = await prisma.$queryRaw<FilmRow[]>`
-    SELECT id, name, slug, brand, manufacturer, "filmType", description,
+    SELECT id, name, slug, brand, manufacturer, description,
            process::text AS process, "colorBalance"::text AS "colorBalance", aliases, format
     FROM "FilmStock"
     ORDER BY name ASC
