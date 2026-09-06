@@ -45,6 +45,23 @@ export default function PhotoActions({
     if (!albumId || busy) return
     setBusy(true)
     try {
+      // The album comes from the query string and nothing on the way in checks
+      // that this photo is in it. The PATCH deletes by id and answers with the
+      // album either way, so its response cannot tell a removal from a no-op:
+      // the photo is absent from the returned list in both cases. Sent blind, a
+      // stale or hand-edited albumId was answered with "Removed from the album"
+      // for a removal that never happened, so membership is read first.
+      const albumRes = await fetch(`/api/albums/${albumId}`)
+      if (!albumRes.ok) {
+        toast(await apiErrorMessage(albumRes, 'Could not remove it from the album'), 'error')
+        return
+      }
+      const album = (await albumRes.json()) as { photos?: { photoId?: string }[] }
+      if (!Array.isArray(album.photos) || !album.photos.some(entry => entry.photoId === photoId)) {
+        toast('This photo is not in that album', 'info')
+        return
+      }
+
       const res = await fetch(`/api/albums/${albumId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -56,6 +73,10 @@ export default function PhotoActions({
       }
       toast('Removed from the album. The photo is still yours.', 'success')
       router.push(`/albums/${albumId}`)
+    } catch {
+      // Two requests now, and a failure in either left the menu silently
+      // un-busy with nothing said, the same way a failed delete used to.
+      toast('Could not reach the server', 'error')
     } finally {
       setBusy(false)
     }
