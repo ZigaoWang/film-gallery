@@ -70,11 +70,19 @@ check('falls back to the first sentence',
   'This is a deliberately long opening sentence about a camera, written so that the whole line runs past ' +
   'the two hundred characters the summary column allows and cannot be used as it stands.')
 
-// No sentence break at all, so it has to be cut, and still fit the column.
+// No sentence break at all. Cutting it would leave a fragment, so there is no
+// summary to be had from this and the column stays empty.
 const noBreak = 'word '.repeat(80).trim()
-const cut = summaryFromDescription(noBreak)
-check('an unbroken line is cut to fit', (cut?.length ?? 0) <= SUMMARY_MAX, true)
-check('and is cut at a word boundary', cut?.endsWith('word'), true)
+check('an unbroken over-long line yields nothing', summaryFromDescription(noBreak), null)
+
+// The real case that ruled out truncation: a long first line whose sentence
+// also runs past the limit.
+const runOn =
+  'The Kodak ColorPlus 200 is an ultra-affordable, versatile color negative film (C-41 process) with an ' +
+  "ISO 200 speed, serving as one of Kodak's most budget-friendly consumer-grade options alongside its " +
+  'other stocks and remaining widely available today.'
+check('a run-on first sentence yields nothing rather than a fragment',
+  summaryFromDescription(runOn), null)
 
 // An abbreviation must not be mistaken for the end of a sentence.
 const abbrev =

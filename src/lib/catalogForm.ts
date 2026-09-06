@@ -73,10 +73,10 @@ export function resolvedFormat(draft: CatalogDraft): string {
  * one from.
  *
  * The first line, because that is where the identifying sentence goes and it is
- * what people already write. If the line is too long to be a summary the first
- * sentence is tried instead, and failing that it is cut at a word boundary.
- * Under twenty characters is not a summary and the database refuses it, so that
- * answers null and the field stays empty rather than holding a fragment.
+ * what people already write. If the line is too long to be a summary, its first
+ * sentence is tried instead. Anything else answers null: under twenty
+ * characters the database refuses it, and a fragment cut to fit is worse than
+ * an empty field.
  */
 export function summaryFromDescription(description: string | null | undefined): string | null {
   const text = (description ?? '').replace(/\r\n/g, '\n').trim()
@@ -91,12 +91,14 @@ export function summaryFromDescription(description: string | null | undefined): 
     // does not end anything.
     const sentence = /^(.+?[.!?])(\s+[A-Z(]|$)/.exec(firstLine)?.[1]?.trim()
     if (sentence && sentence.length >= SUMMARY_MIN && sentence.length <= SUMMARY_MAX) return sentence
-
-    const cut = firstLine.slice(0, SUMMARY_MAX)
-    const atWord = cut.slice(0, cut.lastIndexOf(' ')).trim()
-    return atWord.length >= SUMMARY_MIN ? atWord : cut.trim()
   }
 
+  // Nothing usable. Cutting the line at the last word that fits was the other
+  // option, and running it over the catalog is what ruled it out: it produced
+  // "one of Kodak's most budget-friendly consumer-grade options alongside" and
+  // stopped there. A sentence that ends mid-clause is read as the entry being
+  // broken, and it would sit above the full text that says the same thing
+  // properly. The field stays empty until somebody writes one.
   return null
 }
 
