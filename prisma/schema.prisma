@@ -98,6 +98,7 @@ model Photo {
   likes         Like[]
   comments      Comment[]
   collections   CollectionPhoto[]
+  notifications Notification[]
 
   @@index([userId])
   @@index([published])
@@ -721,7 +722,14 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   actorId   String
+  /// The photo this is about, for a like or a comment.
+  ///
+  /// A relation rather than a bare id, so the database removes the row when
+  /// the photo goes. Nothing did before: a like on a photo that was later
+  /// deleted left a notification behind forever, pointing at a page that
+  /// answers 404, and only a person clicking one ever found out.
   photoId   String?
+  photo     Photo?   @relation(fields: [photoId], references: [id], onDelete: Cascade)
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
