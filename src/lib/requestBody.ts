@@ -56,6 +56,17 @@ export function asInt(value: unknown): number | undefined {
   return Number.isNaN(parsed) ? undefined : parsed
 }
 
+/**
+ * A nested object field, or undefined when absent or some other type.
+ *
+ * An array is also an object and spreads into numeric keys, so it has to be
+ * excluded explicitly, the same way `readJsonObject` excludes it for the body.
+ */
+export function asObject(value: unknown): Record<string, unknown> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
+  return value as Record<string, unknown>
+}
+
 /** A boolean field, or undefined when absent or some other type. */
 export function asBoolean(value: unknown): boolean | undefined {
   return typeof value === 'boolean' ? value : undefined

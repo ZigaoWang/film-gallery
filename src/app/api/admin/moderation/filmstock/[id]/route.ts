@@ -5,7 +5,8 @@ import { prisma } from '@/lib/db'
 import { Prisma } from '@prisma/client'
 import { deleteFromOSS } from '@/lib/oss'
 import { extractKeyFromUrl } from '@/lib/ossUtils'
-import { readJsonObject, invalidBody, asString } from '@/lib/requestBody'
+import { readJsonObject, invalidBody, asString, asObject } from '@/lib/requestBody'
+import { coerceEditableFields } from '@/lib/admin/resources'
 import { reslugIfRenamed } from '@/lib/seo/rename'
 
 export async function POST(
@@ -55,22 +56,21 @@ export async function POST(
     }
 
     if (action === 'approve') {
-      // Merge editedData with proposedData (editedData takes priority)
-      // proposedData is a JSON column, but the suggest-edit handler only ever
-      // writes the resource's allowlisted fields into it, so the keys here are
-      // bounded. editedData is the reviewing admin's own overrides.
-      const finalData: Record<string, unknown> = {
+      // The proposal, with the reviewing admin's overrides on top. Both are
+      // then put through the resource allowlist: proposedData is written by
+      // the suggest-edit handler and is bounded, but editedData comes off the
+      // request and is not, and it used to reach Prisma unread.
+      const merged: Record<string, unknown> = {
         ...(submission.proposedData as Prisma.JsonObject),
-        ...(editedData || {})
+        ...(asObject(editedData) ?? {})
       }
 
-      // Convert ISO to number if it exists
-      if (finalData.iso !== undefined && finalData.iso !== null) {
-        const iso = parseInt(String(finalData.iso), 10)
-        finalData.iso = Number.isNaN(iso) ? null : iso
+      const coerced = coerceEditableFields('films', merged)
+      if ('error' in coerced) {
+        return NextResponse.json({ error: coerced.error }, { status: 400 })
       }
+      const finalData = coerced.data
 
-      // Apply changes to filmstock
       // Cast once, here: finalData is assembled from JSON and cannot be
       // expressed as the generated update input without losing the merge.
       const updateData = {

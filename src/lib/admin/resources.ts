@@ -401,6 +401,45 @@ export const RESOURCE_ORDER: readonly ResourceName[] = [
 ]
 
 /**
+ * Reduces a submitted object to the fields a resource permits, coercing each.
+ *
+ * The editable allowlist is only a boundary if every write goes through it.
+ * The moderation queue did not: it merged the reviewer's overrides into the
+ * proposal and handed the result straight to Prisma, so an approve could write
+ * any column on the record.
+ *
+ * A field the resource does not list is named back rather than dropped. An
+ * approval that reports success over fields it silently discarded is a failure
+ * this codebase has already had once, and the reviewer is the one person who
+ * can still do something about it.
+ */
+export function coerceEditableFields(
+  resource: ResourceName,
+  submitted: Record<string, unknown>
+): { data: Record<string, unknown> } | { error: string } {
+  const spec: ResourceSpec = ADMIN_RESOURCES[resource]
+  const data: Record<string, unknown> = {}
+  const refused: string[] = []
+
+  for (const [field, value] of Object.entries(submitted)) {
+    const fieldSpec = spec.editable[field]
+    if (!fieldSpec) {
+      refused.push(field)
+      continue
+    }
+    const result = coerceField(fieldSpec, value)
+    if ('error' in result) return { error: result.error }
+    data[field] = result.value
+  }
+
+  if (refused.length > 0) {
+    return { error: `Not an editable field on this record: ${refused.join(', ')}` }
+  }
+
+  return { data }
+}
+
+/**
  * Turns one submitted value into something the column accepts, or reports why
  * it cannot. Returning a message rather than throwing keeps the failure
  * attached to the field the admin actually typed in.
