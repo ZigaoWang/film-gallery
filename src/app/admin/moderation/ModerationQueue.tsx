@@ -5,6 +5,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import ModerationDetailModal from './ModerationDetailModal'
 import { useToast } from '@/components/ui/Toast'
+import Button from '@/components/ui/Button'
+import EmptyState from '@/components/ui/EmptyState'
+import { Bar } from '@/components/ui/Skeleton'
+import { apiErrorMessage } from '@/lib/apiError'
 import { formatDate } from '@/lib/formatDate'
 
 type Submission = {
@@ -80,13 +84,16 @@ export default function ModerationQueue() {
     try {
       const res = await fetch('/api/admin/moderation')
       if (!res.ok) {
-        throw new Error(`Failed to fetch: ${res.status}`)
+        // The route names what went wrong, such as an expired session or a
+        // rate limit, and none of that survived being shown as a status code.
+        setError(await apiErrorMessage(res, 'Could not load the queue'))
+        return
       }
       const result = await res.json()
       setData(result)
     } catch (err) {
       console.error('Failed to load pending items:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load pending items')
+      setError('Could not reach the server')
     } finally {
       setLoading(false)
     }
@@ -176,37 +183,66 @@ export default function ModerationQueue() {
     submittedAt: filmStock.imageUploadedAt || new Date().toISOString()
   })
 
+  /**
+   * The queue's own shape while it loads: a section heading over the rows
+   * that replace it.
+   *
+   * Only one section is drawn even though the queue has two. How many are
+   * coming is not known until the response lands, and reserving both pushed
+   * the first real heading down by the height of a section that is not there
+   * whenever only cameras are waiting.
+   */
   if (loading) {
     return (
-      <div className="text-center py-10">
-        <div className="text-neutral-500">Loading pending items…</div>
+      <div aria-busy="true">
+        <span className="sr-only" role="status">
+          Loading
+        </span>
+        {/* h-7 is the line height of the text-lg section heading. */}
+        <Bar className="mb-4 h-7 w-44" />
+        <div className="space-y-3">
+          {[0, 1, 2].map(i => (
+            // The border and the padding are the row's, but its neutral-900
+            // fill is left off: a placeholder bar is that same colour, so a
+            // filled row swallows every bar in it.
+            <div key={i} className="flex items-center gap-4 border border-neutral-800 p-4">
+              <Bar className="h-20 w-20 flex-shrink-0" delay={i * 160} />
+              <div className="min-w-0 flex-1">
+                {/* h-6 is the name, then the brand line and the row of counts
+                    and dates below it, both text-sm. */}
+                <Bar className="h-6 w-56 max-w-full" delay={i * 160} />
+                <Bar className="mt-1 h-5 w-24" delay={i * 160 + 80} />
+                <Bar className="mt-2 h-5 w-64 max-w-full" delay={i * 160 + 160} />
+              </div>
+              {/* h-9 is px-4 py-2 around the text-sm View Details button. */}
+              <Bar className="h-9 w-28 flex-shrink-0" delay={i * 160} />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="bg-neutral-900 p-6 text-center">
-        <div className="text-red-400 mb-4">{error}</div>
-        <button
+      <div className="bg-neutral-900 border border-neutral-800 p-6 text-center">
+        <div className="text-[#ff8a80] mb-4">{error}</div>
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => {
             setLoading(true)
             fetchPendingItems()
           }}
-          className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-sm"
         >
-          Try Again
-        </button>
+          Try again
+        </Button>
       </div>
     )
   }
 
   if (!data || data.total === 0) {
-    return (
-      <div className="bg-neutral-900 p-6 text-center">
-        <div className="text-neutral-500">No pending items to review</div>
-      </div>
-    )
+    return <EmptyState message="Every community edit has been reviewed." />
   }
 
   return (
