@@ -11,8 +11,14 @@ const VALID_TARGETS = new Set(['camera', 'filmstock'])
 
 async function userHasShotWith(userId: string, targetType: string, targetId: string): Promise<boolean> {
   if (targetType === 'camera') {
-    // Camera has @@unique([name, userId]) — each user has own row for same physical camera.
-    // Match by name+brand across all Camera rows so photos linked to any variant count.
+    // Matched by name and brand rather than by id alone.
+    //
+    // The reason has changed since this was written. Cameras used to be one row
+    // per user, and the comment here still described that model long after it
+    // was replaced by shared catalog rows. What keeps the lookup is that
+    // Camera.name carries no unique constraint, so two rows for one body can
+    // exist until somebody merges them, and a note is about the camera rather
+    // than about whichever of those rows a photo happens to point at.
     const target = await prisma.camera.findUnique({
       where: { id: targetId },
       select: { name: true, brand: true },
