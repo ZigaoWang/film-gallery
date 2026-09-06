@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { useToast } from './ui/Toast'
 import { apiErrorMessage } from '@/lib/apiError'
 import Button from '@/components/ui/Button'
 
 export default function FollowButton({ username, initialFollowing }: { username: string; initialFollowing: boolean }) {
   const { data: session } = useSession()
+  const router = useRouter()
   const [following, setFollowing] = useState(initialFollowing)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -34,6 +36,10 @@ export default function FollowButton({ username, initialFollowing }: { username:
         const data = await res.json()
         setFollowing(data.following)
         toast(data.following ? `Following @${username}` : `Unfollowed @${username}`, 'success')
+        // The follower count beside this button is rendered on the server, so
+        // only the button changed: the profile went on claiming the number
+        // from before the follow until the page was reloaded.
+        router.refresh()
       } else {
         toast(await apiErrorMessage(res, 'Could not update follow status'), 'error')
       }
