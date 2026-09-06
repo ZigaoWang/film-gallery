@@ -56,6 +56,14 @@ model User {
   verifiedFields          FieldProvenance[]
   revisionsSubmitted      Revision[]      @relation("revisionsSubmitted")
   revisionsReviewed       Revision[]      @relation("revisionsReviewed")
+
+  /// Both tokens are looked up by value, from endpoints that are open to
+  /// anyone holding a link. Unindexed, every click on a verification or reset
+  /// link was a sequential scan of the whole table, and so was every attempt
+  /// at one, which made the cheapest way to load the database a loop against
+  /// an endpoint no session is needed to reach.
+  @@index([verificationToken])
+  @@index([resetToken])
 }
 
 model Photo {
@@ -720,6 +728,11 @@ model Notification {
   @@index([userId])
   @@index([userId, read])
   @@index([createdAt])
+  /// The actor has no foreign key, so nothing indexed it, and it is what
+  /// deleting an account filters on to clear the notifications that account
+  /// caused. This table gains a row per like, comment and follow, so that
+  /// delete was a scan of the largest table in the schema.
+  @@index([actorId])
 }
 
 model Collection {
