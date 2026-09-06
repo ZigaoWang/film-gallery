@@ -42,6 +42,27 @@ const FETCH_AHEAD_MARGIN = '1000px'
 /** No-op subscription: the hydration snapshot never changes after mount. */
 const subscribeNever = () => () => {}
 
+/**
+ * Parses a value the grid saved for the current path, or `undefined` when there
+ * is nothing usable there.
+ *
+ * Stored state is not guaranteed to be well formed. A write that hits the
+ * storage quota can leave a truncated string behind, and a key written by an
+ * older deploy outlives the shape it was written for. Parsing that threw, and
+ * because the parse happens inside a state initializer the throw landed during
+ * render and took the whole grid down. Callers check the shape of what comes
+ * back and fall through to loading the feed normally.
+ */
+function readSavedState(key: string): unknown {
+  const saved = sessionStorage.getItem(key + window.location.pathname)
+  if (saved === null) return undefined
+  try {
+    return JSON.parse(saved)
+  } catch {
+    return undefined
+  }
+}
+
 interface Photo {
   id: string
   thumbnailPath: string
@@ -139,8 +160,8 @@ export default function MasonryGrid({
 
   const [photos, setPhotos] = useState<Photo[]>(() => {
     if (typeof window !== 'undefined' && initialPhotos !== undefined && savedFeedMatches()) {
-      const saved = sessionStorage.getItem('masonry-photos-' + window.location.pathname)
-      if (saved) return JSON.parse(saved)
+      const saved = readSavedState('masonry-photos-')
+      if (Array.isArray(saved)) return saved
     }
     // Starting empty when the server's page is for a different scope. Showing
     // it would be showing photos that do not match the filter on screen.
@@ -149,8 +170,10 @@ export default function MasonryGrid({
   })
   const [offset, setOffset] = useState<number | null>(() => {
     if (typeof window !== 'undefined' && initialPhotos !== undefined && savedFeedMatches()) {
-      const saved = sessionStorage.getItem('masonry-offset-' + window.location.pathname)
-      if (saved) return JSON.parse(saved)
+      // A stored `null` is meaningful here: it is the feed reporting that it had
+      // reached the end, so it is restored rather than treated as missing.
+      const saved = readSavedState('masonry-offset-')
+      if (typeof saved === 'number' || saved === null) return saved
     }
     if (initialPhotos !== undefined && !serverPageMatchesScope) return 0
     return initialOffset ?? null
