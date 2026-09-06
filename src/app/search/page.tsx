@@ -145,18 +145,26 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Search Results</h1>
         <p className="text-neutral-500 mb-8">Results for &ldquo;{q}&rdquo;</p>
 
-        {/* Tabs */}
-        <div className="flex gap-4 border-b border-neutral-800 mb-8 overflow-x-auto">
+        {/* aria-current, and a transparent border on the inactive tabs, as on
+            Explore. Nothing carried which result type you were on except a red
+            underline, and only the active tab had a border, so the labels
+            shifted by 2px whenever the selection moved. */}
+        <nav aria-label="Result types" className="flex gap-4 border-b border-neutral-800 mb-8 overflow-x-auto">
           {tabs.map(tab => (
             <Link
               key={tab.id}
               href={`/search?q=${encodeURIComponent(q)}&type=${tab.id}`}
-              className={`py-3 text-sm font-medium transition-colors whitespace-nowrap ${type === tab.id ? 'text-white border-b-2 border-[#D32F2F]' : 'text-neutral-500 hover:text-white'}`}
+              aria-current={type === tab.id ? 'page' : undefined}
+              className={`py-3 text-sm font-medium transition-colors whitespace-nowrap border-b-2 ${
+                type === tab.id
+                  ? 'text-white border-[#D32F2F]'
+                  : 'text-neutral-500 hover:text-white border-transparent'
+              }`}
             >
               {tab.label}
             </Link>
           ))}
-        </div>
+        </nav>
 
         {/* Photos */}
         {(type === 'all' || type === 'photos') && photos.length > 0 && (
