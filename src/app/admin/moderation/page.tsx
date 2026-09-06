@@ -1,17 +1,10 @@
 import { prisma } from '@/lib/db'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { isAdminSession } from '@/lib/admin/auth'
 import ModerationQueue from './ModerationQueue'
 
 export default async function ModerationPage() {
-  const session = await getServerSession(authOptions)
-  const userId = (session?.user as { id?: string } | undefined)?.id
-
-  if (!userId) redirect('/login')
-
-  const user = await prisma.user.findUnique({ where: { id: userId } })
-  if (!user?.isAdmin) redirect('/')
+  if (!(await isAdminSession())) redirect('/')
 
   // Get counts from ModerationSubmission table
   const pendingCount = await Promise.all([
