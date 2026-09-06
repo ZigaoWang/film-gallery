@@ -131,6 +131,19 @@ function UploadPageContent() {
   // Why a given file failed, so the tile can explain itself rather than just
   // showing a red cross.
   const [uploadErrors, setUploadErrors] = useState<(string | null)[]>([])
+  /**
+   * Why a photo failed to *publish*, which is not the same as failing to
+   * upload and must not be stored in the same place.
+   *
+   * Folding publish failures into uploadStatus marked the failed tiles 'error',
+   * and the next attempt selected photos by `uploadStatus[i] === 'done'` — so
+   * pressing "Try publishing again" re-sent exactly the photos that had already
+   * published, found nothing wrong, reported success and navigated away. The
+   * photos that actually failed were left unpublished, and the cleanup job
+   * deletes unpublished photos an hour later. The upload was destroyed by the
+   * button offered to rescue it.
+   */
+  const [publishErrors, setPublishErrors] = useState<Record<number, string>>({})
   // The ref, not state: every read of the uploaded ids goes through
   // photoIdsRef, so the parallel useState was written four times per upload
   // and never read — a re-render of the whole page per file for nothing.
@@ -448,10 +461,14 @@ function UploadPageContent() {
 
   const handlePublish = async () => {
     const ids = photoIdsRef.current
+    // Every photo that reached the server. Re-sending one that already
+    // published is a no-op; leaving out one that failed is the bug this
+    // replaces.
     const doneIds = ids.filter((id, i) => id && uploadStatus[i] === 'done')
     if (!doneIds.length) return
     setPublishing(true)
     setPublishError(null)
+    setPublishErrors({})
 
     const photosToPublish = doneIds.length
     const failures: { index: number; reason: string }[] = []
@@ -496,8 +513,7 @@ function UploadPageContent() {
     // is what happened before — meant the upload was silently destroyed while
     // the page behaved as though it had worked.
     if (failures.length > 0) {
-      setUploadStatus(prev => prev.map((s, i) => (failures.some(f => f.index === i) ? 'error' : s)))
-      setUploadErrors(prev => prev.map((e, i) => failures.find(f => f.index === i)?.reason ?? e))
+      setPublishErrors(Object.fromEntries(failures.map(f => [f.index, f.reason])))
       setPublishing(false)
       setPublishError(
         failures.length === photosToPublish
@@ -708,8 +724,8 @@ function UploadPageContent() {
                       url={url}
                       index={i}
                       selected={selectedIdx === i}
-                      status={uploadStatus[i]}
-                      error={uploadErrors[i] ?? null}
+                      status={publishErrors[i] ? 'error' : uploadStatus[i]}
+                      error={publishErrors[i] ?? uploadErrors[i] ?? null}
                       hasCustomMeta={Boolean(
                         individualMeta[i]?.caption ||
                         individualMeta[i]?.cameraId ||
