@@ -212,6 +212,51 @@ export function MasonrySkeleton({ count = 12 }: { count?: number }) {
   )
 }
 
+/**
+ * A film x camera combination page: breadcrumb, heading, the two gear panels
+ * side by side, then the grid.
+ *
+ * This route had no loading boundary of its own, so it inherited the film
+ * page's, which opens with a full-width hero and a column of specifications.
+ * The combination page has neither, so the placeholder and the page that
+ * replaced it shared almost no shape at all.
+ */
+export function ComboDetailSkeleton() {
+  return (
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6 md:py-16">
+      <Bar className="mb-6 h-5 w-72 max-w-full" />
+      {/* The heading runs to two lines on a phone, where it is the tallest
+          thing above the fold. */}
+      <Bar className="mb-3 h-9 w-full max-w-2xl md:h-10" />
+      <Bar className="mb-8 h-5 w-full max-w-xl" delay={160} />
+
+      <div className="mb-10 grid gap-4 md:grid-cols-2">
+        {[0, 1].map(i => (
+          <div key={i} className="flex gap-4 border border-neutral-800 bg-neutral-900 p-4">
+            <Bar className="h-24 w-24 shrink-0" delay={i * 160} />
+            <div className="min-w-0 flex-1">
+              <Bar className="mb-2 h-3 w-16" delay={i * 160} />
+              <Bar className="mb-3 h-5 w-40 max-w-full" delay={i * 160 + 80} />
+              <div className="flex flex-wrap gap-1.5">
+                {/* h-[22px] is px-2 py-0.5 around text-xs, plus the border. */}
+                {['w-16', 'w-12', 'w-20'].map(width => (
+                  <Bar key={width} className={`h-[22px] ${width}`} delay={i * 160 + 160} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mb-6 flex items-center justify-between">
+        <Bar className="h-8 w-28" />
+        <Bar className="h-5 w-20" delay={160} />
+      </div>
+      <MasonrySkeleton />
+    </div>
+  )
+}
+
 /** The film and camera cards: a four-up photo strip over a name and count. */
 export function GearGridSkeleton({ count = 9 }: { count?: number }) {
   return (
