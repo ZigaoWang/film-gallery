@@ -96,6 +96,6 @@ export function citationsByField(rows: readonly ProvenanceRow[]): Map<string, Ci
 export function citationTitle(citation: Citation | undefined): string {
   if (!citation) return ''
   return citation.passage
-    ? `“${citation.passage}” — opens the source`
+    ? `“${citation.passage}” (opens the source)`
     : 'Opens the source. No supporting passage was recorded for this claim.'
 }
