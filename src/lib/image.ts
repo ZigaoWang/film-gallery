@@ -3,7 +3,7 @@ import { encode } from 'blurhash'
 import { uploadToOSS } from './oss'
 import heicDecode from 'heic-decode'
 import exifr from 'exifr'
-import { SHARP_INPUT, MAX_HEIC_PIXELS } from './sharpConfig'
+import { SHARP_INPUT, MAX_HEIC_PIXELS, isTooLarge } from './sharpConfig'
 
 /**
  * A HEIC/HEIF buffer as a PNG, refusing anything too large to hold.
@@ -63,6 +63,34 @@ function isHeicBuffer(buffer: Buffer): boolean {
 }
 
 /**
+ * A buffer sharp can read: HEIC/HEIF becomes PNG, anything else is passed
+ * through untouched. The returned extension is what the result should be
+ * stored under, so it is `png` whenever a conversion happened.
+ *
+ * The extension is only what the uploader's filename claimed, so the magic
+ * bytes are consulted too: browsers send HEIC with an empty type often enough,
+ * and a caller working from a bare buffer can leave the extension out.
+ */
+export async function convertHeicIfNeeded(
+  buffer: Buffer,
+  ext: string = ''
+): Promise<{ buffer: Buffer; ext: string }> {
+  if (ext !== 'heic' && ext !== 'heif' && !isHeicBuffer(buffer)) return { buffer, ext }
+
+  console.log('[Image] Converting HEIC/HEIF to PNG (lossless)')
+  try {
+    return { buffer: await convertHeicToPng(buffer), ext: 'png' }
+  } catch (error) {
+    console.error('[Image] Failed to convert HEIC/HEIF:', error)
+    // An oversized HEIC is a size problem, and callers already have wording for
+    // that. Flattening it into a format failure told someone with a 200MP file
+    // to export it as JPEG, which leaves the pixel count exactly where it was.
+    if (isTooLarge(error)) throw error
+    throw new Error('Failed to process HEIC/HEIF image. Please convert to JPEG or PNG before uploading.')
+  }
+}
+
+/**
  * Removes location from a file that carries it.
  *
  * The stored original is the file as uploaded, and it is publicly downloadable
@@ -93,20 +121,10 @@ export async function stripLocation(buffer: Buffer, ext: string): Promise<Buffer
 }
 
 export async function processImage(buffer: Buffer, id: string, originalExt: string = 'jpg') {
-  // Convert HEIC to PNG if needed (lossless conversion)
-  let processableBuffer = buffer
-  let actualExt = originalExt.toLowerCase()
-
-  if (actualExt === 'heic' || actualExt === 'heif' || isHeicBuffer(buffer)) {
-    try {
-      console.log(`[Image] Converting HEIC/HEIF to PNG (lossless) for ${id}`)
-      processableBuffer = await convertHeicToPng(buffer)
-      actualExt = 'png'
-    } catch (error) {
-      console.error(`[Image] Failed to convert HEIC/HEIF:`, error)
-      throw new Error('Failed to process HEIC/HEIF image. Please convert to JPEG or PNG before uploading.')
-    }
-  }
+  const { buffer: processableBuffer, ext: actualExt } = await convertHeicIfNeeded(
+    buffer,
+    originalExt.toLowerCase()
+  )
 
   // SHARP_INPUT bounds the decoded size. It belongs on the first call in
   // particular: that is where an image the machine cannot afford to hold gets

@@ -1,8 +1,10 @@
 import sharp from 'sharp'
 import { SHARP_INPUT } from './sharpConfig'
+import { convertHeicIfNeeded } from './image'
 
 /**
  * Process item image (camera or filmstock) with standardized pipeline
+ * - Converts HEIC/HEIF, which sharp cannot read
  * - Trims transparent edges
  * - Adds 40px padding
  * - Resizes to max 1200x1200 (maintaining aspect ratio)
@@ -12,7 +14,13 @@ import { SHARP_INPUT } from './sharpConfig'
  * @returns Processed image buffer in WebP format
  */
 export async function processItemImage(buffer: Buffer): Promise<Buffer> {
-  return sharp(buffer, SHARP_INPUT)
+  // A photograph taken on a phone arrives as HEIC, and sharp refused it here as
+  // "unsupported image format" while photo uploads had been converting it since
+  // that path was built. No filename reaches this function, so the magic bytes
+  // are what identify one.
+  const { buffer: readable } = await convertHeicIfNeeded(buffer)
+
+  return sharp(readable, SHARP_INPUT)
     .trim({
       background: { r: 0, g: 0, b: 0, alpha: 0 },
       threshold: 10
