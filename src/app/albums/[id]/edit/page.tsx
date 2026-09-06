@@ -36,7 +36,8 @@ type Album = {
 export default function EditAlbumPage() {
   const params = useParams()
   const albumId = params?.id as string
-  const { status } = useSession()
+  const { data: session, status } = useSession()
+  const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null
   const router = useRouter()
   const { toast } = useToast()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -68,6 +69,15 @@ export default function EditAlbumPage() {
         fetch(`/api/albums/${albumId}`).then(r => (r.ok ? r.json() : Promise.reject(new Error()))),
         fetch('/api/photos/mine?pageSize=200').then(r => (r.ok ? r.json() : { photos: [] }))
       ]).then(([albumData, photosData]) => {
+        // A public album answers to anyone who asks for it, so loading one is
+        // not permission to change it. Unchecked, the whole editor rendered
+        // over somebody else's album, fully interactive, and only refused at
+        // the point of saving, where the API returns a 403.
+        if (albumData.userId !== viewerId) {
+          setLoadFailed(true)
+          setLoading(false)
+          return
+        }
         setAlbum(albumData)
         setAlbumName(albumData.name || '')
         setDescription(albumData.description || '')
@@ -82,7 +92,7 @@ export default function EditAlbumPage() {
         setLoadFailed(true)
       })
     }
-  }, [status, albumId, router])
+  }, [status, albumId, router, viewerId])
 
   const togglePhoto = (photoId: string) => {
     setSelectedPhotoIds(prev =>

@@ -24,10 +24,11 @@ type Camera = {
   cameraType?: string | null
   defaultFilmStockId?: string | null
 }
-type Photo = { id: string; caption: string | null; cameraId: string | null; filmStockId: string | null; takenDate: string | null; visibility: Visibility }
+type Photo = { id: string; userId: string; caption: string | null; cameraId: string | null; filmStockId: string | null; takenDate: string | null; visibility: Visibility }
 
 export default function EditPhotoPage({ params }: { params: Promise<{ id: string }> }) {
-  const { status } = useSession()
+  const { data: session, status } = useSession()
+  const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null
   const router = useRouter()
   const { toast } = useToast()
   const [photo, setPhoto] = useState<Photo | null>(null)
@@ -67,6 +68,13 @@ export default function EditPhotoPage({ params }: { params: Promise<{ id: string
       .then(r => (r.ok ? r.json() : Promise.reject(new Error())))
       .then(data => {
         if (cancelled) return
+        // A public photo answers to anyone, so loading one is not permission
+        // to edit it. Without this the form rendered over somebody else's
+        // photo and only refused at the point of saving.
+        if (data.userId !== viewerId) {
+          setLoadFailed(true)
+          return
+        }
         setPhoto(data)
         setCaption(data.caption || '')
         setCameraId(data.cameraId || '')
@@ -91,7 +99,7 @@ export default function EditPhotoPage({ params }: { params: Promise<{ id: string
       .catch(() => {})
 
     return () => { cancelled = true }
-  }, [photoId])
+  }, [photoId, viewerId])
 
   // A navigation belongs in an effect, not in the render body, where React is
   // free to run it more than once or throw the result away. It was also
