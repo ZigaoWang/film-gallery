@@ -68,11 +68,6 @@ export const LIMITS = {
     perIp: { limit: 10, windowMs: 15 * MINUTE },
   },
 
-  /** Discloses whether an account exists and is unverified; cheap to abuse for enumeration. */
-  checkVerification: {
-    perIp: { limit: 20, windowMs: 15 * MINUTE },
-  },
-
   /**
    * By far the most expensive endpoint here: unauthenticated, it fetches a
    * full-resolution original from object storage, composites it, and encodes

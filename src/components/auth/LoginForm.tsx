@@ -63,32 +63,27 @@ function LoginFormFields() {
     setShowResend(false)
 
     try {
-      // Whether the account exists but has never confirmed its address, so the
-      // failure can say so and offer to send the mail again rather than
-      // reading as a wrong password.
-      const checkRes = await fetch('/api/check-verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      })
-      const checkData = await checkRes.json().catch(() => ({}))
-
-      if (checkData.unverified) {
-        setError('Email not verified.')
-        setShowResend(true)
-        return
-      }
-
       const res = await signIn('credentials', { email, password, redirect: false })
       if (res?.error) {
-        // authorize() throws RATE_LIMITED once too many attempts have been made;
-        // without this it would surface as "invalid email or password" and send
-        // the user round the loop retrying credentials that are probably correct.
-        setError(
-          res.error.includes('RATE_LIMITED')
-            ? 'Too many sign-in attempts. Please wait a few minutes and try again.'
-            : 'Invalid email or password'
-        )
+        // authorize() throws for the two failures that are not simply a wrong
+        // password, because without this each surfaces as "invalid email or
+        // password" and sends the user round the loop retrying credentials
+        // that are probably correct.
+        //
+        // The unverified case used to be asked for separately, by posting the
+        // address to /api/check-verification before trying to sign in. That
+        // cost a round trip on every single sign-in, and it answered whether
+        // an address was registered and unconfirmed to anybody who asked,
+        // without their having to know the password. It comes from authorize()
+        // now, which only reaches that check once the password has matched.
+        if (res.error.includes('EMAIL_NOT_VERIFIED')) {
+          setError('Email not verified.')
+          setShowResend(true)
+        } else if (res.error.includes('RATE_LIMITED')) {
+          setError('Too many sign-in attempts. Please wait a few minutes and try again.')
+        } else {
+          setError('Invalid email or password')
+        }
       } else {
         router.push(destination)
       }
