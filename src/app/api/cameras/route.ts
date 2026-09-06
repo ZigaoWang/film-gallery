@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { allocateSlug } from '@/lib/seo/ensureSlug'
 import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
 import { toBodyType } from '@/lib/cameraFields'
+import { resolveBrand } from '@/lib/brands'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
 
@@ -87,11 +88,19 @@ export async function POST(req: NextRequest) {
     // optional, and null means "not yet classified" rather than "invalid".
     const bodyType = toBodyType(cameraType ?? null)
 
+    // The brand relation, resolved the same way a film stock resolves its
+    // maker. Only the free-text column was written here, so brandId was set on
+    // nothing but the rows the brands migration backfilled, and camera search
+    // matches brand through the relation: every body added since that
+    // migration was unfindable by its maker's name.
+    const brandRecord = brand?.trim() ? await resolveBrand(brand) : null
+
     // Create camera with categorization fields
     const camera = await prisma.camera.create({
       data: {
         name,
         brand,
+        brandId: brandRecord?.id,
         slug: await allocateSlug('camera', name, brand),
         addedById: userId,
         bodyType,
