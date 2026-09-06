@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Combobox from '@/components/Combobox'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { FieldHint, fieldClass, fieldClassMultiline } from '@/components/ui/Field'
@@ -92,6 +93,41 @@ export default function CatalogFields({
   nameRef?: React.Ref<HTMLInputElement>
 }) {
   const isCamera = type === 'camera'
+  const [brands, setBrands] = useState<string[]>([])
+
+  // Every name in this catalog leads with its maker, so the maker is almost
+  // always already sitting in the name. Reading it back saves retyping it, and
+  // matching against the brand table rather than a hardcoded list means a
+  // brand somebody added last week is recognised too.
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/brands')
+      .then(r => (r.ok ? r.json() : []))
+      .then(rows => {
+        if (!cancelled && Array.isArray(rows)) {
+          setBrands(rows.map((b: { name?: string }) => b.name).filter((n): n is string => !!n))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  /** The brand a name starts with, longest first so "Yes!Star" beats "Yes". */
+  const makerInName = (value: string): string | null => {
+    const lower = value.trim().toLowerCase()
+    return [...brands].sort((a, b) => b.length - a.length)
+      .find(b => lower.startsWith(b.toLowerCase())) ?? null
+  }
+
+  /**
+   * Only ever fills a field the person has left empty. Overwriting what
+   * somebody typed because the name happens to start with a brand would be
+   * the form arguing with them.
+   */
+  const changeName = (value: string) => {
+    const found = !draft.maker.trim() ? makerInName(value) : null
+    onChange(found ? { name: value, maker: found } : { name: value })
+  }
   const isDisposable = draft.bodyType === 'DISPOSABLE'
   const noun = isCamera ? 'camera' : 'film'
   const id = (field: string) => `${idPrefix}-${field}`
@@ -171,7 +207,7 @@ export default function CatalogFields({
             id={id('name')}
             type="text"
             value={draft.name}
-            onChange={e => onChange({ name: e.target.value })}
+            onChange={e => changeName(e.target.value)}
             placeholder={isCamera ? 'e.g. AE-1 Program' : 'e.g. HP5 Plus 400'}
             maxLength={120}
             disabled={disabled}
@@ -180,7 +216,7 @@ export default function CatalogFields({
           <FieldHint>
             {showRenameNote
               ? 'Renaming moves this page to a new address. The old one keeps working.'
-              : 'The name on the product, without the maker.'}
+              : 'As it reads on the product. Including the maker is fine and usual here.'}
           </FieldHint>
         </div>
 
@@ -201,7 +237,10 @@ export default function CatalogFields({
             disabled={disabled}
             className={fieldClass}
           />
-          <FieldHint>{isCamera ? 'Who made the body.' : 'Who coats the film, if it is known.'}</FieldHint>
+          <FieldHint>
+            {isCamera ? 'Who made the body.' : 'Who coats the film, if it is known.'}{' '}
+            Repeating it from the name is fine; the page prints it once.
+          </FieldHint>
         </div>
       </div>
 
