@@ -6,6 +6,7 @@ import { sendVerificationEmail } from '@/lib/email'
 import { passwordProblem } from '@/lib/password'
 import { hashPassword } from '@/lib/passwordHash'
 import { readJsonObject, invalidBody, asString } from '@/lib/requestBody'
+import { isUniqueViolation } from '@/lib/prismaErrors'
 import { legalVersion } from '@/lib/legal'
 import crypto from 'crypto'
 
@@ -66,20 +67,31 @@ export async function POST(req: NextRequest) {
   const verificationToken = crypto.randomBytes(32).toString('hex')
   const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
-  const user = await prisma.user.create({
-    data: {
-      email: emailLower,
-      passwordHash,
-      username: usernameLower,
-      name,
-      verificationToken,
-      verificationTokenExpiry,
-      // Stamped from the document itself, so the record says which wording was
-      // agreed to rather than merely that something was.
-      termsAcceptedAt: new Date(),
-      termsVersion: await legalVersion(),
-    }
-  })
+  let user: { id: string }
+  try {
+    user = await prisma.user.create({
+      data: {
+        email: emailLower,
+        passwordHash,
+        username: usernameLower,
+        name,
+        verificationToken,
+        verificationTokenExpiry,
+        // Stamped from the document itself, so the record says which wording was
+        // agreed to rather than merely that something was.
+        termsAcceptedAt: new Date(),
+        termsVersion: await legalVersion(),
+      }
+    })
+  } catch (error) {
+    // The lookup above narrows the window but does not close it: a double
+    // submit gets both requests past it, they both reach the insert, and the
+    // one that loses the unique index threw a 500 instead of the answer the
+    // lookup already had. Same wording as that answer, so a caller still
+    // cannot tell whether it was the email or the username that was taken.
+    if (!isUniqueViolation(error)) throw error
+    return NextResponse.json({ error: 'User already exists' }, { status: 400 })
+  }
 
   const emailResult = await sendVerificationEmail(emailLower, verificationToken)
 
