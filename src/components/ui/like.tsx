@@ -81,6 +81,18 @@ export function useLike(photoId: string, initialLiked: boolean, initialCount: nu
         body: JSON.stringify({ photoId }),
       })
       if (!res.ok) throw new Error(await apiErrorMessage(res, 'Could not save that like'))
+
+      // The endpoint toggles against the row that is actually in the table, so
+      // its answer is the only authority on which way the heart ended up. A
+      // second tab, or a page restored from the back-forward cache, sends its
+      // toggle from a state the database has already left: the request
+      // succeeds and lands on the opposite of what was drawn optimistically.
+      const settled = await res.json().catch(() => null)
+      const serverLiked = settled?.liked
+      if (typeof serverLiked === 'boolean' && serverLiked !== next) {
+        setLiked(serverLiked)
+        setCount(c => Math.max(0, serverLiked ? c + 1 : c - 1))
+      }
     } catch (error) {
       // Put the button back where it was. An optimistic update that is never
       // reconciled is a lie the reader only discovers on the next page load.
