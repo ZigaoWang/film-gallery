@@ -6,7 +6,7 @@ export { usefulAliases } from './aliases'
  * Nothing here may import the database module, directly or transitively. Seven
  * client components import this file for the pickers, so a runtime dependency
  * on Prisma reaching it puts the whole client in the browser bundle. The query
- * itself lives in catalogueSearch, which is server only, and nothing in this
+ * itself lives in catalogSearch, which is server only, and nothing in this
  * file may grow a second copy of it.
  *
  * Film stock lookup, alternate names included.

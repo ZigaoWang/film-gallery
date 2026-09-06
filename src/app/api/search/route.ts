@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import type { Prisma } from '@prisma/client'
 import { hiddenFilter, hiddenUserIds } from '@/lib/blocks'
-import { searchCatalogue } from '@/lib/catalogueSearch'
+import { searchCatalog } from '@/lib/catalogSearch'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { parseIntParam } from '@/lib/validation'
 import { clientIp, enforceLimit } from '@/lib/rateLimit'
@@ -59,8 +59,8 @@ export async function GET(req: NextRequest) {
     // brand is matched through the relation. The legacy brand text column is
     // populated on almost no rows now that brands are their own table, so the
     // old query could only find a camera whose brand appeared in its name.
-    searchCatalogue('camera', q, limit),
-    searchCatalogue('film', q, limit),
+    searchCatalog('camera', q, limit),
+    searchCatalog('film', q, limit),
   ])
 
   // Hydrated after matching, the same way film stocks are. slug travels with

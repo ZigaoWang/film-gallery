@@ -20,7 +20,7 @@ import { prisma } from './db'
  * with ILIKE makes an alias behave like any other searchable text.
  */
 
-export interface CatalogueMatch {
+export interface CatalogMatch {
   id: string
   /** The alias responsible, when the name itself did not match. For display. */
   matchedAlias: string | null
@@ -50,17 +50,17 @@ const ENTITIES = {
   },
 } as const
 
-export type CatalogueEntity = keyof typeof ENTITIES
+export type CatalogEntity = keyof typeof ENTITIES
 
 /**
  * Matching ids, most relevant first: exact name, then name prefix, then
  * anything else.
  */
-export async function searchCatalogue(
-  entity: CatalogueEntity,
+export async function searchCatalog(
+  entity: CatalogEntity,
   query: string,
   limit = 50
-): Promise<CatalogueMatch[]> {
+): Promise<CatalogMatch[]> {
   const q = query.trim()
   if (!q) return []
 
@@ -85,7 +85,7 @@ export async function searchCatalogue(
   // for every row, so "500T" against a stock named "Kodak Vision3 500T (5219)"
   // came back with an alias too, and the result printed "Also known as Vision3
   // 500T" underneath a title that already said it.
-  return prisma.$queryRaw<CatalogueMatch[]>`
+  return prisma.$queryRaw<CatalogMatch[]>`
     SELECT e.id,
            CASE WHEN e.name ILIKE ${like} THEN NULL ELSE (
              SELECT a FROM unnest(e."aliases") AS a

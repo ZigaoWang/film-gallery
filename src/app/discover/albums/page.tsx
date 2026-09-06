@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Albums are written by users, so this list grows forever, unlike the film and
- * camera indexes whose catalogues are a fixed size. This page had no `take` at
+ * camera indexes whose catalogs are a fixed size. This page had no `take` at
  * all: every visit loaded every public album, then ran a window function over
  * every photo in all of them to pick the previews. Divides by the 1, 2 and 3
  * column grid below so the last row is never short.

@@ -137,7 +137,7 @@ export default async function CameraDetailPage({ params }: Params) {
   // Films actually shot on this body — the reverse side of the combo pages.
   // A disposable arrives loaded, and the film in it is the whole reason its
   // photographs look the way they do. Naming it here, and naming the camera on
-  // that film's page, is the one link the catalogue could already store and
+  // that film's page, is the one link the catalog could already store and
   // never showed.
   const loadedFilm = camera.defaultFilmStockId
     ? await prisma.filmStock.findUnique({
