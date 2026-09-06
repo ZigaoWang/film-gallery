@@ -89,6 +89,14 @@ const SUPPORTING_WORDS: Record<string, readonly string[]> = {
   INSTANT: ['instant'],
   DISPOSABLE: ['single-use', 'single use', 'disposable', 'one-time-use', 'one time use'],
   FULL_FRAME: ['35 mm', '35mm', '24x36', '24 x 36', 'full frame', 'full-frame', '135'],
+  // A datasheet almost never writes "35mm" when naming the format. It writes
+  // the negative size, or the ISO designation for the cassette. Matching the
+  // string literally rejected the manufacturer's own wording on six films.
+  '35mm': ['35 mm', '35mm', '135', '24 x 36', '24x36', '36x24', '36 x 24'],
+  '120': ['120', 'medium format', '6x'],
+  '110': ['110'],
+  '126': ['126'],
+  '127': ['127'],
   HALF_FRAME: ['half-frame', 'half frame'],
   PANORAMIC: ['panoram'],
   SPROCKET_HOLE: ['sprocket'],
