@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db'
 import { Prisma, type EntityType, type ValueSource } from '@prisma/client'
 import { ADMIN_RESOURCES, coerceField, type ResourceName, type ResourceSpec } from '@/lib/admin/resources'
 import { summaryFromDescription } from '@/lib/catalogForm'
+import { resolveBrand } from '@/lib/brands'
 import { reslugIfRenamed } from '@/lib/seo/rename'
 
 /**
@@ -240,6 +241,19 @@ export async function reviewRevision(
       const derived = summaryFromDescription(data.description)
       if (derived) data.summary = derived
     }
+  }
+
+  /**
+   * A camera's brand text also sets the relation it is searched through.
+   *
+   * `Camera.brandId` is what brand search joins on, and only the create route
+   * resolved it, so a brand supplied by an edit left the relation null. The
+   * Canon Autoboy S was added without a brand and given one afterwards, which
+   * is exactly this path.
+   */
+  if (revision.entityType === 'CAMERA' && typeof data.brand === 'string' && data.brand.trim()) {
+    const brandRecord = await resolveBrand(data.brand)
+    if (brandRecord) data.brandId = brandRecord.id
   }
 
   await prisma.$transaction(async tx => {
