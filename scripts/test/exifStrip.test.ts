@@ -67,6 +67,40 @@ async function labScan(): Promise<Buffer> {
   return Buffer.from(url.split(',')[1], 'base64')
 }
 
+/**
+ * A JPEG whose only location is in XMP, which is where Lightroom and several
+ * phone makers write it. The packet is spliced in as its own APP1 segment
+ * because that is exactly how it arrives in a real file, and because exifr.gps
+ * does not look at it.
+ */
+async function xmpLocationPhoto(): Promise<Buffer> {
+  const plain = await sharp({
+    create: { width: 200, height: 150, channels: 3, background: '#666' },
+  })
+    .jpeg()
+    .toBuffer()
+
+  const xml =
+    '<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>' +
+    '<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF ' +
+    'xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">' +
+    '<rdf:Description xmlns:exif="http://ns.adobe.com/exif/1.0/" ' +
+    'exif:GPSLatitude="51,30.000000N" exif:GPSLongitude="0,7.000000W"/>' +
+    '</rdf:RDF></x:xmpmeta><?xpacket end="w"?>'
+
+  const payload = Buffer.concat([
+    Buffer.from('http://ns.adobe.com/xap/1.0/\0', 'latin1'),
+    Buffer.from(xml, 'latin1'),
+  ])
+  const header = Buffer.alloc(4)
+  header.writeUInt16BE(0xffe1, 0)
+  // The length field counts itself but not the marker.
+  header.writeUInt16BE(payload.length + 2, 2)
+
+  // After the SOI marker, before everything else.
+  return Buffer.concat([plain.subarray(0, 2), header, payload, plain.subarray(2)])
+}
+
 async function main() {
   console.log('uploads carrying GPS')
 
@@ -90,6 +124,19 @@ async function main() {
   check('stored untouched', kept.equals(scan), true)
   const scanMeta = await exifr.parse(kept)
   check('scanner EXIF survives', scanMeta?.Model, 'SP-3000')
+
+  console.log('location outside the GPS IFD')
+
+  // exifr.gps reads the EXIF GPS IFD only, so this file answers "no GPS" and
+  // was stored with its coordinates intact.
+  const xmpPhoto = await xmpLocationPhoto()
+  check('fixture has no GPS in the EXIF IFD', (await exifr.gps(xmpPhoto).catch(() => null))?.latitude ?? null, null)
+  check('fixture really carries XMP coordinates', xmpPhoto.toString('latin1').includes('GPSLatitude'), true)
+
+  const xmpCleaned = await stripLocation(xmpPhoto, 'jpg')
+  check('XMP coordinates are gone', xmpCleaned.toString('latin1').includes('GPSLatitude'), false)
+  const xmpMeta = await sharp(xmpCleaned).metadata()
+  check('still decodes at the same size', [xmpMeta.width, xmpMeta.height], [200, 150])
 
   console.log('bad input')
 

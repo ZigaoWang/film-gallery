@@ -91,6 +91,25 @@ export async function convertHeicIfNeeded(
 }
 
 /**
+ * Whether an XMP packet in the file names a location.
+ *
+ * `exifr.gps` reads the EXIF GPS IFD and nothing else, so a file whose only
+ * coordinates live in XMP answered "no location" and was stored untouched.
+ * Lightroom and several phone makers write there as well as, or instead of,
+ * the GPS IFD. XMP is plain XML embedded in the file, so the tags are findable
+ * as text without parsing the container.
+ *
+ * Only the head of the file is searched: an XMP packet sits in the metadata
+ * segments near the start, and scanning tens of megabytes of pixel data for a
+ * string would cost more than the re-encode it is trying to avoid. A false
+ * positive costs one re-encode, which is the cheap direction to be wrong in.
+ */
+function hasXmpLocation(buffer: Buffer): boolean {
+  const head = buffer.subarray(0, Math.min(buffer.length, 256 * 1024)).toString('latin1')
+  return /GPSLatitude|GPSLongitude|exif:GPS/i.test(head)
+}
+
+/**
  * Removes location from a file that carries it.
  *
  * The stored original is the file as uploaded, and it is publicly downloadable
@@ -103,21 +122,33 @@ export async function convertHeicIfNeeded(
  * through sharp, which drops all metadata.
  */
 export async function stripLocation(buffer: Buffer, ext: string): Promise<Buffer> {
-  let hasGps = false
+  let mustStrip: boolean
   try {
     const gps = await exifr.gps(buffer)
-    hasGps = gps?.latitude != null && gps?.longitude != null
+    mustStrip = (gps?.latitude != null && gps?.longitude != null) || hasXmpLocation(buffer)
   } catch {
-    // Unreadable metadata is not a reason to reject an upload.
+    // Metadata that will not parse is not the same answer as metadata that
+    // holds no location, and this used to return the file untouched for both.
+    // A privacy control that fails open publishes the coordinates it exists to
+    // remove, so an unreadable answer is treated as a yes and the file is
+    // re-encoded. That costs a re-encode on an unusual file and leaks nothing.
+    mustStrip = true
+  }
+  if (!mustStrip) return buffer
+
+  try {
+    const image = sharp(buffer, SHARP_INPUT).rotate()
+    const encoded =
+      ext === 'png' ? await image.png().toBuffer() : await image.jpeg({ quality: 95 }).toBuffer()
+    console.log(`[Image] Stripped location from an upload (${buffer.length} -> ${encoded.length} bytes)`)
+    return encoded
+  } catch {
+    // Nothing sharp can decode is nothing that carries image metadata, so
+    // there is no location here to publish. Returned as it arrived, and
+    // refused further up by the validation that decides what an image is:
+    // unreadable bytes must not cost somebody their upload.
     return buffer
   }
-  if (!hasGps) return buffer
-
-  const image = sharp(buffer, SHARP_INPUT).rotate()
-  const encoded =
-    ext === 'png' ? await image.png().toBuffer() : await image.jpeg({ quality: 95 }).toBuffer()
-  console.log(`[Image] Stripped GPS from an upload (${buffer.length} -> ${encoded.length} bytes)`)
-  return encoded
 }
 
 export async function processImage(buffer: Buffer, id: string, originalExt: string = 'jpg') {
