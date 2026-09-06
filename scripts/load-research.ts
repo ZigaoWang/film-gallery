@@ -67,39 +67,52 @@ const ENUMS: Record<string, readonly string[]> = {
  * nothing. Such a field is refused and reported, leaving the value uncited
  * rather than wrongly cited.
  */
+/**
+ * How a source actually words each value.
+ *
+ * A datasheet states things in the manufacturer's language, not in our enum
+ * labels, and matching the label literally rejects correct work. That already
+ * happened once: `format` was checked against the string "35mm" while every
+ * datasheet writes the negative size, so six films from Kodak's own PDFs were
+ * refused. The entries below are the manufacturer's wording, not ours.
+ *
+ * British spellings are deliberate. Harman and Ilford publish in British
+ * English, so a Harman datasheet says "colour negative"; matching only the
+ * American spelling would refuse the manufacturer's own page.
+ */
 const SUPPORTING_WORDS: Record<string, readonly string[]> = {
-  COLOR: ['color', 'color'],
-  MONOCHROME: ['black and white', 'black & white', 'monochrome', 'panchromatic', 'b&w'],
-  TUNGSTEN: ['tungsten', '3200k'],
-  DAYLIGHT: ['daylight', '5500k', 'luz día', 'luz dia'],
-  NA: ['black and white', 'monochrome', 'panchromatic'],
-  C41: ['c-41', 'c41'],
-  E6: ['e-6', 'e6'],
+  COLOR: ['color', 'colour'],
+  MONOCHROME: ['black and white', 'black & white', 'monochrome', 'panchromatic', 'b&w', 'b+w'],
+  TUNGSTEN: ['tungsten', '3200k', '3200 k', '3,200 k'],
+  DAYLIGHT: ['daylight', '5500k', '5500 k', '5,500 k', 'luz día', 'luz dia'],
+  NA: ['black and white', 'black & white', 'monochrome', 'panchromatic', 'b&w', 'b+w'],
+  // CN-16 is Fujifilm's name for C-41 and CR-56 for E-6. A Fuji datasheet uses
+  // its own process names and would otherwise fail against ours.
+  C41: ['c-41', 'c41', 'cn-16'],
+  E6: ['e-6', 'e6', 'cr-56'],
   ECN2: ['ecn-2', 'ecn2'],
-  BW: ['black and white', 'black & white', 'monochrome', 'panchromatic'],
+  BW: ['black and white', 'black & white', 'monochrome', 'panchromatic', 'b&w', 'b+w'],
   NEGATIVE: ['negativ'],
-  POSITIVE: ['positive', 'slide', 'reversal'],
+  POSITIVE: ['positive', 'slide', 'reversal', 'transparency'],
   DIRECT_POSITIVE: ['instant', 'diffusion transfer'],
-  SLR: ['single-lens reflex', 'single lens reflex', ' slr', 'reflex'],
-  RANGEFINDER: ['rangefinder'],
+  SLR: ['single-lens reflex', 'single lens reflex', 'slr', 'reflex'],
+  RANGEFINDER: ['rangefinder', 'range finder', 'range-finder'],
   COMPACT: ['compact', 'point-and-shoot', 'point and shoot'],
   TLR: ['twin-lens', 'twin lens', 'tlr'],
   FOLDING: ['folding'],
   VIEW: ['view camera'],
   INSTANT: ['instant'],
   DISPOSABLE: ['single-use', 'single use', 'disposable', 'one-time-use', 'one time use'],
-  FULL_FRAME: ['35 mm', '35mm', '24x36', '24 x 36', 'full frame', 'full-frame', '135'],
-  // A datasheet almost never writes "35mm" when naming the format. It writes
-  // the negative size, or the ISO designation for the cassette. Matching the
-  // string literally rejected the manufacturer's own wording on six films.
+  FULL_FRAME: ['35 mm', '35mm', '24x36', '24 x 36', '36x24', '36 x 24', 'full frame', 'full-frame', '135'],
+  HALF_FRAME: ['half-frame', 'half frame'],
+  PANORAMIC: ['panoram'],
+  SPROCKET_HOLE: ['sprocket'],
+  // Film formats, stated as a negative size or an ISO cassette designation.
   '35mm': ['35 mm', '35mm', '135', '24 x 36', '24x36', '36x24', '36 x 24'],
   '120': ['120', 'medium format', '6x'],
   '110': ['110'],
   '126': ['126'],
   '127': ['127'],
-  HALF_FRAME: ['half-frame', 'half frame'],
-  PANORAMIC: ['panoram'],
-  SPROCKET_HOLE: ['sprocket'],
 }
 
 /**
@@ -110,10 +123,14 @@ const SUPPORTING_WORDS: Record<string, readonly string[]> = {
  * loaded. Free text and the maker's confidence are exempt: a summary is our own
  * sentence, and no phrasing of "reported" appears in a source verbatim.
  */
-function passageSupports(field: string, value: unknown, passage: string): boolean {
+export function passageSupports(field: string, value: unknown, passage: string): boolean {
   if (field === 'summary' || field === 'manufacturerStatus' || field === 'manufacturedBy') return true
   const text = passage.toLowerCase()
-  if (typeof value === 'number') return text.includes(String(value))
+  // Bounded, so an ISO of 100 is not satisfied by a passage that says 1000 and
+  // a year of 198 cannot be read out of 1980.
+  if (typeof value === 'number') {
+    return new RegExp(`(^|[^0-9])${value}([^0-9]|$)`).test(text)
+  }
   const words = SUPPORTING_WORDS[String(value)]
   if (words) return words.some(w => text.includes(w))
   return String(value)
@@ -149,11 +166,6 @@ function isRetailer(url: string): boolean {
 
 const [, , file, ...flags] = process.argv
 const apply = flags.includes('--apply')
-
-if (!file) {
-  console.error('usage: tsx scripts/load-research.ts <results.json> [--apply]')
-  process.exit(1)
-}
 
 /**
  * `manufacturedBy` arrives as a brand name because a researcher cannot know our
@@ -224,6 +236,10 @@ async function findEntity(entry: Result) {
 }
 
 async function main() {
+  if (!file) {
+    console.error('usage: tsx scripts/load-research.ts <results.json> [--apply]')
+    process.exit(1)
+  }
   const results: Result[] = JSON.parse(readFileSync(file, 'utf8'))
   let submitted = 0
   let skipped = 0
@@ -322,4 +338,6 @@ async function main() {
   await prisma.$disconnect()
 }
 
-main()
+// Only when invoked directly. The matching table above is imported by
+// scripts/test/passageSupports.test.ts, which must not run the loader.
+if (process.argv[1]?.endsWith('load-research.ts')) main()
