@@ -6,6 +6,7 @@ import { deleteFromOSS } from '@/lib/oss'
 import { extractKeyFromUrl } from '@/lib/ossUtils'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
+import { readJsonObject, invalidBody, asString, asNullableString, asObject } from '@/lib/requestBody'
 
 /**
  * Applies one change to many of your own photos at once.
@@ -24,14 +25,6 @@ const MAX_IDS = 200
 
 const CAPTION_MAX = 2000
 
-interface Changes {
-  cameraId?: string | null
-  filmStockId?: string | null
-  takenDate?: string | null
-  visibility?: 'PUBLIC' | 'PRIVATE'
-  caption?: string | null
-}
-
 function parseIds(raw: unknown): string[] {
   if (!Array.isArray(raw)) return []
   return [...new Set(raw.filter((v): v is string => typeof v === 'string' && v.length > 0))].slice(0, MAX_IDS)
@@ -48,43 +41,53 @@ export async function PATCH(req: NextRequest) {
   )
   if (limited) return limited
 
-  const body = await req.json().catch(() => null)
-  if (!body || typeof body !== 'object') {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-  }
+  const body = await readJsonObject(req)
+  if (!body) return invalidBody()
 
-  const ids = parseIds((body as { ids?: unknown }).ids)
+  const ids = parseIds(body.ids)
   if (ids.length === 0) return NextResponse.json({ error: 'No photos selected' }, { status: 400 })
 
-  const changes = (body as { changes?: Changes }).changes ?? {}
+  // A `changes` of `"cameraId"` or `3` passed the null check that stood here
+  // and then reached `'cameraId' in changes`, where the operator throws on a
+  // non-object, so a badly shaped request came back as a 500.
+  const changes = asObject(body.changes ?? {})
+  if (!changes) return invalidBody()
+
   const data: Record<string, unknown> = {}
 
-  if ('cameraId' in changes) {
-    if (changes.cameraId) {
-      const exists = await prisma.camera.findUnique({ where: { id: changes.cameraId }, select: { id: true } })
+  // Each field is read through a type check rather than tested with `in`. A
+  // value of the wrong type is treated as absent, because `{"cameraId": 123}`
+  // is not a request to clear the camera on two hundred photos, and passing it
+  // on to Prisma is a 500.
+  const cameraId = asNullableString(changes.cameraId)
+  if (cameraId !== undefined) {
+    if (cameraId) {
+      const exists = await prisma.camera.findUnique({ where: { id: cameraId }, select: { id: true } })
       if (!exists) return NextResponse.json({ error: 'That camera no longer exists' }, { status: 400 })
-      data.cameraId = changes.cameraId
+      data.cameraId = cameraId
     } else {
       data.cameraId = null
     }
   }
 
-  if ('filmStockId' in changes) {
-    if (changes.filmStockId) {
-      const exists = await prisma.filmStock.findUnique({ where: { id: changes.filmStockId }, select: { id: true } })
+  const filmStockId = asNullableString(changes.filmStockId)
+  if (filmStockId !== undefined) {
+    if (filmStockId) {
+      const exists = await prisma.filmStock.findUnique({ where: { id: filmStockId }, select: { id: true } })
       if (!exists) return NextResponse.json({ error: 'That film stock no longer exists' }, { status: 400 })
-      data.filmStockId = changes.filmStockId
+      data.filmStockId = filmStockId
     } else {
       data.filmStockId = null
     }
   }
 
-  if ('takenDate' in changes) {
-    if (changes.takenDate) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(changes.takenDate)) {
+  const takenDate = asNullableString(changes.takenDate)
+  if (takenDate !== undefined) {
+    if (takenDate) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(takenDate)) {
         return NextResponse.json({ error: 'Date must be YYYY-MM-DD' }, { status: 400 })
       }
-      const date = new Date(`${changes.takenDate}T00:00:00.000Z`)
+      const date = new Date(`${takenDate}T00:00:00.000Z`)
       if (Number.isNaN(date.getTime())) {
         return NextResponse.json({ error: 'That is not a real date' }, { status: 400 })
       }
@@ -95,14 +98,16 @@ export async function PATCH(req: NextRequest) {
   }
 
   if ('visibility' in changes) {
-    if (changes.visibility !== 'PUBLIC' && changes.visibility !== 'PRIVATE') {
+    const visibility = asString(changes.visibility)
+    if (visibility !== 'PUBLIC' && visibility !== 'PRIVATE') {
       return NextResponse.json({ error: 'Visibility must be public or private' }, { status: 400 })
     }
-    data.visibility = changes.visibility
+    data.visibility = visibility
   }
 
-  if ('caption' in changes) {
-    const caption = typeof changes.caption === 'string' ? changes.caption.trim() : ''
+  const rawCaption = asNullableString(changes.caption)
+  if (rawCaption !== undefined) {
+    const caption = rawCaption?.trim() ?? ''
     if (caption.length > CAPTION_MAX) {
       return NextResponse.json({ error: `Caption must be ${CAPTION_MAX} characters or fewer` }, { status: 400 })
     }
@@ -128,8 +133,10 @@ export async function DELETE(req: NextRequest) {
   )
   if (limited) return limited
 
-  const body = await req.json().catch(() => null)
-  const ids = parseIds((body as { ids?: unknown } | null)?.ids)
+  const body = await readJsonObject(req)
+  if (!body) return invalidBody()
+
+  const ids = parseIds(body.ids)
   if (ids.length === 0) return NextResponse.json({ error: 'No photos selected' }, { status: 400 })
 
   // Scoped to the owner, so an id belonging to someone else simply is not found
