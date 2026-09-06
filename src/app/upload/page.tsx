@@ -9,6 +9,7 @@ import NewItemModal from '@/components/NewItemModal'
 import Button from '@/components/ui/Button'
 import { buildNewItemFormData, CREATE_ENDPOINT, type NewItemPayload } from '@/lib/newItemForm'
 import { createPreviewUrls, isHeic } from '@/lib/previewImage'
+import { formatCaptureDate } from '@/lib/formatDate'
 import MissingMetadataModal from '@/components/MissingMetadataModal'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass } from '@/components/ui/Field'
@@ -767,12 +768,25 @@ function UploadPageContent() {
               </div>
 
               <div>
-                <FieldLabel>Date taken</FieldLabel>
+                {/* The batch default has to be stated in the label. It used to
+                    be a placeholder, which a date input never renders, so the
+                    one person who needed to know there was no default to fall
+                    back on was the one person who could not see it. */}
+                <FieldLabel
+                  hint={
+                    isIndividual
+                      ? bulkMeta.takenDate
+                        ? `(default ${formatCaptureDate(bulkMeta.takenDate)})`
+                        : '(no default)'
+                      : undefined
+                  }
+                >
+                  Date taken
+                </FieldLabel>
                 <input
                   type="date"
                   value={currentMeta.takenDate}
                   onChange={e => setCurrentMeta({ ...currentMeta, takenDate: e.target.value })}
-                  placeholder={isIndividual ? bulkMeta.takenDate || 'No default date' : 'Select date…'}
                   className={`${fieldClass}`}
                 />
               </div>
