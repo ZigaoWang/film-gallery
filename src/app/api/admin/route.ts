@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { deleteFromOSS } from '@/lib/oss'
 import { extractKeyFromUrl } from '@/lib/ossUtils'
-import { readJsonObject, invalidBody, asString, asNullableString, asBoolean } from '@/lib/requestBody'
+import { readJsonObject, invalidBody, asString, asBoolean } from '@/lib/requestBody'
 
 /**
  * Reads only the flag it needs. This fetched the entire user row —
@@ -58,14 +58,11 @@ export async function DELETE(req: NextRequest) {
     // Delete moderation submissions by this user
     await prisma.moderationSubmission.deleteMany({ where: { submittedBy: id } })
 
-    // Now delete the user (cascades to photos, likes, comments, follows, notifications, collections, cameras)
+    // Now delete the user (cascades to photos, likes, comments, follows,
+    // notifications and collections). Cameras and film stocks they added stay:
+    // Camera.addedById is SetNull precisely because a catalog entry is a shared
+    // record and not the property of whoever typed it in first.
     await prisma.user.delete({ where: { id } })
-
-    // Clean up orphaned cameras and film stocks
-    await Promise.all([
-      prisma.camera.deleteMany({ where: { photos: { none: {} } } }),
-      prisma.filmStock.deleteMany({ where: { photos: { none: {} } } })
-    ])
   } else if (type === 'photo') {
     const photo = await prisma.photo.findUnique({ where: { id } })
     if (photo) {
@@ -74,10 +71,6 @@ export async function DELETE(req: NextRequest) {
         .filter((k): k is string => k !== null)
       await Promise.all(keys.map(key => deleteFromOSS(key).catch(() => {})))
       await prisma.photo.delete({ where: { id } })
-      await Promise.all([
-        prisma.camera.deleteMany({ where: { photos: { none: {} } } }),
-        prisma.filmStock.deleteMany({ where: { photos: { none: {} } } })
-      ])
     }
   } else if (type === 'comment') {
     await prisma.comment.delete({ where: { id } })
@@ -103,9 +96,6 @@ export async function PATCH(req: NextRequest) {
   if (!body) return invalidBody()
 
   const type = asString(body.type)
-  const id = asString(body.id)
-  const name = asString(body.name)
-  const brand = asNullableString(body.brand)
   const targetId = asString(body.userId)
   const makeAdmin = asBoolean(body.isAdmin)
 
@@ -127,19 +117,17 @@ export async function PATCH(req: NextRequest) {
       where: { submittedBy: { notIn: existingUserIds } }
     })
 
-    // Clean up orphaned cameras and film stocks
-    const [deletedCameras, deletedFilmStocks] = await Promise.all([
-      prisma.camera.deleteMany({ where: { photos: { none: {} } } }),
-      prisma.filmStock.deleteMany({ where: { photos: { none: {} } } })
-    ])
-
+    // Cameras and film stocks are deliberately not touched. This swept away
+    // every catalog row that happened to have no photos yet, which is not an
+    // orphan: it is an entry nobody has shot with, including one an
+    // administrator wrote by hand that morning. It also ran on every user and
+    // photo deletion, so a record created during an upload could be deleted
+    // out from under the person still uploading against it.
     return NextResponse.json({
       success: true,
       cleaned: {
         notifications: deletedNotifications.count,
         moderationSubmissions: deletedSubmissions.count,
-        cameras: deletedCameras.count,
-        filmStocks: deletedFilmStocks.count
       }
     })
   } else if (targetId && makeAdmin !== undefined) {

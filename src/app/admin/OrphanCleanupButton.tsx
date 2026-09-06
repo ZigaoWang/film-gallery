@@ -26,8 +26,7 @@ export default function OrphanCleanupButton() {
         return
       }
       const { cleaned } = await res.json()
-      const total =
-        cleaned.notifications + cleaned.moderationSubmissions + cleaned.cameras + cleaned.filmStocks
+      const total = cleaned.notifications + cleaned.moderationSubmissions
       // One line rather than the four-line list the alert used: the detail is
       // on screen after the refresh anyway.
       toast(total === 0 ? 'Nothing to clean up' : `Removed ${total} orphaned records`, 'success')
@@ -62,8 +61,8 @@ export default function OrphanCleanupButton() {
         onConfirm={handleCleanup}
         onClose={() => setConfirming(false)}
       >
-        Notifications, moderation submissions and unused cameras and film stocks left behind by
-        deleted accounts. Photos are not affected.
+        Notifications and moderation submissions left behind by deleted accounts. Photos and
+        catalog entries are not affected.
       </ConfirmDialog>
     </>
   )
