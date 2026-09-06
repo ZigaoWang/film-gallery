@@ -15,10 +15,18 @@ import type { ManufacturerStatus } from '@prisma/client'
 
 type Row = Record<string, unknown>
 
-interface Props {
+interface Props<F extends string = string> {
   resource: ResourceName
   /** Optional preset narrowing, offered as tabs above the table. */
-  filters?: readonly { value: string; label: string }[]
+  filters?: readonly { value: F; label: string }[]
+  /**
+   * Which preset the table opens on. Defaults to All.
+   *
+   * Typed against the presets themselves: a value that matches none of them
+   * leaves every tab unlit and the server quietly returning everything, which
+   * is indistinguishable from having no default at all.
+   */
+  defaultFilter?: NoInfer<F>
 }
 
 /**
@@ -37,7 +45,7 @@ const MAX_BULK_IDS = 200
 /** Long enough that a fast typist sends one request, not one per keystroke. */
 const SEARCH_DEBOUNCE_MS = 350
 
-export default function ResourceTable({ resource, filters }: Props) {
+export default function ResourceTable<F extends string>({ resource, filters, defaultFilter }: Props<F>) {
   // Widened from the const-asserted literal: the table treats every resource
   // the same way, and optional members like quickActions are only visible
   // through the interface.
@@ -49,7 +57,7 @@ export default function ResourceTable({ resource, filters }: Props) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE)
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState('')
+  const [filter, setFilter] = useState<string>(defaultFilter ?? '')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<Row | null>(null)
