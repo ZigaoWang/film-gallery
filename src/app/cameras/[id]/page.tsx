@@ -17,7 +17,8 @@ import { displayName, gearImageAlt, article } from '@/lib/seo/alt'
 import { usefulAliases } from '@/lib/aliases'
 import { textLinkClass } from '@/components/ui/TextLink'
 import CompletenessNote from '@/components/CompletenessNote'
-import { citationsByField } from '@/lib/citations'
+import { citationsByField, citationTitle } from '@/lib/citations'
+import SourceLink from '@/components/SourceLink'
 import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
 import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
@@ -25,7 +26,7 @@ import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
 import { descriptionParagraphs } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
-import { bodyTypeLabel, bodyTypeProse } from '@/lib/cameraFields'
+import { bodyTypeLabel, bodyTypeProse, frameFormatLabel } from '@/lib/cameraFields'
 import type { CameraBodyType } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
@@ -186,12 +187,19 @@ export default async function CameraDetailPage({ params }: Params) {
   const displayDescription = camera.description
   const canonicalPath = `/cameras/${camera.slug ?? camera.id}`
 
+  const sourceFor = new Map(Array.from(citationFor, ([field, c]) => [field, c.url]))
+
   const specs = [
-    camera.bodyType && { label: 'Type', value: bodyTypeLabel(camera.bodyType)! },
-    camera.format && { label: 'Format', value: camera.format },
-    camera.mountType && { label: 'Mount', value: camera.mountType },
-    camera.year && { label: 'Year', value: String(camera.year) },
-  ].filter(Boolean) as Array<{ label: string; value: string }>
+    camera.bodyType && { label: 'Type', value: bodyTypeLabel(camera.bodyType)!, field: 'bodyType' },
+    // Only when it is not the ordinary answer. Nearly every 35mm body is full
+    // frame, so printing it on all of them is noise; half-frame or panoramic is
+    // the thing a reader actually needs to be told.
+    camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
+      && { label: 'Frame', value: frameFormatLabel(camera.frameFormat)!, field: 'frameFormat' },
+    camera.format && { label: 'Format', value: camera.format, field: 'format' },
+    camera.mountType && { label: 'Mount', value: camera.mountType, field: 'mountType' },
+    camera.year && { label: 'Year', value: String(camera.year), field: 'year' },
+  ].filter(Boolean) as Array<{ label: string; value: string; field: string }>
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
@@ -270,9 +278,18 @@ export default async function CameraDetailPage({ params }: Params) {
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-2 mb-4">
+                  {/* The source beside the value, as the film page shows it.
+                      This page loaded provenance for the completeness note at
+                      the foot and then never showed any of it, so a camera
+                      whose specifications were sourced looked exactly like one
+                      where somebody had typed them in from memory. */}
                   {specs.map((s) => (
                     <span key={s.label} className="text-xs px-2 py-0.5 border border-neutral-700 text-neutral-300">
                       {s.value}
+                      <SourceLink
+                        url={sourceFor.get(s.field) ?? null}
+                        title={citationTitle(citationFor.get(s.field))}
+                      />
                     </span>
                   ))}
                   <span className="text-xs text-neutral-500">{totalPhotos} photos</span>
