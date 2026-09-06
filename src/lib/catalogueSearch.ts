@@ -40,9 +40,13 @@ const ENTITIES = {
   },
   camera: {
     table: '"Camera"',
-    // Brand is matched through the relation rather than the legacy text column,
-    // which is populated on almost no rows since brands became their own table.
-    extraColumns: ['b.name'],
+    // Both, because between them they cover the catalog. The relation is the
+    // one that should be right, but nothing set brandId on a camera until the
+    // create route was fixed to resolve it, so every body added between the
+    // brands migration and that fix carries its maker in the text column and
+    // nowhere else. Matching only the relation made those bodies unfindable by
+    // the name on the front of them.
+    extraColumns: ['b.name', 'e.brand'],
   },
 } as const
 
