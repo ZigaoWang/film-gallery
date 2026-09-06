@@ -134,10 +134,20 @@ export async function PATCH(
 
     const startOrder = (maxOrder?.order ?? -1) + 1
 
-    photoOps.create = ids.map((photoId, index) => ({
-      photoId,
-      order: startOrder + index
-    }))
+    // A photo the album already holds is the outcome the caller asked for, so
+    // a duplicate is skipped rather than refused. A plain nested create broke
+    // @@unique([collectionId, photoId]) and surfaced as a 500 on a double
+    // submit, which the upload page hits when the album step is retried after
+    // the photos were already published. Leaving the check to the database
+    // covers the race as well, and a P2002 would roll the whole nested write
+    // back, losing the name change and the removals with it.
+    photoOps.createMany = {
+      data: ids.map((photoId, index) => ({
+        photoId,
+        order: startOrder + index
+      })),
+      skipDuplicates: true
+    }
   }
 
   // Scoped to this album's rows by the nested write, and the album's ownership
@@ -148,7 +158,7 @@ export async function PATCH(
     if (ids.length > 0) photoOps.deleteMany = { photoId: { in: ids } }
   }
 
-  if (photoOps.create || photoOps.deleteMany) {
+  if (photoOps.createMany || photoOps.deleteMany) {
     updateData.photos = photoOps
   }
 
