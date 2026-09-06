@@ -74,7 +74,7 @@ export function normalizeManufacturer(input: string): string {
   // "Film Ferrania", "Kodak Alaris". Stored whole, it gets pasted in front of
   // a product name that already carries the brand, giving "Lucky Film (乐凯)
   // Lucky Color 400". Reduced to the brand only when a word of it is one we
-  // recognise, so an unfamiliar maker is left exactly as typed rather than
+  // recognize, so an unfamiliar maker is left exactly as typed rather than
   // guessed at.
   const words = trimmed
     .replace(/\([^)]*\)/g, ' ')

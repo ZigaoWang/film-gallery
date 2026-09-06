@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 /**
- * Browse filters for a catalogue index.
+ * Browse filters for a catalog index.
  *
  * Links rather than a client component: the filter state belongs in the URL so
  * a filtered view can be shared, revisited and returned to with the back
@@ -77,7 +77,7 @@ export default function BrowseFilters({
         return (
           <div key={group.key} className="flex flex-wrap items-center gap-2">
             {/* The group is named to assistive technology as well as shown,
-                and the applied chip carries aria-current — the colour was the
+                and the applied chip carries aria-current — the color was the
                 only thing saying which one was on. */}
             <span id={`filter-${group.key}`} className="mr-1 text-xs uppercase tracking-widest text-neutral-600">
               {group.label}

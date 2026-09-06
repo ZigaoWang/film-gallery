@@ -5,7 +5,7 @@
  * uploads, so it gets bumped for security fixes more often than most — and a
  * successful build says nothing about whether the image pipelines still work,
  * because every call is behind a runtime binding to libvips. This runs the
- * real chains: upload processing, catalogue image processing, and the
+ * real chains: upload processing, catalog image processing, and the
  * watermark compositor.
  *
  *   npx tsx scripts/test/sharpPipeline.test.ts
@@ -103,7 +103,7 @@ async function main() {
   })
 
   // lib/imageProcessing.ts — trim + extend, the most version-sensitive chain.
-  await check('catalogue image: trim transparent edges, pad, resize', async () => {
+  await check('catalog image: trim transparent edges, pad, resize', async () => {
     const output = await processItemImage(await sampleTransparentPng())
     const metadata = await sharp(output).metadata()
     assert(metadata.format === 'webp', `expected webp, got ${metadata.format}`)
@@ -129,10 +129,10 @@ async function main() {
   })
 
   // The pixel ceiling is the guard that actually protects memory, and the
-  // upload route only reports it usefully if isTooLarge recognises the error
+  // upload route only reports it usefully if isTooLarge recognizes the error
   // sharp really throws. Tested with a deliberately tiny limit against a small
   // image, which produces the same failure without allocating anything large.
-  await check('pixel ceiling is enforced and recognised by isTooLarge', async () => {
+  await check('pixel ceiling is enforced and recognized by isTooLarge', async () => {
     const source = await sampleJpeg(500, 500)
     let caught: unknown = null
     try {

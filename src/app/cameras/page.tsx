@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic'
 
-/** Only values the catalogue actually uses, so a filter cannot match nothing. */
+/** Only values the catalog actually uses, so a filter cannot match nothing. */
 function tally(rows: { _count: { _all: number } }[], keys: (string | null)[]) {
   return Object.fromEntries(
     rows

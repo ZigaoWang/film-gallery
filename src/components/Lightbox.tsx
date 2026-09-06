@@ -158,7 +158,7 @@ export default function Lightbox({ photoId, src, alt, width, height, prevId, nex
     // Most browsers suppress the click after a touch that moved this far, but
     // not all of them. Left to chance, that click reaches the overlay's close
     // handler, which clears the reopen marker the swipe just set — so the next
-    // photo would open with the lightbox shut, which is the exact behaviour
+    // photo would open with the lightbox shut, which is the exact behavior
     // the swipe exists to avoid.
     swipeHandled.current = true
 

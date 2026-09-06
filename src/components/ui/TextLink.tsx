@@ -13,7 +13,7 @@ import Link from 'next/link'
  *
  * The rule is one rule: white, underlined, and the site's red on hover. White
  * because these sit on a near-black page and anything dimmer reads as
- * unavailable; underlined because colour alone is not a link, and someone who
+ * unavailable; underlined because color alone is not a link, and someone who
  * cannot separate the red from the grey has nothing else to go on.
  *
  * This is for prose. Navigation — the header, the footer's link lists — is a

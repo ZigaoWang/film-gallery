@@ -65,7 +65,7 @@ check('all keys bind their values', all.values.length >= keys.length, true)
 const badDay = feedScopeSql({ day: 'not-a-date' })
 check('unparseable day excludes everything', badDay.strings.join('').includes('false'), true)
 
-// parseFeedScope has to recognise every key, or the scope never reaches either
+// parseFeedScope has to recognize every key, or the scope never reaches either
 // builder in the first place.
 const params = new URLSearchParams(Object.entries(SAMPLE).map(([k, v]) => [k, v]))
 check('parseFeedScope reads every key', parseFeedScope(params), SAMPLE)

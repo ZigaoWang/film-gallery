@@ -15,7 +15,7 @@ import { sendFeedbackReplyEmail } from '@/lib/email'
  *
  * The reply is appended rather than overwriting a column, so the sender can
  * answer it and the exchange reads as a conversation. Whatever changes, the
- * sender is emailed — a queue that only changes colour in an admin panel is
+ * sender is emailed — a queue that only changes color in an admin panel is
  * the silent form this feature exists to replace.
  */
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

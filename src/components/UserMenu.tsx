@@ -25,7 +25,7 @@ const ITEMS = [
  * way out but Tab, and a screen reader announced it only as "button".
  *
  * The overflow menu on photos and comments already does all of this properly;
- * this is the same behaviour on the one menu every signed-in reader uses on
+ * this is the same behavior on the one menu every signed-in reader uses on
  * every page.
  */
 export default function UserMenu({ username, name, avatar }: UserMenuProps) {

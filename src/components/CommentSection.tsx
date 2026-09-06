@@ -117,7 +117,7 @@ export default function CommentSection({ photoId }: { photoId: string }) {
             // comment had been written and sent.
             maxLength={VALIDATION_LIMITS.MAX_COMMENT_LENGTH}
             placeholder="Add a comment…"
-            // The shared field style. This input had its own border colour and
+            // The shared field style. This input had its own border color and
             // padding, so the one place on a photo page you type sat a shade
             // off every other control on the site.
             className={`${fieldClass} flex-1`}

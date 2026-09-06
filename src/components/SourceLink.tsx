@@ -2,9 +2,9 @@
  * Where a value came from, offered next to it.
  *
  * An offer to check, not a claim of quality. So it is a small link and nothing
- * else: no badge, no colour, no icon that needs explaining. Absence means
+ * else: no badge, no color, no icon that needs explaining. Absence means
  * nobody has recorded a source yet, which is the ordinary state of most of the
- * catalogue and is not an accusation.
+ * catalog and is not an accusation.
  *
  * The reverse view, marking what is uncited, belongs in admin, where the point
  * is to work through the backlog. Same data, opposite default, because a

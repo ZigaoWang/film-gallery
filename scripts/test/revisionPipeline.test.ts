@@ -2,7 +2,7 @@
  * Exercises the revision pipeline against a real database.
  *
  * Unlike the other tests here this one needs a database, because what it checks
- * is transactional behaviour: that the entity write, the version bump and the
+ * is transactional behavior: that the entity write, the version bump and the
  * provenance row land together. Point DATABASE_URL at a clone, never at
  * production. It restores what it changes, but a test that writes is a test
  * that can leave a mess if it dies partway.

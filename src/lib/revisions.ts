@@ -200,7 +200,7 @@ export async function reviewRevision(
    * longer present, which only means anything if the rest are kept.
    *
    * A citation carried over from before claims existed has no text to check, so
-   * it survives any edit. That is the old field-level behaviour and no worse
+   * it survives any edit. That is the old field-level behavior and no worse
    * than it; the alternative here is deleting it.
    */
   const survivingClaims = new Map<string, ClaimCitation[]>()

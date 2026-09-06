@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   const bio = user.bio?.trim()
   const description = bio
     ? `${bio.slice(0, 140)}${bio.length > 140 ? '…' : ''}. ${photoCount} film ${photoCount === 1 ? 'photograph' : 'photographs'} on AvoidXray.`
-    : `${displayName} shoots film. Browse ${photoCount} ${photoCount === 1 ? 'photograph' : 'photographs'} on AvoidXray, organised by film stock and camera.`
+    : `${displayName} shoots film. Browse ${photoCount} ${photoCount === 1 ? 'photograph' : 'photographs'} on AvoidXray, organized by film stock and camera.`
 
   return {
     title: `${displayName} (@${user.username})`,

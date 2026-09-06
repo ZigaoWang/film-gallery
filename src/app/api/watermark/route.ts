@@ -472,7 +472,7 @@ async function renderClean(ctx: RenderContext, quality: number): Promise<Buffer>
     lines.map(l => renderCaptionLine(l.text, l.size, l.color, l.weight, l.track, frameW))
   )
 
-  const centre = (w: number) => Math.round((canvasW - w) / 2)
+  const center = (w: number) => Math.round((canvasW - w) / 2)
   const composites: OverlayOptions[] = [{
     input: Buffer.from(
       `<svg width="${photoW + 2}" height="${photoH + 2}"><rect x="0.5" y="0.5" width="${photoW + 1}" height="${photoH + 1}" fill="none" stroke="${palette.hairline}" stroke-width="1"/></svg>`
@@ -483,12 +483,12 @@ async function renderClean(ctx: RenderContext, quality: number): Promise<Buffer>
 
   let cursorY = photoTop + photoH + gap
   for (const [i, buffer] of rendered.entries()) {
-    composites.push({ input: buffer, left: centre(await widthOf(buffer)), top: cursorY })
+    composites.push({ input: buffer, left: center(await widthOf(buffer)), top: cursorY })
     cursorY += lineHeights[i] + lineGap
   }
 
   cursorY += logoGap - (lines.length ? lineGap : 0)
-  const markLeft = centre(markRowW)
+  const markLeft = center(markRowW)
   composites.push({ input: logo, left: markLeft, top: cursorY + Math.round((markRowH - logoHeight) / 2) })
 
   if (ctx.qrUrl) {
@@ -772,7 +772,7 @@ async function renderSlide(ctx: RenderContext, quality: number): Promise<Buffer>
   const frameW = photoW + bezel * 2
   const frameH = photoH + bezel * 2
 
-  const centre = (w: number) => Math.round((mount - w) / 2)
+  const center = (w: number) => Math.round((mount - w) / 2)
   const pad = Math.round(mount * 0.06)
 
   const shape = Buffer.from(
@@ -793,8 +793,8 @@ async function renderSlide(ctx: RenderContext, quality: number): Promise<Buffer>
   const parts: OverlayOptions[] = [{ input: card, left: 0, top: 0 }]
 
   const printTop = Math.round(mount * 0.055)
-  parts.push({ input: top1, left: centre(await widthOf(top1)), top: printTop })
-  parts.push({ input: top2, left: centre(await widthOf(top2)), top: printTop + Math.ceil(printSize * 1.4) + printGap })
+  parts.push({ input: top1, left: center(await widthOf(top1)), top: printTop })
+  parts.push({ input: top2, left: center(await widthOf(top2)), top: printTop + Math.ceil(printSize * 1.4) + printGap })
 
   // The stamp goes in the top corner, clear of the centered lab line.
   if (stampLine) {
@@ -811,10 +811,10 @@ async function renderSlide(ctx: RenderContext, quality: number): Promise<Buffer>
       `<svg width="${frameW}" height="${frameH}" xmlns="http://www.w3.org/2000/svg">` +
       `<rect width="${frameW}" height="${frameH}" fill="${SLIDE.window}"/></svg>`
     ),
-    left: centre(frameW),
+    left: center(frameW),
     top: frameTop,
   })
-  parts.push({ input: fitted, left: centre(photoW), top: frameTop + bezel })
+  parts.push({ input: fitted, left: center(photoW), top: frameTop + bezel })
 
   const cross = Math.round(mount * 0.022)
   const crossMark = Buffer.from(
@@ -831,13 +831,13 @@ async function renderSlide(ctx: RenderContext, quality: number): Promise<Buffer>
       .toBuffer()
     parts.push({
       input: written,
-      left: centre(await widthOf(written)),
+      left: center(await widthOf(written)),
       top: frameTop + frameH + Math.round(mount * 0.012),
     })
   }
 
   const baseline = mount - Math.round(mount * 0.055) - Math.ceil(subSize * 1.4)
-  parts.push({ input: labLine, left: centre(await widthOf(labLine)), top: baseline })
+  parts.push({ input: labLine, left: center(await widthOf(labLine)), top: baseline })
   parts.push(await grainLayer())
   // Last, always: every tiled overlay above covers the full square, corners
   // included, so the board has to be cut to shape after the final one.

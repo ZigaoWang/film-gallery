@@ -8,7 +8,7 @@ import { normalizeManufacturer } from '@/lib/filmFields'
  * Matching is deliberately generous — exact name, then slug, then alias, all
  * case-insensitively — because the whole point of the table is that "Yestar",
  * "Yes!Star" and "yesstar" are one company. A miss here does not merely create
- * a duplicate row; it splits a brand's catalogue in two and the split is
+ * a duplicate row; it splits a brand's catalog in two and the split is
  * invisible until someone notices half the films are missing from a page.
  */
 export async function resolveBrand(input: string): Promise<{ id: string } | null> {
@@ -30,7 +30,7 @@ export async function resolveBrand(input: string): Promise<{ id: string } | null
   })
   if (existing) return existing
 
-  // New brand. The catalogue grows this way, and refusing unknown names would
+  // New brand. The catalog grows this way, and refusing unknown names would
   // mean no stock could be added without an administrator first.
   const taken = new Set(
     (await prisma.brand.findMany({ select: { slug: true } })).map(b => b.slug)

@@ -4,7 +4,7 @@ import type { ManufacturerStatus } from '@prisma/client'
  * How a film's manufacturer reads to someone who has never thought about it.
  *
  * The name on the box is often not the company that coated the film, and that
- * is the single most useful thing this catalogue knows. Saying it plainly is
+ * is the single most useful thing this catalog knows. Saying it plainly is
  * the whole point: telling a reader Fujifilm 400 is made by Kodak is a
  * different claim from telling them it is widely reported to be, and the second
  * one is the honest version.
@@ -15,7 +15,7 @@ import type { ManufacturerStatus } from '@prisma/client'
  *
  * Importing nothing but a type, so the same wording is available to a server
  * page, a client picker and the admin table. Four places rendering this four
- * ways is how a catalogue starts contradicting itself.
+ * ways is how a catalog starts contradicting itself.
  */
 
 export interface ManufacturerInput {

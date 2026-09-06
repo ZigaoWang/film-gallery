@@ -1,5 +1,5 @@
 /**
- * The catalogue's gaps, written out as a research brief.
+ * The catalog's gaps, written out as a research brief.
  *
  * Generated from the database rather than kept by hand, so it cannot drift from
  * what is actually stored. Every entry lists what is recorded, what is missing,
@@ -45,7 +45,7 @@ async function main() {
   const variants = await prisma.filmVariant.findMany({ select: { filmStockId: true, format: true } })
 
   const out: string[] = []
-  out.push(`# AvoidXray catalogue: research brief`)
+  out.push(`# AvoidXray catalog: research brief`)
   out.push('')
   out.push(`${films.length} film stocks and ${cameras.length} cameras. Generated from the live database.`)
   out.push('')

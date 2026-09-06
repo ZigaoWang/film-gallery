@@ -39,7 +39,7 @@ export default function MaintenancePage() {
           <h2 className="text-sm font-medium text-white mb-1">Orphaned records</h2>
           <p className="text-xs text-neutral-500 mb-3">
             Clears notifications and moderation submissions belonging to deleted accounts, and cameras and film
-            stocks with no photos left. Note that this also removes catalogue entries nobody has shot yet.
+            stocks with no photos left. Note that this also removes catalog entries nobody has shot yet.
           </p>
           <OrphanCleanupButton />
         </section>

@@ -187,7 +187,7 @@ export const LIMITS = {
    * The duplicate check behind the add-film and add-camera dialogs.
    *
    * It reads the entire film stock or camera table and scores every row
-   * against the submitted name, so its cost is the size of the catalogue on
+   * against the submitted name, so its cost is the size of the catalog on
    * every call. It ran unauthenticated and unlimited. Adding a piece of gear
    * is a rare, deliberate act — someone naming a few stocks in a sitting is
    * comfortably inside this.

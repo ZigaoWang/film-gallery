@@ -111,7 +111,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Tone colours.
+ * Tone colors.
  *
  * Success and error were Tailwind's `green-600` and `red-600`, neither of
  * which appears anywhere else on the site — so the one red the reader has been

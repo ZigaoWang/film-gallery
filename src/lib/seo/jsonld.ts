@@ -19,7 +19,7 @@ export function websiteJsonLd(): Json {
     url: SITE_URL,
     name: SITE_NAME,
     description:
-      'A community archive of film photography, organised by film stock, camera, and photographer.',
+      'A community archive of film photography, organized by film stock, camera, and photographer.',
     publisher: { '@id': `${SITE_URL}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',

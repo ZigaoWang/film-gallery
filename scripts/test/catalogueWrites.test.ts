@@ -1,5 +1,5 @@
 /**
- * Every write to a catalogue record goes through the revision pipeline.
+ * Every write to a catalog record goes through the revision pipeline.
  *
  * This is a structural fact rather than a rule anyone will remember. Three write
  * paths existed at one point: the admin table, the suggest-edit form and the
@@ -13,7 +13,7 @@
  * nothing notices until something downstream depends on one of those.
  *
  * So this asserts the funnel rather than trusting it. A new direct write to a
- * catalogue table fails here and has to be either routed through the pipeline
+ * catalog table fails here and has to be either routed through the pipeline
  * or added to ALLOWED with a reason.
  *
  *   npx tsx scripts/test/catalogueWrites.test.ts
@@ -96,7 +96,7 @@ for (const file of walk('src')) {
   }
 }
 
-console.log('catalogue writes')
+console.log('catalog writes')
 console.log(`  ${found} direct writes, ${ALLOWED.length} files deliberately excluded`)
 
 // An allowlist that names files no longer containing a write has gone stale,
@@ -110,7 +110,7 @@ const stale = ALLOWED.filter(a => {
 })
 
 if (offenders.length > 0) {
-  console.error('\n  A catalogue record is being written outside the revision pipeline.')
+  console.error('\n  A catalog record is being written outside the revision pipeline.')
   console.error('  Route it through applyAdminEdit or submitRevision, or add it to')
   console.error('  ALLOWED in this file with the reason it does not belong there.\n')
   for (const o of offenders) console.error(`    ${o}`)

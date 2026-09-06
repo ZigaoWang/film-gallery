@@ -11,7 +11,7 @@ interface LikedUser { username: string; name: string | null; avatar: string | nu
  *
  * The heart was the characters ♡ and ♥, drawn by whichever font on the
  * reader's machine claims them — a different weight, and often a different
- * colour, from the outlined heart the grid uses for the same action. Both now
+ * color, from the outlined heart the grid uses for the same action. Both now
  * come from one component.
  */
 export default function LikeButton({

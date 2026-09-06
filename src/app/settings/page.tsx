@@ -251,11 +251,11 @@ export default function SettingsPage() {
             <div>
               <FieldLabel>Instagram</FieldLabel>
               <div className="flex">
-                {/* Matches the control it is joined to: same border colour and
+                {/* Matches the control it is joined to: same border color and
                     the same vertical padding. It used border-neutral-800
                     against the field's -700 and p-3 against its py-2.5, so the
                     two halves of one control were a different height and a
-                    different colour where they met. */}
+                    different color where they met. */}
                 <span className="flex items-center bg-neutral-800 px-3 py-2.5 text-sm text-neutral-500 border border-r-0 border-neutral-700">@</span>
                 <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="username" className={`${fieldClass} flex-1`} />
               </div>
@@ -264,11 +264,11 @@ export default function SettingsPage() {
             <div>
               <FieldLabel>Twitter / X</FieldLabel>
               <div className="flex">
-                {/* Matches the control it is joined to: same border colour and
+                {/* Matches the control it is joined to: same border color and
                     the same vertical padding. It used border-neutral-800
                     against the field's -700 and p-3 against its py-2.5, so the
                     two halves of one control were a different height and a
-                    different colour where they met. */}
+                    different color where they met. */}
                 <span className="flex items-center bg-neutral-800 px-3 py-2.5 text-sm text-neutral-500 border border-r-0 border-neutral-700">@</span>
                 <input type="text" value={twitter} onChange={e => setTwitter(e.target.value)} placeholder="username" className={`${fieldClass} flex-1`} />
               </div>

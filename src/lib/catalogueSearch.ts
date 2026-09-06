@@ -2,9 +2,9 @@ import { Prisma } from '@prisma/client'
 import { prisma } from './db'
 
 /**
- * Matching a catalogue record by its name or by a name it is also sold under.
+ * Matching a catalog record by its name or by a name it is also sold under.
  *
- * Both halves of the catalogue have the same problem. A film stock is "5219" to
+ * Both halves of the catalog have the same problem. A film stock is "5219" to
  * anyone buying Vision3 500T in 35mm, and a camera body sold as the Mju in one
  * market is the Stylus in another. A record stored under one name is simply
  * unfindable to everyone who knows it by the other.

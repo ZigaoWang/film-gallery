@@ -65,7 +65,7 @@ function hostOf(url: string): string {
  * A manufacturer's own document outranks a reference wiki, which outranks a lab
  * or a review. The pass has been wrong once via each of the lower two, so the
  * tier is worth seeing at the moment of judging rather than inferring from a
- * domain the reviewer may not recognise.
+ * domain the reviewer may not recognize.
  */
 function tierOf(url: string): string {
   const host = hostOf(url)

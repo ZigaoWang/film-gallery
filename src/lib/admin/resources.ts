@@ -21,7 +21,7 @@ export type FieldKind =
   /** A pointer to another record, chosen by name rather than typed as an id. */
   | 'reference'
 
-/** Which catalogue a `reference` field picks from. */
+/** Which catalog a `reference` field picks from. */
 export type ReferenceSource = 'cameras' | 'films' | 'brands'
 
 export interface FieldSpec {
@@ -126,7 +126,7 @@ export interface ResourceSpec {
  */
 export const VALUE_LABELS: Record<string, Record<string, string>> = {
   process: { C41: 'C-41', E6: 'E-6', ECN2: 'ECN-2', BW: 'Black & white', OTHER: 'Other' },
-  chromaticity: { COLOR: 'Colour', MONOCHROME: 'Monochrome' },
+  chromaticity: { COLOR: 'Color', MONOCHROME: 'Monochrome' },
   polarity: { NEGATIVE: 'Negative', POSITIVE: 'Positive', DIRECT_POSITIVE: 'Direct positive' },
   manufacturerStatus: {
     SAME_AS_BRAND: 'The brand itself', KNOWN: 'Confirmed', ATTRIBUTED: 'Reported', UNKNOWN: 'Not established',
@@ -257,7 +257,7 @@ export const ADMIN_RESOURCES = {
   cameras: {
     label: 'Camera',
     plural: 'Cameras',
-    description: 'The camera catalogue. Edits here apply immediately.',
+    description: 'The camera catalog. Edits here apply immediately.',
     columns: ['name', 'brand', 'bodyType', 'format', 'year', 'photoCount', 'imageStatus'],
     searchFields: ['name', 'brand', 'mountType'],
     orderBy: { name: 'asc' },
@@ -284,7 +284,7 @@ export const ADMIN_RESOURCES = {
   films: {
     label: 'Film stock',
     plural: 'Film stocks',
-    description: 'The film catalogue. Process is required by the schema.',
+    description: 'The film catalog. Process is required by the schema.',
     columns: ['name', 'madeBy', 'iso', 'process', 'colorBalance', 'sources', 'photoCount', 'imageStatus'],
     searchFields: ['name', 'brand', 'manufacturer'],
     orderBy: { name: 'asc' },
@@ -296,8 +296,8 @@ export const ADMIN_RESOURCES = {
       aliases: { kind: 'stringList', label: 'Aliases', help: 'Comma separated. Product codes and alternate names.' },
       iso: { kind: 'number', label: 'ISO', min: 1, max: 100000 },
       process: { kind: 'enum', label: 'Process', options: FILM_PROCESS },
-      colorBalance: { kind: 'enum', label: 'Colour balance', options: COLOR_BALANCE },
-      chromaticity: { kind: 'enum', label: 'Colour or mono', options: CHROMATICITY, help: 'Independent of process: XP2 Super is black and white developed in C-41.' },
+      colorBalance: { kind: 'enum', label: 'Color balance', options: COLOR_BALANCE },
+      chromaticity: { kind: 'enum', label: 'Color or mono', options: CHROMATICITY, help: 'Independent of process: XP2 Super is black and white developed in C-41.' },
       polarity: { kind: 'enum', label: 'Negative or positive', options: POLARITY },
       // What the page actually renders for "made by". The legacy `manufacturer`
       // text column above is not it, so without these two the displayed claim

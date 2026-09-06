@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 /**
- * An overlay dialog, with the behaviour a dialog has to have.
+ * An overlay dialog, with the behavior a dialog has to have.
  *
  * Every modal on the site had grown its own version of this, and each one was
  * missing something different: the likes list and the followers list could

@@ -1,12 +1,12 @@
 import type { EntityType } from '@prisma/client'
 
 /**
- * How complete a catalogue entry is, and how much of it anybody has checked.
+ * How complete a catalog entry is, and how much of it anybody has checked.
  *
  * Two separate questions, deliberately kept apart. A page with every field
  * filled and nothing cited is not the same as one with half the fields filled
  * and all of them sourced, and collapsing the two into one percentage would
- * make the first look better than the second. It is the second this catalogue
+ * make the first look better than the second. It is the second this catalog
  * is trying to be.
  *
  * ## The computation
@@ -23,7 +23,7 @@ import type { EntityType } from '@prisma/client'
  * *filled* weight carrying a source. Cited is expressed against what is filled
  * rather than against everything, because an unfilled field is not an uncited
  * claim: it is honestly absent, and counting it as a citation failure would
- * punish leaving a gap open, which is the behaviour the catalogue wants.
+ * punish leaving a gap open, which is the behavior the catalog wants.
  *
  * Legacy columns are excluded. They are superseded and scheduled for removal,
  * and counting them would make every entry look permanently incomplete.
@@ -106,7 +106,7 @@ export function completenessOf(
    *
    * A note that reads identically on all forty pages carries no information at
    * the point a reader sees it. A field nothing has yet is a backlog item for
-   * the catalogue rather than a gap in the record in front of them, so it is
+   * the catalog rather than a gap in the record in front of them, so it is
    * left out until it is the exception rather than the rule.
    */
   universallyMissing: ReadonlySet<string> = new Set()

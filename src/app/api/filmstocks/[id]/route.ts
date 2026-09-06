@@ -95,7 +95,7 @@ export async function PATCH(
     }
 
     // A film stock has no owner at all, so this route previously let any signed
-    // in account write to a shared catalogue record directly. It goes through
+    // in account write to a shared catalog record directly. It goes through
     // the pipeline now: an administrator's edit applies immediately, anyone
     // else's waits for review.
     if (user?.isAdmin) {

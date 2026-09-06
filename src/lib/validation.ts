@@ -170,7 +170,7 @@ export const VALIDATION_LIMITS = {
   MAX_NAME_LENGTH: 80,
   MAX_IMAGE_SIZE_MB: 10,
   /**
-   * Photo originals, which are scans rather than catalogue thumbnails.
+   * Photo originals, which are scans rather than catalog thumbnails.
    *
    * Set against what people actually upload: the largest original on record is
    * 49.5MB, so a 50MB cap sat half a megabyte from rejecting real work. File

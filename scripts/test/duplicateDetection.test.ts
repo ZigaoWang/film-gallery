@@ -1,6 +1,6 @@
 /**
  * The duplicate check stands between someone adding a film stock or camera and
- * the catalogue everyone tags their photographs against. Warning about a real
+ * the catalog everyone tags their photographs against. Warning about a real
  * product is worse than missing a duplicate: it either sends the contributor
  * away or has them pick the wrong stock.
  *
@@ -25,7 +25,7 @@ const same = (a: string, b: string, want: boolean) => {
 
 console.log('duplicate detection')
 
-// Every one of these is a real, separate product in the live catalogue that
+// Every one of these is a real, separate product in the live catalog that
 // plain edit distance scored 83-93% alike.
 same('Kodak Gold 200', 'Kodak Gold 800', false)
 same('Lucky Color 200', 'Lucky Color 400', false)
@@ -56,18 +56,18 @@ check('punctuation and case are ignored', normalizeString('Ilford HP5+') === 'il
 check('empty name matches nothing', productSimilarity('', 'Kodak Gold 200') === 0)
 
 // The route hands in brand and name separately and joins them.
-const catalogue = [
+const catalog = [
   { id: 'a', name: 'Gold 200', brand: 'Kodak' },
   { id: 'b', name: 'Gold 800', brand: 'Kodak' },
   { id: 'c', name: 'Superia 400', brand: 'Fujifilm' },
 ]
 
-const forGold800 = findPotentialDuplicates({ name: 'Gold 800', brand: 'Kodak' }, catalogue, 5, 0.6)
+const forGold800 = findPotentialDuplicates({ name: 'Gold 800', brand: 'Kodak' }, catalog, 5, 0.6)
 check('adding a stock that exists is flagged', forGold800.some(d => d.id === 'b'))
 check('the other speed is not flagged alongside it', !forGold800.some(d => d.id === 'a'),
   `got ${JSON.stringify(forGold800.map(d => d.id))}`)
 
-const forNewStock = findPotentialDuplicates({ name: 'Gold 400', brand: 'Kodak' }, catalogue, 5, 0.6)
+const forNewStock = findPotentialDuplicates({ name: 'Gold 400', brand: 'Kodak' }, catalog, 5, 0.6)
 check('a genuinely new speed is not blocked', forNewStock.length === 0,
   `got ${JSON.stringify(forNewStock.map(d => d.id))}`)
 

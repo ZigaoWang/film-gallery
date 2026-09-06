@@ -49,7 +49,7 @@ export interface Citation {
   passage: string | null
 }
 
-/** The provenance shape both catalogue pages already select. */
+/** The provenance shape both catalog pages already select. */
 export interface ProvenanceRow {
   fieldName: string
   sourceUrl: string | null

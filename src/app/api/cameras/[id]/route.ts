@@ -63,7 +63,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Camera not found' }, { status: 404 })
     }
 
-    // Every field on a camera is a catalogue field, so the whole edit goes
+    // Every field on a camera is a catalog field, so the whole edit goes
     // through the revision pipeline. Whoever added the record has no special
     // claim on it; an administrator's edit applies immediately and anyone
     // else's waits for review, which is the same rule everywhere else.
@@ -147,12 +147,12 @@ export async function DELETE(
       where: { id: userId }
     })
 
-    // A catalogue entry that other people's photos point at is not something
+    // A catalog entry that other people's photos point at is not something
     // its creator can remove. Deletion is irreversible and is an administrator's
     // call.
     if (!user?.isAdmin) {
       return NextResponse.json(
-        { error: 'Only an administrator can delete a catalogue entry' },
+        { error: 'Only an administrator can delete a catalog entry' },
         { status: 403 }
       )
     }

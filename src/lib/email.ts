@@ -238,7 +238,7 @@ export async function sendAdminModerationNotification(
   }
 
   const typeName = type === 'camera' ? 'Camera' : 'Film Stock'
-  // Both of these are typed by whoever created the catalogue entry, and they
+  // Both of these are typed by whoever created the catalog entry, and they
   // land in an administrator's inbox as markup. Escaped for the same reason the
   // report notification escapes its detail.
   const fullName = escapeHtml(itemBrand ? `${itemBrand} ${itemName}` : itemName)
@@ -360,7 +360,7 @@ const REPORT_REASON_LABELS: Record<string, string> = {
 /**
  * Tells the administrators that something has been reported.
  *
- * Catalogue edits already emailed; reports did not, so a complaint sat unseen
+ * Catalog edits already emailed; reports did not, so a complaint sat unseen
  * until somebody happened to open the admin area. That is the wrong failure
  * mode for the one queue where waiting has a cost.
  *

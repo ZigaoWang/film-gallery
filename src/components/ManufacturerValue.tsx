@@ -6,7 +6,7 @@ import SourceLink from './SourceLink'
  *
  * One component so the film page, the search results and the admin table cannot
  * word this differently. The distinction it carries is the point of the field,
- * and a catalogue that phrases the same claim three ways has undermined it.
+ * and a catalog that phrases the same claim three ways has undermined it.
  */
 export default function ManufacturerValue({
   size = 'base',

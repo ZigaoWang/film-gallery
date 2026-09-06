@@ -4,7 +4,7 @@ import type { Camera, FilmStock } from '@prisma/client'
  * Who may change a camera or film stock.
  *
  * Only deletion is gated. Proposing an edit is open to anyone signed in by
- * design — that is what makes the catalogue community-maintained — and the
+ * design — that is what makes the catalog community-maintained — and the
  * moderation queue, not a predicate here, is what decides whether a proposal
  * lands. There were once canEditCamera/canEditFilmStock functions expressing
  * that, but they took three arguments, ignored all of them and returned true,
@@ -26,7 +26,7 @@ export function canDeleteCameraImage(
   userId: string,
   isAdmin: boolean
 ): boolean {
-  // Whoever added the camera has no special claim on it: a catalogue entry is
+  // Whoever added the camera has no special claim on it: a catalog entry is
   // shared, and the account that created it is provenance rather than a right.
   // The person who uploaded the image still does, since that is their file.
   return camera.imageUploadedBy === userId || isAdmin

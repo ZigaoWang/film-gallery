@@ -5,7 +5,7 @@
  * submits each entry as a revision. Nothing is written to a record: every
  * result lands in /admin/revisions with its citations attached and a person
  * decides. Research arriving from elsewhere is exactly the input that should
- * not be trusted straight into the catalogue.
+ * not be trusted straight into the catalog.
  *
  * What it refuses, and why each one has bitten:
  *  - a claim with a source but no passage, which is how a correct citation
@@ -68,7 +68,7 @@ const ENUMS: Record<string, readonly string[]> = {
  * rather than wrongly cited.
  */
 const SUPPORTING_WORDS: Record<string, readonly string[]> = {
-  COLOR: ['color', 'colour'],
+  COLOR: ['color', 'color'],
   MONOCHROME: ['black and white', 'black & white', 'monochrome', 'panchromatic', 'b&w'],
   TUNGSTEN: ['tungsten', '3200k'],
   DAYLIGHT: ['daylight', '5500k', 'luz día', 'luz dia'],
@@ -147,7 +147,7 @@ function problemsWith(entry: Result): string[] {
     // manufacturedBy is a name here and becomes manufacturedByBrandId below.
     const column = field === 'manufacturedBy' ? 'manufacturedByBrandId' : field
     if (!(column in editable)) {
-      problems.push(`${field}: not a field this catalogue can write`)
+      problems.push(`${field}: not a field this catalog can write`)
       continue
     }
     if (cited.editorial) {

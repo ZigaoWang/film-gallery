@@ -17,8 +17,8 @@ import type { FilmStockOption } from '@/lib/filmSearch'
 /**
  * What choosing a development process already settles.
  *
- * Process, type and colour balance overlap almost completely: a film developed
- * in B&W *is* a black and white film, and colour balance is meaningless for
+ * Process, type and color balance overlap almost completely: a film developed
+ * in B&W *is* a black and white film, and color balance is meaningless for
  * one. Asking for all three made the form demand two answers it already had —
  * pick B&W and it still wanted "Black & White" and "Not applicable (B&W)".
  *
@@ -140,7 +140,7 @@ export default function SuggestEditModal({
    *
    * Written into state rather than only derived at submit time, so what the
    * form shows is what it will send — and so that switching away from B&W does
-   * not leave "N/A" behind on a colour film, which is how a stock ends up
+   * not leave "N/A" behind on a color film, which is how a stock ends up
    * filed under a balance that cannot apply to it.
    */
   const handleProcessChange = (value: string) => {
@@ -557,13 +557,13 @@ export default function SuggestEditModal({
                     </p>
                   </div>
 
-                  {/* Colour balance does not apply to black and white, so it is
+                  {/* Color balance does not apply to black and white, so it is
                       stated rather than asked. */}
                   {implied?.colorBalance ? (
                     <DerivedField
                       label="Color balance"
                       value="Not applicable"
-                      from="Black and white film has no colour balance."
+                      from="Black and white film has no color balance."
                     />
                   ) : (
                     <div>

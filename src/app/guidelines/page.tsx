@@ -82,7 +82,7 @@ export default function GuidelinesPage() {
           <h3 className="text-base font-bold text-white mb-1.5">Not sure what you shot?</h3>
           <p className="text-neutral-300 leading-relaxed">
             A thrifted camera with half a roll already in it, a lab envelope with nothing written on
-            it. Say you&rsquo;re not sure instead of leaving it blank. Someone usually recognises it
+            it. Say you&rsquo;re not sure instead of leaving it blank. Someone usually recognizes it
             from the frame edges, and you can come back and fix it later.
           </p>
         </section>
@@ -120,7 +120,7 @@ export default function GuidelinesPage() {
           <p className="text-neutral-300 leading-relaxed">
             Phone photographs often record where they were taken, which can be your home. We strip
             those coordinates out of every upload before storing it. Worth a thought anyway for what
-            else ends up in shot: house numbers, licence plates, school uniforms, mail on a table.
+            else ends up in shot: house numbers, license plates, school uniforms, mail on a table.
           </p>
         </section>
 

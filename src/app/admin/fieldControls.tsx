@@ -13,7 +13,7 @@ import { ADMIN_RESOURCES, displayValue, type FieldSpec, type ReferenceSource, ty
 
 export interface Option { id: string; label: string }
 
-/** The catalogues a `reference` field can point at. */
+/** The catalogs a `reference` field can point at. */
 const REFERENCE_ENDPOINTS: Record<ReferenceSource, string> = {
   cameras: '/api/cameras',
   films: '/api/filmstocks',
@@ -21,7 +21,7 @@ const REFERENCE_ENDPOINTS: Record<ReferenceSource, string> = {
 }
 
 /**
- * Loads every catalogue this resource's reference fields need, once.
+ * Loads every catalog this resource's reference fields need, once.
  *
  * Fetched per modal rather than per field, so a photo does not pull the camera
  * list twice.

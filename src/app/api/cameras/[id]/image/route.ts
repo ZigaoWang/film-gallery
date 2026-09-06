@@ -52,7 +52,7 @@ const { POST, DELETE } = createImageRouteHandler<Camera>({
     // field, not as an unknown string.
     bodyType: (value) => toBodyType(value),
     // Trimmed and de-duplicated the same way a film stock's are, so the two
-    // halves of the catalogue cannot disagree about what an alias list is.
+    // halves of the catalog cannot disagree about what an alias list is.
     aliases: (value) => normalizeAliases(value.split(',')),
     year: (value) => {
       const parsed = parseInt(value, 10)

@@ -1,10 +1,10 @@
 /**
- * Submits written catalogue entries as revisions, in batches.
+ * Submits written catalog entries as revisions, in batches.
  *
  * The pass never writes to a record. Every entry becomes a proposal that lands
  * in /admin/revisions with its citations attached, and a person decides. That
  * is the whole point: a rewrite that wrote forty descriptions directly would be
- * the thing this catalogue exists not to be, just in better prose.
+ * the thing this catalog exists not to be, just in better prose.
  *
  * Content lives in scripts/rewrite/*.json, one file per batch. Each entry
  * carries the fields it proposes and a source URL per field. A field with no
