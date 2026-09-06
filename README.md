@@ -1,4 +1,4 @@
-<a href="https://AvoidXray.com"><img src="docs/cover.webp" alt="AvoidXray" width="100%"></a>
+<a href="https://AvoidXray.com"><img src="https://AvoidXray.com/opengraph-image" alt="AvoidXray" width="100%"></a>
 
 # AvoidXray
 
@@ -23,8 +23,8 @@ exactly as they arrived, apart from stripping the GPS coordinates out of the
 EXIF.
 
 <p>
-  <a href="https://AvoidXray.com/films/kodak-ultramax-400"><img src="docs/film-ultramax.webp" alt="The Kodak UltraMax 400 page, with 195 sample photos" width="49%"></a>
-  <a href="https://AvoidXray.com/cameras/canon-ae-1-program"><img src="docs/camera-ae1.webp" alt="The Canon AE-1 Program page, with 501 sample photos" width="49%"></a>
+  <a href="https://AvoidXray.com/films/kodak-ultramax-400"><img src="https://AvoidXray.com/films/kodak-ultramax-400/opengraph-image" alt="The Kodak UltraMax 400 page, showing sample photographs from the community" width="49%"></a>
+  <a href="https://AvoidXray.com/cameras/canon-ae-1-program"><img src="https://AvoidXray.com/cameras/canon-ae-1-program/opengraph-image" alt="The Canon AE-1 Program page, showing sample photographs from the community" width="49%"></a>
 </p>
 
 ## What it does
