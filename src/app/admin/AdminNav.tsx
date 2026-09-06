@@ -25,7 +25,7 @@ export default function AdminNav() {
         aria-current={current ? 'page' : undefined}
         className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border-l-2 transition-colors ${
           current
-            ? 'text-white border-[#D32F2F] bg-neutral-900'
+            ? 'text-white border-brand bg-neutral-900'
             : 'text-neutral-400 border-transparent hover:text-white hover:bg-neutral-900/60'
         }`}
       >

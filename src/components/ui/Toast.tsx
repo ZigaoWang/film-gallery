@@ -119,7 +119,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
  * had failed.
  */
 const TONE: Record<ToastType, string> = {
-  error: 'bg-[#D32F2F] text-white',
+  error: 'bg-brand text-white',
   success: 'bg-[#1B5E20] text-white border border-[#2E7D32]',
   info: 'bg-neutral-800 text-white border border-neutral-700',
 }

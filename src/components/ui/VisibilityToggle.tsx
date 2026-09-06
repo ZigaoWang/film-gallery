@@ -78,7 +78,7 @@ export default function VisibilityToggle({
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                 active
                   ? option.value === 'PRIVATE'
-                    ? 'bg-[#D32F2F] text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-neutral-700 text-white'
                   : 'text-neutral-400 hover:text-white'
               }`}

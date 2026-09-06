@@ -363,8 +363,8 @@ export default function RevisionQueue() {
               <button
                 onClick={() => submit(revision)}
                 disabled={busy === revision.id || !allDecided}
-                className="h-9 bg-[#D32F2F] px-4 text-xs font-bold uppercase tracking-wide text-white
-                           hover:bg-[#B71C1C] disabled:opacity-40"
+                className="h-9 bg-brand px-4 text-xs font-bold uppercase tracking-wide text-white
+                           hover:bg-brand-dark disabled:opacity-40"
               >
                 {busy === revision.id ? 'Saving…' : 'Apply decision'}
               </button>

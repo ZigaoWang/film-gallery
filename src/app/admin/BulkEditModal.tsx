@@ -123,7 +123,7 @@ export default function BulkEditModal({
                     type="checkbox"
                     checked={on}
                     onChange={e => setEnabled(prev => ({ ...prev, [name]: e.target.checked }))}
-                    className="w-3.5 h-3.5 accent-[#D32F2F]"
+                    className="w-3.5 h-3.5 accent-brand"
                   />
                   <span className={`text-xs uppercase tracking-wide ${on ? 'text-white' : 'text-neutral-500'}`}>
                     {field.label}

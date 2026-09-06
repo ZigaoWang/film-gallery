@@ -11,6 +11,7 @@ import {
   type ProfileTab, type ProfileView,
 } from '@/lib/profileView'
 import { formatLongDate } from '@/lib/formatDate'
+import { BRAND_RED } from '@/lib/constants'
 
 interface PhotoThumb {
   id: string
@@ -188,7 +189,7 @@ export default function ProfileTabs({ photos, initialOffset, username, totalPhot
                 className={`py-3.5 px-4 text-sm font-medium capitalize transition-colors border-b-2
                             focus-visible:outline-none focus-visible:bg-neutral-900 ${
                   activeTab === t
-                    ? 'text-white border-[#D32F2F]'
+                    ? 'text-white border-brand'
                     : 'text-neutral-500 hover:text-white border-transparent'
                 }`}
               >
@@ -208,7 +209,7 @@ export default function ProfileTabs({ photos, initialOffset, username, totalPhot
                   onClick={() => setSort(s)}
                   className={`px-3 py-1.5 text-xs font-medium capitalize transition-colors
                               focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1
-                              focus-visible:outline-[#D32F2F] ${
+                              focus-visible:outline-brand ${
                     sort === s ? 'bg-white text-black' : 'text-neutral-500 hover:text-white'
                   }`}
                 >
@@ -238,7 +239,7 @@ export default function ProfileTabs({ photos, initialOffset, username, totalPhot
                 aria-label={`Clear the ${activeFilterLabel} filter`}
                 className="ml-4 text-neutral-500 transition-colors hover:text-white
                            focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                           focus-visible:outline-[#D32F2F]"
+                           focus-visible:outline-brand"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -332,7 +333,7 @@ function heatStyle(count: number, max: number): React.CSSProperties {
   if (r <= 0.25) return { backgroundColor: '#4a0e0e' }
   if (r <= 0.5)  return { backgroundColor: '#7a1a1a' }
   if (r <= 0.75) return { backgroundColor: '#b02525' }
-  return { backgroundColor: '#D32F2F' }
+  return { backgroundColor: BRAND_RED }
 }
 
 function formatTooltip(date: string, count: number): string {
@@ -486,7 +487,7 @@ function ActivityHeatmap({ photoDays, onDayClick, joinedDate }: {
                       ? (count > 0 ? `${formatTooltip(date, count)} · Joined AvoidXray` : 'Joined AvoidXray')
                       : formatTooltip(date, count)
                     const cellStyle = isJoinDay && count === 0
-                      ? { backgroundColor: '#D32F2F' }
+                      ? { backgroundColor: BRAND_RED }
                       : heatStyle(count, max)
                     return (
                       <button
@@ -562,8 +563,8 @@ function CameraCard({ item, onClick, isActive }: { item: GearItem; onClick: () =
       aria-pressed={isActive}
       className={`group w-full overflow-hidden border bg-neutral-900 text-left transition-colors
                   focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                  focus-visible:outline-[#D32F2F] ${
-        isActive ? 'border-[#D32F2F]' : 'border-neutral-800 hover:border-[#D32F2F]'
+                  focus-visible:outline-brand ${
+        isActive ? 'border-brand' : 'border-neutral-800 hover:border-brand'
       }`}
     >
       <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -591,7 +592,7 @@ function CameraCard({ item, onClick, isActive }: { item: GearItem; onClick: () =
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+            <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
               {item.brand ? `${item.brand} ${item.name}` : item.name}
             </h3>
           </div>
@@ -615,8 +616,8 @@ function FilmCard({ item, onClick, isActive }: { item: GearItem; onClick: () => 
       aria-pressed={isActive}
       className={`group w-full overflow-hidden border bg-neutral-900 text-left transition-colors
                   focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                  focus-visible:outline-[#D32F2F] ${
-        isActive ? 'border-[#D32F2F]' : 'border-neutral-800 hover:border-[#D32F2F]'
+                  focus-visible:outline-brand ${
+        isActive ? 'border-brand' : 'border-neutral-800 hover:border-brand'
       }`}
     >
       <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -642,7 +643,7 @@ function FilmCard({ item, onClick, isActive }: { item: GearItem; onClick: () => 
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+          <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
             {item.brand ? `${item.brand} ${item.name}` : item.name}
           </h3>
           <div className="flex items-center gap-2 text-neutral-500">

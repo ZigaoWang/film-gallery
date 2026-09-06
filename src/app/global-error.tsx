@@ -1,5 +1,7 @@
 'use client'
 
+import { BRAND_RED } from '@/lib/constants'
+
 /**
  * The last resort: an error thrown by the root layout itself, where the normal
  * error page cannot render because its surrounding chrome is what failed. This
@@ -16,7 +18,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
             <button
               onClick={reset}
               style={{
-                background: '#D32F2F', color: '#fff', border: 0, padding: '0.6rem 1.25rem',
+                background: BRAND_RED, color: '#fff', border: 0, padding: '0.6rem 1.25rem',
                 textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, cursor: 'pointer',
               }}
             >

@@ -177,7 +177,7 @@ export default function NotificationBell() {
         // half again as large, so the two did not even miss consistently.
         className="relative grid h-11 w-11 place-items-center text-neutral-400 transition-colors
                    hover:text-white focus-visible:outline focus-visible:outline-1
-                   focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]
+                   focus-visible:outline-offset-2 focus-visible:outline-brand
                    [@media(hover:hover)]:h-8 [@media(hover:hover)]:w-8"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -187,7 +187,7 @@ export default function NotificationBell() {
           <span
             aria-hidden
             className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full
-                       bg-[#D32F2F] text-[10px] font-bold text-white"
+                       bg-brand text-[10px] font-bold text-white"
           >
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>

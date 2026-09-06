@@ -274,14 +274,14 @@ export default function ManagePhotos() {
               aria-pressed={isSelected}
               aria-label={`Select ${photo.caption?.trim() || `photo ${index + 1}`}`}
               className={`relative aspect-square bg-neutral-900 overflow-hidden group transition-all ${
-                isSelected ? 'ring-2 ring-[#D32F2F]' : 'hover:opacity-80'
+                isSelected ? 'ring-2 ring-brand' : 'hover:opacity-80'
               }`}
             >
               <Image src={photo.thumbnailPath} alt={photo.caption ?? ''} fill sizes="200px" className="object-cover" />
 
               <span
                 className={`absolute top-1.5 left-1.5 w-5 h-5 grid place-items-center border transition-colors ${
-                  isSelected ? 'bg-[#D32F2F] border-[#D32F2F]' : 'bg-black/50 border-white/40'
+                  isSelected ? 'bg-brand border-brand' : 'bg-black/50 border-white/40'
                 }`}
                 aria-hidden
               >
@@ -379,16 +379,16 @@ export default function ManagePhotos() {
                 <button
                   onClick={() => setConfirmingDelete(true)}
                   disabled={busy}
-                  className="h-9 px-4 text-xs uppercase tracking-wide font-bold text-neutral-400 hover:text-[#D32F2F]
-                             border border-neutral-800 hover:border-[#D32F2F] transition-colors disabled:opacity-40"
+                  className="h-9 px-4 text-xs uppercase tracking-wide font-bold text-neutral-400 hover:text-brand
+                             border border-neutral-800 hover:border-brand transition-colors disabled:opacity-40"
                 >
                   Delete
                 </button>
                 <button
                   onClick={apply}
                   disabled={busy || changeCount === 0}
-                  className="h-9 px-5 text-xs uppercase tracking-wide font-bold bg-[#D32F2F] text-white
-                             hover:bg-[#B71C1C] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="h-9 px-5 text-xs uppercase tracking-wide font-bold bg-brand text-white
+                             hover:bg-brand-dark transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   {busy ? 'Applying…' : changeCount === 0 ? 'Choose a change' : `Apply to ${selected.size}`}
                 </button>

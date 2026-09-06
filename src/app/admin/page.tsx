@@ -45,8 +45,8 @@ export default async function AdminOverview() {
       {openReports > 0 && (
         <Link
           href="/admin/reports"
-          className="flex items-center justify-between gap-4 mb-3 px-4 py-3 border border-[#D32F2F]/40 bg-[#D32F2F]/10
-                     hover:bg-[#D32F2F]/20 transition-colors"
+          className="flex items-center justify-between gap-4 mb-3 px-4 py-3 border border-brand/40 bg-brand/10
+                     hover:bg-brand/20 transition-colors"
         >
           <span className="text-sm text-white">
             {openReports} open report{openReports === 1 ? '' : 's'}
@@ -58,8 +58,8 @@ export default async function AdminOverview() {
       {pending > 0 && (
         <Link
           href="/admin/moderation"
-          className="flex items-center justify-between gap-4 mb-6 px-4 py-3 border border-[#D32F2F]/40 bg-[#D32F2F]/10
-                     hover:bg-[#D32F2F]/20 transition-colors"
+          className="flex items-center justify-between gap-4 mb-6 px-4 py-3 border border-brand/40 bg-brand/10
+                     hover:bg-brand/20 transition-colors"
         >
           <span className="text-sm text-white">
             {pending} submission{pending === 1 ? '' : 's'} waiting for review

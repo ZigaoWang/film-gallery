@@ -196,7 +196,7 @@ export default function SearchBar() {
         aria-expanded={false}
         className="hidden text-xs font-medium uppercase tracking-wide text-neutral-400 transition-colors
                    hover:text-white focus-visible:outline focus-visible:outline-1
-                   focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F] md:block"
+                   focus-visible:outline-offset-2 focus-visible:outline-brand md:block"
       >
         Search
       </button>
@@ -292,7 +292,7 @@ export default function SearchBar() {
               )}
               <Link
                 href={`/search?q=${encodeURIComponent(query)}`}
-                {...optionProps(viewAllIndex, 'block px-3 py-2 text-center text-sm text-[#D32F2F] hover:bg-neutral-800 border-t border-neutral-800')}
+                {...optionProps(viewAllIndex, 'block px-3 py-2 text-center text-sm text-brand hover:bg-neutral-800 border-t border-neutral-800')}
               >
                 View all results
               </Link>

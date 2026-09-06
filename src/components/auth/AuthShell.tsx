@@ -60,7 +60,7 @@ export default function AuthShell({
             href="/explore"
             className="-ml-2 inline-flex h-11 items-center gap-1.5 px-2 text-sm text-neutral-400
                        transition-colors hover:text-white focus-visible:outline focus-visible:outline-1
-                       focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]"
+                       focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -71,7 +71,7 @@ export default function AuthShell({
           <Link
             href="/"
             className="ml-auto inline-block focus-visible:outline focus-visible:outline-1
-                       focus-visible:outline-offset-4 focus-visible:outline-[#D32F2F]"
+                       focus-visible:outline-offset-4 focus-visible:outline-brand"
             aria-label="AvoidXray home"
           >
             <Image src="/logo.svg" alt="AvoidXray" width={132} height={26} priority />

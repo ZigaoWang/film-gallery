@@ -105,7 +105,7 @@ export function FieldInput({
           checked={value === true}
           disabled={disabled}
           onChange={e => onChange(e.target.checked)}
-          className="w-4 h-4 accent-[#D32F2F] disabled:opacity-40"
+          className="w-4 h-4 accent-brand disabled:opacity-40"
         />
         <span className={`text-sm ${disabled ? 'text-neutral-600' : 'text-neutral-400'}`}>
           {value === true ? 'Yes' : 'No'}

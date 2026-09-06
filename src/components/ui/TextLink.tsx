@@ -21,9 +21,9 @@ import Link from 'next/link'
  * not a sentence with a word picked out.
  */
 export const textLinkClass =
-  'text-white underline underline-offset-2 transition-colors hover:text-[#D32F2F] ' +
+  'text-white underline underline-offset-2 transition-colors hover:text-brand ' +
   'focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 ' +
-  'focus-visible:outline-[#D32F2F]'
+  'focus-visible:outline-brand'
 
 export default function TextLink({
   href,

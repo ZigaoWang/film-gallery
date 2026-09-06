@@ -76,7 +76,7 @@ export default function UserMenu({ username, name, avatar }: UserMenuProps) {
         className="flex h-8 w-8 items-center justify-center overflow-hidden bg-neutral-800 text-sm font-bold
                    text-white transition-colors hover:bg-neutral-700
                    focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                   focus-visible:outline-[#D32F2F]"
+                   focus-visible:outline-brand"
       >
         {avatar ? (
           <Image src={avatar} alt="" width={32} height={32} className="h-full w-full object-cover" />
@@ -126,8 +126,8 @@ export default function UserMenu({ username, name, avatar }: UserMenuProps) {
               role="menuitem"
               onClick={() => signOut({ callbackUrl: '/' })}
               className="block w-full px-4 py-2 text-left text-sm text-neutral-400 transition-colors
-                         hover:bg-neutral-800 hover:text-[#D32F2F]
-                         focus:bg-neutral-800 focus:text-[#D32F2F] focus:outline-none"
+                         hover:bg-neutral-800 hover:text-brand
+                         focus:bg-neutral-800 focus:text-brand focus:outline-none"
             >
               Sign out
             </button>

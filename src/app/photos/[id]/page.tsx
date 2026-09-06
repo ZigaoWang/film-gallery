@@ -358,7 +358,7 @@ export default async function PhotoPage({
                   {photo.camera && (
                     <Link
                       href={canonicalCameraPath(photo.camera)}
-                      className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-all p-4 flex items-center gap-4"
+                      className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-all p-4 flex items-center gap-4"
                     >
                       <div className="relative w-20 h-16 flex-shrink-0 flex items-center justify-center">
                         {photo.camera.imageUrl && photo.camera.imageStatus === 'approved' ? (
@@ -377,11 +377,11 @@ export default async function PhotoPage({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-neutral-500 mb-1 uppercase tracking-wide">Camera</div>
-                        <div className="text-white font-semibold group-hover:text-[#D32F2F] transition-colors truncate">
+                        <div className="text-white font-semibold group-hover:text-brand transition-colors truncate">
                           {photo.camera.brand ? `${photo.camera.brand} ${photo.camera.name}` : photo.camera.name}
                         </div>
                       </div>
-                      <svg className="w-5 h-5 text-neutral-600 group-hover:text-[#D32F2F] transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-neutral-600 group-hover:text-brand transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -390,7 +390,7 @@ export default async function PhotoPage({
                   {photo.filmStock && (
                     <Link
                       href={canonicalFilmPath(photo.filmStock)}
-                      className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-all p-4 flex items-center gap-4"
+                      className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-all p-4 flex items-center gap-4"
                     >
                       <div className="relative w-20 h-16 flex-shrink-0 flex items-center justify-center">
                         {photo.filmStock.imageUrl && photo.filmStock.imageStatus === 'approved' ? (
@@ -408,14 +408,14 @@ export default async function PhotoPage({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-neutral-500 mb-1 uppercase tracking-wide">Film Stock</div>
-                        <div className="text-white font-semibold group-hover:text-[#D32F2F] transition-colors truncate">
+                        <div className="text-white font-semibold group-hover:text-brand transition-colors truncate">
                           {photo.filmStock.brand ? `${photo.filmStock.brand} ${photo.filmStock.name}` : photo.filmStock.name}
                         </div>
                         {photo.filmStock.iso && (
                           <div className="text-xs text-neutral-500">ISO {photo.filmStock.iso}</div>
                         )}
                       </div>
-                      <svg className="w-5 h-5 text-neutral-600 group-hover:text-[#D32F2F] transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-neutral-600 group-hover:text-brand transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -429,7 +429,7 @@ export default async function PhotoPage({
             <div className="lg:w-80 space-y-6">
               {/* Author. Wholly a link to their profile, which is the only
                   thing this card does. */}
-              <Link href={`/${photo.user.username}`} className="flex items-center gap-4 group bg-neutral-900 border border-neutral-800 p-4 hover:border-[#D32F2F] transition-colors">
+              <Link href={`/${photo.user.username}`} className="flex items-center gap-4 group bg-neutral-900 border border-neutral-800 p-4 hover:border-brand transition-colors">
                 <div className="w-14 h-14 bg-neutral-800 flex items-center justify-center text-white text-xl font-bold overflow-hidden flex-shrink-0">
                   {photo.user.avatar ? (
                     <Image src={photo.user.avatar} alt={`${photo.user.name || photo.user.username} profile photo`} width={56} height={56} className="w-full h-full object-cover" />
@@ -438,10 +438,10 @@ export default async function PhotoPage({
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-semibold text-lg group-hover:text-[#D32F2F] transition-colors truncate">{photo.user.name || photo.user.username}</p>
+                  <p className="text-white font-semibold text-lg group-hover:text-brand transition-colors truncate">{photo.user.name || photo.user.username}</p>
                   <p className="text-neutral-500 text-sm truncate">@{photo.user.username}</p>
                 </div>
-                <svg className="w-5 h-5 text-neutral-600 group-hover:text-[#D32F2F] transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-neutral-600 group-hover:text-brand transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

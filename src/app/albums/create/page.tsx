@@ -197,7 +197,7 @@ export default function CreateAlbumPage() {
                       aria-label={`Select ${photo.caption?.trim() || `photo ${index + 1}`}`}
                       className={`aspect-square relative overflow-hidden transition-all ${
                         selectedPhotoIds.includes(photo.id)
-                          ? 'ring-4 ring-[#D32F2F] scale-[0.95]'
+                          ? 'ring-4 ring-brand scale-[0.95]'
                           : 'hover:opacity-80'
                       }`}
                     >
@@ -209,7 +209,7 @@ export default function CreateAlbumPage() {
                         sizes="(max-width: 768px) 33vw, 20vw"
                       />
                       {selectedPhotoIds.includes(photo.id) && (
-                        <div className="absolute top-2 right-2 w-6 h-6 bg-[#D32F2F] rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-brand rounded-full flex items-center justify-center shadow-lg">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>

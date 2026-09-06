@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useToast } from './Toast'
 import { apiErrorMessage } from '@/lib/apiError'
+import { BRAND_RED } from '@/lib/constants'
 
 /**
  * Liking a photo, shared by the button on the photo page and the one on every
@@ -24,8 +25,8 @@ export function Heart({ filled, className = '' }: { filled: boolean; className?:
     <svg
       viewBox="0 0 24 24"
       className={className}
-      fill={filled ? '#D32F2F' : 'none'}
-      stroke={filled ? '#D32F2F' : 'currentColor'}
+      fill={filled ? BRAND_RED : 'none'}
+      stroke={filled ? BRAND_RED : 'currentColor'}
       strokeWidth={1.8}
       strokeLinejoin="round"
       aria-hidden

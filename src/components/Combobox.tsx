@@ -269,7 +269,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
         onBlur={handleBlur}
         placeholder={placeholder}
         disabled={disabled}
-        className={`w-full p-3 bg-neutral-900 text-white border border-neutral-800 focus:border-[#D32F2F] focus:outline-none ${
+        className={`w-full p-3 bg-neutral-900 text-white border border-neutral-800 focus:border-brand focus:outline-none ${
           selected?.imageUrl && !open ? 'pl-11' : ''
         } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
       />
@@ -303,7 +303,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
                   {...shared}
                   key="add-new"
                   onClick={() => chooseRow(row)}
-                  className={`w-full px-3 py-2 text-left text-sm text-[#D32F2F] border-b border-neutral-800 transition-colors ${
+                  className={`w-full px-3 py-2 text-left text-sm text-brand border-b border-neutral-800 transition-colors ${
                     highlighted ? 'bg-neutral-800' : ''
                   }`}
                 >

@@ -17,7 +17,7 @@ type Size = 'sm' | 'md' | 'lg'
 
 const VARIANTS: Record<Variant, string> = {
   /** The one action a screen wants you to take. */
-  primary: 'bg-[#D32F2F] text-white hover:bg-[#B71C1C]',
+  primary: 'bg-brand text-white hover:bg-brand-dark',
   /** Sits next to a primary — "Cancel", "Back". */
   secondary: 'bg-neutral-800 text-white hover:bg-neutral-700',
   /** Lowest weight, for dismissals that should not compete. */

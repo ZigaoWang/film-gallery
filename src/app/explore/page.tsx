@@ -127,7 +127,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
                 aria-current={activeTab === t.id ? 'page' : undefined}
                 className={`py-3 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === t.id
-                    ? 'text-white border-[#D32F2F]'
+                    ? 'text-white border-brand'
                     : 'text-neutral-500 hover:text-white border-transparent'
                 }`}
               >

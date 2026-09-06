@@ -32,7 +32,7 @@ export default function FieldLabel({
       {children}
       {required && (
         <>
-          <span className="text-[#D32F2F] ml-0.5" aria-hidden="true">
+          <span className="text-brand ml-0.5" aria-hidden="true">
             *
           </span>
           <span className="sr-only"> (required)</span>

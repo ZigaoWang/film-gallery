@@ -83,7 +83,7 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Announced, like the sign-in form's. */}
-      {error && <div role="alert" className="bg-[#D32F2F] text-white text-sm px-4 py-3">{error}</div>}
+      {error && <div role="alert" className="bg-brand text-white text-sm px-4 py-3">{error}</div>}
 
       {/* Stacked on a narrow phone: side by side, Username and Name were
           about 130px each, which is not enough to read what you typed. */}
@@ -175,7 +175,7 @@ export default function RegisterForm() {
           checked={acceptedTerms}
           onChange={e => setAcceptedTerms(e.target.checked)}
           required
-          className="mt-0.5 h-4 w-4 flex-shrink-0 accent-[#D32F2F]"
+          className="mt-0.5 h-4 w-4 flex-shrink-0 accent-brand"
         />
         <label htmlFor="accept-terms" className="text-neutral-400 text-sm leading-relaxed">
           {/* Age sits in the same tick rather than in a date-of-birth

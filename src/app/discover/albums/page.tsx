@@ -119,7 +119,7 @@ export default async function DiscoverAlbumsPage({
             {albums.map((album, cardIndex) => {
               const photos = photosByAlbum.get(album.id) || []
               return (
-                <div key={album.id} className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors overflow-hidden">
+                <div key={album.id} className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors overflow-hidden">
                   <Link href={`/albums/${album.id}`}>
                     {/* Photo Grid */}
                     <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -149,7 +149,7 @@ export default async function DiscoverAlbumsPage({
                       ))}
                     </div>
                     <div className="p-4 pb-2">
-                      <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+                      <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                         {album.name}
                       </h3>
                       {album.description && (

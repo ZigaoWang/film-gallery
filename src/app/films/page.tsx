@@ -151,7 +151,7 @@ export default async function FilmsPage({
                 <Link
                   key={film.id}
                   href={canonicalFilmPath(film)}
-                  className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors overflow-hidden"
+                  className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors overflow-hidden"
                 >
                   {/* Photo Grid */}
                   <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -207,7 +207,7 @@ export default async function FilmsPage({
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+                      <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                         {film.brand ? `${film.brand} ${film.name}` : film.name}
                       </h3>
                       <div className="flex items-center gap-2 text-neutral-500">

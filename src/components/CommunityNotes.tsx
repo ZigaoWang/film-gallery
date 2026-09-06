@@ -279,7 +279,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
     'flex items-center gap-1.5 h-8 px-4 text-xs uppercase tracking-wide font-bold transition-colors ' +
     (ctaLocked
       ? 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white'
-      : 'bg-[#D32F2F] hover:bg-[#B71C1C] text-white')
+      : 'bg-brand hover:bg-brand-dark text-white')
 
   const ctaIcon = ctaLocked ? (
     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -376,7 +376,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
             return (
               <li
                 key={n.id}
-                className={`flex gap-3 py-4 first:pt-0 animate-fade-in ${isTop ? 'border-l-2 border-[#D32F2F] pl-4 -ml-4' : ''}`}
+                className={`flex gap-3 py-4 first:pt-0 animate-fade-in ${isTop ? 'border-l-2 border-brand pl-4 -ml-4' : ''}`}
               >
                 <Link href={`/${n.user.username}`} className="flex-shrink-0 hover:opacity-80 transition-opacity">
                   <div className="w-9 h-9 bg-neutral-800 flex items-center justify-center text-xs font-bold text-white overflow-hidden">
@@ -399,7 +399,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
                     </span>
                     {n.edited && <span className="text-xs text-neutral-600 italic">(edited)</span>}
                     {isTop && (
-                      <span className="text-[10px] px-1.5 py-0.5 bg-[#D32F2F]/10 text-[#D32F2F] uppercase tracking-widest font-bold">
+                      <span className="text-[10px] px-1.5 py-0.5 bg-brand/10 text-brand uppercase tracking-widest font-bold">
                         Top
                       </span>
                     )}
@@ -417,7 +417,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
                         <button
                           onClick={() => saveEdit(n.id)}
                           disabled={savingEdit || editContent.trim().length < MIN_LEN}
-                          className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs px-4 h-7 uppercase tracking-wide font-bold transition-colors disabled:opacity-40"
+                          className="bg-brand hover:bg-brand-dark text-white text-xs px-4 h-7 uppercase tracking-wide font-bold transition-colors disabled:opacity-40"
                         >
                           {savingEdit ? 'Saving…' : 'Save'}
                         </button>
@@ -448,7 +448,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
                           n.isAuthor
                             ? 'border-neutral-800 text-neutral-600 cursor-not-allowed'
                             : n.votedHelpful
-                              ? 'border-[#D32F2F] text-[#D32F2F] bg-[#D32F2F]/5'
+                              ? 'border-brand text-brand bg-brand/5'
                               : 'border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white'
                         }`}
                       >

@@ -101,7 +101,7 @@ export default function EditRecordModal({
             <button
               type="submit"
               disabled={busy}
-              className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-[#D32F2F] text-white hover:bg-[#B71C1C] disabled:opacity-40"
+              className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark disabled:opacity-40"
             >
               {busy ? 'Saving…' : 'Save changes'}
             </button>

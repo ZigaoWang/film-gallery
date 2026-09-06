@@ -229,7 +229,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
             aria-label="Close"
             className="-mr-2 p-2 text-neutral-500 hover:text-white
                        focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                       focus-visible:outline-[#D32F2F]"
+                       focus-visible:outline-brand"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -271,7 +271,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
               )}
             </div>
             {error && previewUrl && (
-              <p role="status" className="mt-3 text-sm text-[#D32F2F]">{error}</p>
+              <p role="status" className="mt-3 text-sm text-brand">{error}</p>
             )}
           </div>
 
@@ -286,7 +286,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                   aria-pressed={style === st.id}
                   className={`p-3 text-left border transition-colors ${
                     style === st.id
-                      ? 'bg-[#D32F2F]/10 border-[#D32F2F] text-white'
+                      ? 'bg-brand/10 border-brand text-white'
                       : 'bg-neutral-800/50 border-neutral-700 text-neutral-300 hover:border-neutral-600'
                   }`}
                 >
@@ -305,13 +305,13 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                   aria-pressed={format === f.id}
                   className={`p-2 border transition-colors ${
                     format === f.id
-                      ? 'bg-[#D32F2F]/10 border-[#D32F2F] text-white'
+                      ? 'bg-brand/10 border-brand text-white'
                       : 'bg-neutral-800/50 border-neutral-700 text-neutral-400 hover:border-neutral-600'
                   }`}
                 >
                   <span
                     aria-hidden
-                    className={`block w-full mb-1.5 border ${format === f.id ? 'border-[#D32F2F]' : 'border-neutral-600'}`}
+                    className={`block w-full mb-1.5 border ${format === f.id ? 'border-brand' : 'border-neutral-600'}`}
                     style={{ aspectRatio: f.ratio }}
                   />
                   <span className="block text-[11px] font-medium leading-tight">{f.name}</span>
@@ -330,7 +330,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                   value={mat}
                   onChange={e => setMat(Number(e.target.value))}
                   aria-label="Photograph size"
-                  className="w-full mb-6 accent-[#D32F2F]"
+                  className="w-full mb-6 accent-brand"
                 />
               </>
             )}
@@ -366,7 +366,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                     type="checkbox"
                     checked={showCamera}
                     onChange={(e) => setShowCamera(e.target.checked)}
-                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-[#D32F2F] focus:ring-[#D32F2F] focus:ring-offset-0"
+                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-brand focus:ring-brand focus:ring-offset-0"
                   />
                   <span className="text-neutral-300 text-sm">Show camera ({camera})</span>
                 </label>
@@ -377,7 +377,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                     type="checkbox"
                     checked={showFilm}
                     onChange={(e) => setShowFilm(e.target.checked)}
-                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-[#D32F2F] focus:ring-[#D32F2F] focus:ring-offset-0"
+                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-brand focus:ring-brand focus:ring-offset-0"
                   />
                   <span className="text-neutral-300 text-sm">Show film ({filmStock})</span>
                 </label>
@@ -388,7 +388,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                     type="checkbox"
                     checked={showCaption}
                     onChange={(e) => setShowCaption(e.target.checked)}
-                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-[#D32F2F] focus:ring-[#D32F2F] focus:ring-offset-0"
+                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-brand focus:ring-brand focus:ring-offset-0"
                   />
                   <span className="text-neutral-300 text-sm">Show caption</span>
                 </label>
@@ -400,7 +400,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                     type="checkbox"
                     checked={showQR}
                     onChange={(e) => setShowQR(e.target.checked)}
-                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-[#D32F2F] focus:ring-[#D32F2F] focus:ring-offset-0"
+                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-brand focus:ring-brand focus:ring-offset-0"
                   />
                   <span className="text-neutral-300 text-sm">Show QR code</span>
                 </label>
@@ -416,7 +416,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                     type="checkbox"
                     checked={showUsername}
                     onChange={(e) => setShowUsername(e.target.checked)}
-                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-[#D32F2F] focus:ring-[#D32F2F] focus:ring-offset-0"
+                    className="w-4 h-4 bg-neutral-800 border-neutral-700 text-brand focus:ring-brand focus:ring-offset-0"
                   />
                   <span className="text-neutral-300 text-sm">Show your username</span>
                 </label>
@@ -428,7 +428,7 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
                   type="checkbox"
                   checked={showDate}
                   onChange={(e) => setShowDate(e.target.checked)}
-                  className="w-4 h-4 bg-neutral-800 border-neutral-700 text-[#D32F2F] focus:ring-[#D32F2F] focus:ring-offset-0"
+                  className="w-4 h-4 bg-neutral-800 border-neutral-700 text-brand focus:ring-brand focus:ring-offset-0"
                 />
                 <span className="text-neutral-300 text-sm">Show date</span>
               </label>

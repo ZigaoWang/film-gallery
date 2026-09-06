@@ -50,17 +50,17 @@ export default function HeroSection({ items, totalPhotos, totalFilms, totalCamer
 
         <div className="flex items-center justify-center gap-6 mb-8">
           <Link href="/explore" className="group">
-            <div className="text-2xl md:text-3xl font-black text-white group-hover:text-[#D32F2F] transition-colors">{totalPhotos}</div>
+            <div className="text-2xl md:text-3xl font-black text-white group-hover:text-brand transition-colors">{totalPhotos}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider group-hover:text-neutral-400 transition-colors">Photos</div>
           </Link>
           <div className="w-px h-8 bg-neutral-700" />
           <Link href="/films" className="group">
-            <div className="text-2xl md:text-3xl font-black text-white group-hover:text-[#D32F2F] transition-colors">{totalFilms}</div>
+            <div className="text-2xl md:text-3xl font-black text-white group-hover:text-brand transition-colors">{totalFilms}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider group-hover:text-neutral-400 transition-colors">Films</div>
           </Link>
           <div className="w-px h-8 bg-neutral-700" />
           <Link href="/cameras" className="group">
-            <div className="text-2xl md:text-3xl font-black text-white group-hover:text-[#D32F2F] transition-colors">{totalCameras}</div>
+            <div className="text-2xl md:text-3xl font-black text-white group-hover:text-brand transition-colors">{totalCameras}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider group-hover:text-neutral-400 transition-colors">Cameras</div>
           </Link>
         </div>

@@ -105,7 +105,7 @@ export default function GuidelinesPage() {
         {/* Set apart from the list deliberately. Everything above is removed;
             this is the one where the consequence leaves the site, so it should
             not read as another bullet. */}
-        <p className="mt-8 border-l-2 border-[#D32F2F] pl-4 text-neutral-300 leading-relaxed">
+        <p className="mt-8 border-l-2 border-brand pl-4 text-neutral-300 leading-relaxed">
           Sexual content involving anyone under 18 is illegal. It is removed, the account is banned
           permanently, and it is reported to the authorities. There is no version of this we handle
           quietly.

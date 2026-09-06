@@ -136,7 +136,7 @@ export default function OverflowMenu({
         // keeps a visible focus ring, since a menu is harder to find by
         // keyboard than the plain buttons it replaced.
         className={`inline-flex h-9 w-9 items-center justify-center transition-colors
-                    focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#D32F2F] ${
+                    focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand ${
           open ? 'text-white bg-neutral-800' : 'text-neutral-500 hover:text-white hover:bg-neutral-800'
         }`}
       >
@@ -177,7 +177,7 @@ export default function OverflowMenu({
                 onMouseEnter={() => setActive(index)}
                 className={`block w-full px-4 py-2 text-left text-sm transition-colors focus:outline-none ${
                   item.destructive
-                    ? 'text-[#EF5350] hover:bg-[#D32F2F]/10 focus:bg-[#D32F2F]/10'
+                    ? 'text-[#EF5350] hover:bg-brand/10 focus:bg-brand/10'
                     : 'text-neutral-300 hover:bg-neutral-800 hover:text-white focus:bg-neutral-800 focus:text-white'
                 }`}
               >

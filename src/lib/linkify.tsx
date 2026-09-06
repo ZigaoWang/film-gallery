@@ -124,7 +124,7 @@ function label(url: string, path: string | null): string {
 }
 
 const LINK_CLASS =
-  'text-[#D32F2F] hover:underline underline-offset-2 break-all'
+  'text-brand hover:underline underline-offset-2 break-all'
 
 export function linkify(text: string): React.ReactNode[] {
   // Defensive: this renders whatever a record holds, and a non-string there

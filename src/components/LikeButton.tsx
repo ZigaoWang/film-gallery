@@ -56,8 +56,8 @@ export default function LikeButton({
           aria-label={label}
           aria-pressed={liked}
           className={`transition-colors focus-visible:outline focus-visible:outline-1
-                      focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]
-                      ${liked ? 'text-[#D32F2F]' : 'text-neutral-500 hover:text-white'}`}
+                      focus-visible:outline-offset-2 focus-visible:outline-brand
+                      ${liked ? 'text-brand' : 'text-neutral-500 hover:text-white'}`}
         >
           <Heart filled={liked} className={`h-5 w-5 ${animating ? 'animate-heart-pop' : ''}`} />
         </button>
@@ -72,7 +72,7 @@ export default function LikeButton({
           aria-label={count === 0 ? 'No likes yet' : `See who liked this, ${count}`}
           className={`text-sm tabular-nums transition-colors ${
             count > 0
-              ? 'text-neutral-400 hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]'
+              ? 'text-neutral-400 hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-brand'
               : 'text-neutral-600'
           }`}
         >

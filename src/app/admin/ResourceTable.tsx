@@ -346,7 +346,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
       )}
 
       {error && (
-        <div className="border border-[#D32F2F]/40 bg-[#D32F2F]/10 text-[#ff8a80] text-sm px-4 py-3 mb-4">
+        <div className="border border-brand/40 bg-brand/10 text-[#ff8a80] text-sm px-4 py-3 mb-4">
           {error}
         </div>
       )}
@@ -395,7 +395,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
             <button
               onClick={() => setConfirmingBulkDelete(true)}
               disabled={busy}
-              className="text-xs uppercase tracking-wide text-neutral-500 hover:text-[#D32F2F] px-2 py-1 disabled:opacity-40"
+              className="text-xs uppercase tracking-wide text-neutral-500 hover:text-brand px-2 py-1 disabled:opacity-40"
             >
               Delete
             </button>
@@ -421,7 +421,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
                   onChange={togglePage}
                   disabled={rows.length === 0}
                   aria-label={allOnPageSelected ? 'Deselect this page' : 'Select this page'}
-                  className="w-4 h-4 accent-[#D32F2F] align-middle disabled:opacity-30"
+                  className="w-4 h-4 accent-brand align-middle disabled:opacity-30"
                 />
               </th>
               {spec.columns.map(col => (
@@ -460,7 +460,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
                     // selected row can always be unticked to make room.
                     disabled={atCap && !isSelected}
                     aria-label={`Select ${spec.label.toLowerCase()}`}
-                    className="w-4 h-4 accent-[#D32F2F] align-middle disabled:opacity-30"
+                    className="w-4 h-4 accent-brand align-middle disabled:opacity-30"
                   />
                 </td>
                 {spec.columns.map(col => (
@@ -506,7 +506,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
                   {spec.deletable && (
                     <button
                       onClick={() => setConfirming(row)}
-                      className="text-xs uppercase tracking-wide text-neutral-500 hover:text-[#D32F2F] px-2 py-1"
+                      className="text-xs uppercase tracking-wide text-neutral-500 hover:text-brand px-2 py-1"
                     >
                       Delete
                     </button>
@@ -671,7 +671,7 @@ function ConfirmBulkDelete({
           <button
             onClick={onConfirm}
             disabled={busy || typed.trim() !== expected}
-            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-[#D32F2F] text-white hover:bg-[#B71C1C]
+            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark
                        disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {busy ? 'Deleting…' : `Delete ${count}`}
@@ -901,7 +901,7 @@ function ConfirmDelete({
           <button
             onClick={onConfirm}
             disabled={busy || (heavy && typed !== expected)}
-            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-[#D32F2F] text-white hover:bg-[#B71C1C]
+            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark
                        disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {busy ? 'Deleting…' : 'Delete'}

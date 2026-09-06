@@ -5,6 +5,8 @@
  * note — into markup. Without escaping, a report whose detail contains a tag
  * would render as markup in an administrator's inbox.
  */
+
+import { BRAND_RED } from '@/lib/constants'
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -60,7 +62,7 @@ export async function sendVerificationEmail(email: string, token: string): Promi
               <p style="margin: 0 0 24px; color: #a3a3a3; font-size: 15px; line-height: 1.6;">
                 Thanks for signing up! Click the button below to verify your email address and start sharing your film photography.
               </p>
-              <a href="${verifyUrl}" style="display: inline-block; background-color: #D32F2F; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+              <a href="${verifyUrl}" style="display: inline-block; background-color: ${BRAND_RED}; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                 Verify Email
               </a>
               <p style="margin: 32px 0 0; color: #525252; font-size: 13px; line-height: 1.5;">
@@ -157,7 +159,7 @@ export async function sendPasswordResetEmail(email: string, token: string): Prom
               <p style="margin: 0 0 24px; color: #a3a3a3; font-size: 15px; line-height: 1.6;">
                 Click the button below to reset your password. This link expires in 1 hour.
               </p>
-              <a href="${resetUrl}" style="display: inline-block; background-color: #D32F2F; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+              <a href="${resetUrl}" style="display: inline-block; background-color: ${BRAND_RED}; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                 Reset Password
               </a>
               <p style="margin: 32px 0 0; color: #525252; font-size: 13px; line-height: 1.5;">
@@ -289,7 +291,7 @@ export async function sendAdminModerationNotification(
                   Uploaded by: <span style="color: #a3a3a3;">@${safeUploader}</span>
                 </p>
               </div>
-              <a href="${moderationUrl}" style="display: inline-block; background-color: #D32F2F; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+              <a href="${moderationUrl}" style="display: inline-block; background-color: ${BRAND_RED}; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                 Review Now
               </a>
               <p style="margin: 32px 0 0; color: #525252; font-size: 13px; line-height: 1.5;">
@@ -457,7 +459,7 @@ export async function sendAdminReportNotification(input: {
                   Reported by: <span style="color: #a3a3a3;">@${reporter}</span>
                 </p>
               </div>
-              <a href="${queueUrl}" style="display: inline-block; background-color: #D32F2F; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+              <a href="${queueUrl}" style="display: inline-block; background-color: ${BRAND_RED}; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                 Review ${input.openReports} open report${input.openReports === 1 ? '' : 's'}
               </a>
               ${targetUrl ? `
@@ -506,7 +508,7 @@ function feedbackEmailShell(input: {
   footnote?: string
 }): string {
   const cta = input.cta
-    ? `<a href="${input.cta.url}" style="display: inline-block; background-color: #D32F2F; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHtml(input.cta.label)}</a>`
+    ? `<a href="${input.cta.url}" style="display: inline-block; background-color: ${BRAND_RED}; color: #ffffff; text-decoration: none; padding: 14px 32px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHtml(input.cta.label)}</a>`
     : ''
   const footnote = input.footnote
     ? `<tr><td style="padding-top: 24px; text-align: center;"><p style="margin: 0; color: #525252; font-size: 12px; line-height: 1.6;">${input.footnote}</p></td></tr>`

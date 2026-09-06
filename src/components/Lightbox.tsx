@@ -180,7 +180,7 @@ export default function Lightbox({ photoId, src, alt, width, height, prevId, nex
   const chromeClass =
     'grid place-items-center bg-neutral-900/80 border border-neutral-800 text-neutral-400 ' +
     'backdrop-blur transition-colors hover:text-white hover:border-neutral-600 ' +
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]'
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
 
   const arrowClass = `absolute top-1/2 -translate-y-1/2 h-12 w-12 sm:h-14 sm:w-14 ${chromeClass}`
 

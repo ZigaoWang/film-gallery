@@ -262,7 +262,7 @@ export default async function CameraDetailPage({ params }: Params) {
             <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
               <div>
                 {camera.brand && (
-                  <div className="text-[#D32F2F] text-xs font-medium uppercase tracking-widest mb-1">{camera.brand}</div>
+                  <div className="text-brand text-xs font-medium uppercase tracking-widest mb-1">{camera.brand}</div>
                 )}
                 <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight leading-tight">
                   {camera.name}
@@ -346,7 +346,7 @@ export default async function CameraDetailPage({ params }: Params) {
                   <Link
                     key={film.id}
                     href={href}
-                    className="text-sm px-3 py-1.5 border border-neutral-800 text-neutral-300 hover:border-[#D32F2F] hover:text-white transition-colors"
+                    className="text-sm px-3 py-1.5 border border-neutral-800 text-neutral-300 hover:border-brand hover:text-white transition-colors"
                   >
                     {filmName} <span className="text-neutral-600">({film._count.photos})</span>
                   </Link>

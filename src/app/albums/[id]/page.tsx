@@ -148,7 +148,7 @@ export default async function AlbumPage({ params }: { params: Promise<{ id: stri
 
                 {/* Owner */}
                 {album.user && (
-                  <Link href={`/${album.user.username}`} className="inline-flex items-center gap-3 group bg-neutral-900/50 p-3 border border-neutral-800 hover:border-[#D32F2F] transition-colors">
+                  <Link href={`/${album.user.username}`} className="inline-flex items-center gap-3 group bg-neutral-900/50 p-3 border border-neutral-800 hover:border-brand transition-colors">
                     <div className="w-10 h-10 bg-neutral-800 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                       {album.user.avatar ? (
                         <Image src={album.user.avatar} alt="" width={40} height={40} className="w-full h-full object-cover" />
@@ -157,7 +157,7 @@ export default async function AlbumPage({ params }: { params: Promise<{ id: stri
                       )}
                     </div>
                     <div>
-                      <p className="text-white text-sm font-medium group-hover:text-[#D32F2F] transition-colors">
+                      <p className="text-white text-sm font-medium group-hover:text-brand transition-colors">
                         {album.user.name || album.user.username}
                       </p>
                       <p className="text-neutral-500 text-xs">@{album.user.username}</p>

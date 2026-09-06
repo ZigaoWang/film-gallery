@@ -67,7 +67,7 @@ const PhotoTile = memo(function PhotoTile({
     <div
       onClick={() => onSelect(index)}
       className={`aspect-square overflow-hidden bg-neutral-900 relative cursor-pointer transition-all ${
-        selected ? 'ring-2 ring-[#D32F2F] scale-[1.02]' : 'hover:opacity-80'
+        selected ? 'ring-2 ring-brand scale-[1.02]' : 'hover:opacity-80'
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- a blob URL from
@@ -647,7 +647,7 @@ function UploadPageContent() {
               onDrop={handleDrop}
               onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
               onDragLeave={e => { e.preventDefault(); setIsDragging(false) }}
-              className={`border-2 border-dashed p-10 text-center transition-all ${isDragging ? 'border-[#D32F2F] bg-[#D32F2F]/5' : 'border-neutral-700 hover:border-neutral-600'}`}
+              className={`border-2 border-dashed p-10 text-center transition-all ${isDragging ? 'border-brand bg-brand/5' : 'border-neutral-700 hover:border-neutral-600'}`}
             >
               <input type="file" multiple accept="image/*,.heic,.heif" onChange={e => { uploadFiles(Array.from(e.target.files || []).filter(isImageFile)); e.target.value = '' }} className="hidden" id="file-input" />
               <label htmlFor="file-input" className="cursor-pointer block">
@@ -712,7 +712,7 @@ function UploadPageContent() {
                     <span className="text-neutral-600 ml-2">/ {previews.length} total</span>
                   </span>
                   {isIndividual && (
-                    <button onClick={() => setSelectedIdx(null)} className="px-3 py-1 bg-[#D32F2F] text-white text-xs font-medium hover:bg-[#B71C1C]">
+                    <button onClick={() => setSelectedIdx(null)} className="px-3 py-1 bg-brand text-white text-xs font-medium hover:bg-brand-dark">
                       ← All Photos
                     </button>
                   )}
@@ -835,10 +835,10 @@ function UploadPageContent() {
                       type="checkbox"
                       checked={addToAlbum}
                       onChange={e => setAddToAlbum(e.target.checked)}
-                      className="w-5 h-5 bg-neutral-800 border-2 border-neutral-700 checked:bg-[#D32F2F] checked:border-[#D32F2F] focus:outline-none focus:ring-2 focus:ring-[#D32F2F] focus:ring-offset-2 focus:ring-offset-neutral-900 cursor-pointer"
+                      className="w-5 h-5 bg-neutral-800 border-2 border-neutral-700 checked:bg-brand checked:border-brand focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-neutral-900 cursor-pointer"
                     />
                     <div className="flex-1">
-                      <span className="text-white font-semibold text-sm block group-hover:text-[#D32F2F] transition-colors">
+                      <span className="text-white font-semibold text-sm block group-hover:text-brand transition-colors">
                         Add to Album
                       </span>
                       <span className="text-neutral-500 text-xs">
@@ -893,7 +893,7 @@ function UploadPageContent() {
                               type="button"
                               onClick={() => setAlbumPublic(!albumPublic)}
                               className={`relative w-10 h-5 rounded-full transition-colors ${
-                                albumPublic ? 'bg-[#D32F2F]' : 'bg-neutral-700'
+                                albumPublic ? 'bg-brand' : 'bg-neutral-700'
                               }`}
                             >
                               <span
@@ -927,10 +927,10 @@ function UploadPageContent() {
                   type="checkbox"
                   checked={confirmedFilm}
                   onChange={e => setConfirmedFilm(e.target.checked)}
-                  className="mt-0.5 w-5 h-5 shrink-0 bg-neutral-800 border-2 border-neutral-700 checked:bg-[#D32F2F] checked:border-[#D32F2F] focus:outline-none focus:ring-2 focus:ring-[#D32F2F] focus:ring-offset-2 focus:ring-offset-neutral-900 cursor-pointer"
+                  className="mt-0.5 w-5 h-5 shrink-0 bg-neutral-800 border-2 border-neutral-700 checked:bg-brand checked:border-brand focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-neutral-900 cursor-pointer"
                 />
                 <span className="text-sm">
-                  <span className="block text-white font-semibold group-hover:text-[#D32F2F] transition-colors">
+                  <span className="block text-white font-semibold group-hover:text-brand transition-colors">
                     These were shot on film
                   </span>
                   <span className="block text-neutral-500 text-xs mt-0.5">
@@ -957,7 +957,7 @@ function UploadPageContent() {
               {publishError && (
                 <div
                   role="alert"
-                  className="mb-3 border border-[#D32F2F]/40 bg-[#D32F2F]/10 px-4 py-3 text-sm text-[#ff8a80]"
+                  className="mb-3 border border-brand/40 bg-brand/10 px-4 py-3 text-sm text-[#ff8a80]"
                 >
                   {publishError}
                 </div>

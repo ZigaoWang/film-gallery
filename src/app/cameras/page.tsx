@@ -148,7 +148,7 @@ export default async function CamerasPage({
                 <Link
                   key={camera.id}
                   href={canonicalCameraPath(camera)}
-                  className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors overflow-hidden"
+                  className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors overflow-hidden"
                 >
                   {/* Photo Grid */}
                   <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -211,7 +211,7 @@ export default async function CamerasPage({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+                        <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                           {camera.brand ? `${camera.brand} ${camera.name}` : camera.name}
                         </h3>
                       </div>

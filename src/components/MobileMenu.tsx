@@ -51,7 +51,7 @@ export default function MobileMenu({ isLoggedIn, username, name, avatar }: Mobil
 
   const rowClass = (current: boolean) =>
     `py-3 pl-3 text-base transition-colors border-l-2 ${
-      current ? 'text-white border-[#D32F2F]' : 'text-neutral-400 border-transparent hover:text-white'
+      current ? 'text-white border-brand' : 'text-neutral-400 border-transparent hover:text-white'
     }`
 
   return (
@@ -61,7 +61,7 @@ export default function MobileMenu({ isLoggedIn, username, name, avatar }: Mobil
         onClick={() => setOpenAt(open ? null : pathname)}
         className="relative z-50 -mr-2 grid h-11 w-11 place-items-center text-neutral-400
                    transition-colors hover:text-white focus-visible:outline focus-visible:outline-1
-                   focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]"
+                   focus-visible:outline-offset-2 focus-visible:outline-brand"
         aria-label={open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
         aria-controls="mobile-menu"
@@ -169,8 +169,8 @@ export default function MobileMenu({ isLoggedIn, username, name, avatar }: Mobil
                     type="button"
                     onClick={() => { close(); signOut({ callbackUrl: '/' }) }}
                     className="mt-4 py-3 pl-3 text-left text-base text-neutral-400 transition-colors
-                               hover:text-[#D32F2F] focus-visible:outline focus-visible:outline-1
-                               focus-visible:outline-offset-2 focus-visible:outline-[#D32F2F]"
+                               hover:text-brand focus-visible:outline focus-visible:outline-1
+                               focus-visible:outline-offset-2 focus-visible:outline-brand"
                   >
                     Sign out
                   </button>

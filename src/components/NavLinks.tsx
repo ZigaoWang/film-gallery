@@ -27,7 +27,7 @@ export default function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             className={`relative text-xs uppercase tracking-wide font-medium transition-colors
               ${current ? 'text-white' : 'text-neutral-400 hover:text-white'}
               after:absolute after:left-0 after:right-0 after:-bottom-1.5 after:h-px after:transition-colors
-              ${current ? 'after:bg-[#D32F2F]' : 'after:bg-transparent'}`}
+              ${current ? 'after:bg-brand' : 'after:bg-transparent'}`}
           >
             {item.label}
           </Link>

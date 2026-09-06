@@ -58,7 +58,7 @@ export default function BrowseFilters({
   const chip = (isActive: boolean) =>
     `text-xs px-3 py-1.5 border transition-colors ${
       isActive
-        ? 'border-[#D32F2F] bg-[#D32F2F] text-white'
+        ? 'border-brand bg-brand text-white'
         : 'border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white'
     }`
 

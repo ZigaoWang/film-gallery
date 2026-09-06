@@ -113,7 +113,7 @@ export default function FeedbackThread({
             <li
               key={entry.id}
               className={`border-l-2 pl-4 py-1 ${
-                staff ? 'border-[#D32F2F]' : 'border-neutral-800'
+                staff ? 'border-brand' : 'border-neutral-800'
               }`}
             >
               <p className="text-xs text-neutral-500 mb-1">
@@ -186,7 +186,7 @@ export default function FeedbackThread({
           {error && (
             <p
               role="alert"
-              className="mt-3 text-sm text-[#EF5350] border border-[#D32F2F]/40 bg-[#D32F2F]/5 px-4 py-3"
+              className="mt-3 text-sm text-[#EF5350] border border-brand/40 bg-brand/5 px-4 py-3"
             >
               {error}
             </p>

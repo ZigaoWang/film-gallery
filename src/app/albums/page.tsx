@@ -76,7 +76,7 @@ export default async function MyAlbumsPage() {
           <Link href="/manage" className="py-2 text-sm font-medium text-neutral-500 hover:text-white transition-colors">
             Photos
           </Link>
-          <span className="py-2 text-sm font-medium text-white border-b-2 border-[#D32F2F] -mb-px">
+          <span className="py-2 text-sm font-medium text-white border-b-2 border-brand -mb-px">
             Albums
           </span>
           <div className="ml-auto pb-1">
@@ -99,7 +99,7 @@ export default async function MyAlbumsPage() {
             {albums.map(album => {
               const photos = photosByAlbum.get(album.id) || []
               return (
-                <div key={album.id} className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors overflow-hidden relative">
+                <div key={album.id} className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors overflow-hidden relative">
                   <Link href={`/albums/${album.id}`}>
                     {/* Photo Grid */}
                     <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -128,7 +128,7 @@ export default async function MyAlbumsPage() {
                     {/* Info Section */}
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+                        <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                           {album.name}
                         </h3>
                         <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${

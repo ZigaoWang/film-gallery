@@ -74,7 +74,7 @@ function ResetPasswordFields() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div role="alert" className="bg-[#D32F2F] px-4 py-3 text-sm text-white">
+        <div role="alert" className="bg-brand px-4 py-3 text-sm text-white">
           {error}
           {!token && (
             <>

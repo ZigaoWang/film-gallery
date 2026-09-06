@@ -123,7 +123,7 @@ function GearPanel({
       className="group flex gap-4 border border-neutral-800 bg-gradient-to-br from-neutral-900 to-neutral-950 p-4
                  transition-colors hover:border-neutral-700
                  focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                 focus-visible:outline-[#D32F2F]"
+                 focus-visible:outline-brand"
     >
       <div className="flex h-24 w-24 shrink-0 items-center justify-center bg-neutral-900/50">
         {imageUrl ? (
@@ -134,7 +134,7 @@ function GearPanel({
       </div>
       <div className="min-w-0 flex-1">
         {eyebrow && (
-          <div className="mb-1 text-[11px] font-medium uppercase tracking-widest text-[#D32F2F]">{eyebrow}</div>
+          <div className="mb-1 text-[11px] font-medium uppercase tracking-widest text-brand">{eyebrow}</div>
         )}
         <h2 className="mb-2 font-bold leading-tight text-white group-hover:underline underline-offset-2">
           {name}
@@ -182,7 +182,7 @@ function RelatedPairs({
             key={item.href}
             href={item.href}
             className="border border-neutral-800 px-3 py-1.5 text-sm text-neutral-300 transition-colors
-                       hover:border-[#D32F2F] hover:text-white"
+                       hover:border-brand hover:text-white"
           >
             {item.label} <span className="text-neutral-600">({item.count})</span>
           </Link>

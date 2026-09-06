@@ -21,7 +21,7 @@ const BASE =
   // 16px is the threshold, so this is the smallest value that does not.
   'w-full bg-neutral-900 text-white text-base sm:text-sm px-3 py-2.5 ' +
   'border border-neutral-700 placeholder:text-neutral-600 ' +
-  'focus:border-[#D32F2F] focus:outline-none focus:ring-1 focus:ring-[#D32F2F] ' +
+  'focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand ' +
   'disabled:text-neutral-500 disabled:border-neutral-800 disabled:cursor-not-allowed ' +
   'transition-colors'
 
@@ -78,5 +78,5 @@ export function FieldHint({ children }: { children: React.ReactNode }) {
 
 /** A validation message. Same slot as FieldHint, so layout does not jump. */
 export function FieldError({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1.5 text-xs text-[#D32F2F]">{children}</p>
+  return <p className="mt-1.5 text-xs text-brand">{children}</p>
 }

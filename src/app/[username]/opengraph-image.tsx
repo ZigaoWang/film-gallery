@@ -12,6 +12,7 @@ import {
   logoDataUri,
 } from '@/lib/seo/ogCard'
 import { randomTileUrls } from '@/lib/seo/ogPhotos'
+import { BRAND_RED } from '@/lib/constants'
 
 export const alt = 'Film photographer on AvoidXray'
 export const size = OG_SIZE
@@ -132,7 +133,7 @@ export default async function Image({ params }: Params) {
                 width: 148,
                 height: 148,
                 borderRadius: 74,
-                background: '#D32F2F',
+                background: BRAND_RED,
                 border: '3px solid rgba(255, 255, 255, 0.85)',
                 fontSize: 66,
                 fontWeight: 700,

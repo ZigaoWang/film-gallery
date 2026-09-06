@@ -1,12 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --red: #D32F2F;
-  --yellow: #FFEB3B;
   --black: #0a0a0a;
   --white: #ffffff;
-  --gray: #666;
-  --dark: #111;
 }
 
 /**
@@ -24,7 +20,29 @@
  * class like `font-display` is available for the places that want the tighter
  * cut on purpose.
  */
+/**
+ * The brand red, as a real token.
+ *
+ * There were four colour variables above this that nothing referenced, while
+ * the red itself was written as a literal `#D32F2F` inside an arbitrary-value
+ * class in sixty-nine files, and its hover `#B71C1C` in ten more. So the site
+ * had a colour with no single place to change it, and a set of variables that
+ * looked like that place and were not.
+ *
+ * Declared in `@theme` rather than `:root` because that is what generates the
+ * utilities: `bg-brand`, `text-brand`, `border-brand`, `outline-brand`,
+ * `ring-brand` and `accent-brand` all come from this one line, which is what
+ * lets the arbitrary values go.
+ *
+ * A handful of literals remain on purpose. The open graph cards and the global
+ * error page render without Tailwind, so they cannot reference a utility, and
+ * the heart in the like button sets an SVG fill attribute rather than a class.
+ * Those read the value from lib/constants instead.
+ */
 @theme {
+  --color-brand: #D32F2F;
+  --color-brand-dark: #B71C1C;
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif,

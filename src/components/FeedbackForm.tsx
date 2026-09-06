@@ -127,7 +127,7 @@ export default function FeedbackForm() {
                 aria-pressed={selected}
                 className={`px-4 h-9 text-sm font-medium border transition-colors ${
                   selected
-                    ? 'border-[#D32F2F] bg-[#D32F2F] text-white'
+                    ? 'border-brand bg-brand text-white'
                     : 'border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white'
                 }`}
               >
@@ -206,7 +206,7 @@ export default function FeedbackForm() {
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-[#EF5350] border border-[#D32F2F]/40 bg-[#D32F2F]/5 px-4 py-3">
+        <p role="alert" className="text-sm text-[#EF5350] border border-brand/40 bg-brand/5 px-4 py-3">
           {error}
         </p>
       )}

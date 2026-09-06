@@ -94,7 +94,7 @@ export default function FeedbackItem({ item }: { item: AdminFeedback }) {
               href={`/feedback/${item.reference}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-white text-sm hover:text-[#D32F2F] transition-colors"
+              className="font-mono text-white text-sm hover:text-brand transition-colors"
             >
               {item.reference}
             </a>
@@ -123,7 +123,7 @@ export default function FeedbackItem({ item }: { item: AdminFeedback }) {
               return (
                 <li
                   key={entry.id}
-                  className={`border-l-2 pl-3 ${staff ? 'border-[#D32F2F]' : 'border-neutral-700'}`}
+                  className={`border-l-2 pl-3 ${staff ? 'border-brand' : 'border-neutral-700'}`}
                 >
                   <p className="text-[11px] text-neutral-500 mb-0.5">
                     {staff ? 'You' : 'Them'} · {entry.sentAt}
@@ -167,7 +167,7 @@ export default function FeedbackItem({ item }: { item: AdminFeedback }) {
               aria-pressed={status === option.value}
               className={`px-3 h-8 text-xs font-bold uppercase tracking-wide border transition-colors ${
                 status === option.value
-                  ? 'border-[#D32F2F] bg-[#D32F2F] text-white'
+                  ? 'border-brand bg-brand text-white'
                   : 'border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white'
               }`}
             >

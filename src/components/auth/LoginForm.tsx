@@ -136,7 +136,7 @@ function LoginFormFields() {
             it — the page simply sat there after Enter. */}
         {success && <div role="status" className="bg-[#1B5E20] text-white text-sm px-4 py-3">{success}</div>}
         {error && (
-          <div role="alert" className="bg-[#D32F2F] text-white text-sm px-4 py-3">
+          <div role="alert" className="bg-brand text-white text-sm px-4 py-3">
             {error}
             {showResend && (
               <button

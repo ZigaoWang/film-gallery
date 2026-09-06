@@ -23,7 +23,7 @@ export default function NotFound() {
 
       <main className="flex flex-1 items-center justify-center px-6 py-24">
         <div className="text-center">
-          <p className="mb-4 text-8xl font-black text-[#D32F2F]">404</p>
+          <p className="mb-4 text-8xl font-black text-brand">404</p>
           <h1 className="mb-2 text-2xl font-bold text-white">Film Fogged</h1>
           <p className="mb-8 text-neutral-500">
             This page got exposed to light. It may have been deleted, or the link may be wrong.

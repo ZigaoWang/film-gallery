@@ -37,7 +37,7 @@ export default async function ManagePage() {
         </header>
 
         <div className="flex gap-4 border-b border-neutral-800 mb-6">
-          <span className="py-2 text-sm font-medium text-white border-b-2 border-[#D32F2F] -mb-px">
+          <span className="py-2 text-sm font-medium text-white border-b-2 border-brand -mb-px">
             Photos
           </span>
           <Link href="/albums" className="py-2 text-sm font-medium text-neutral-500 hover:text-white transition-colors">

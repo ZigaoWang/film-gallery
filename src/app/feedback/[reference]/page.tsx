@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 
 const TONE: Record<string, string> = {
   neutral: 'border-neutral-700 text-neutral-300 bg-neutral-900',
-  progress: 'border-[#D32F2F] text-white bg-[#D32F2F]/10',
+  progress: 'border-brand text-white bg-brand/10',
   good: 'border-emerald-700 text-emerald-300 bg-emerald-950/40',
   muted: 'border-neutral-800 text-neutral-500 bg-neutral-900/60',
 }

@@ -102,7 +102,7 @@ export default async function AdminFeedbackPage({
               aria-current={current ? 'page' : undefined}
               className={`px-3 h-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide border transition-colors ${
                 current
-                  ? 'border-[#D32F2F] bg-[#D32F2F] text-white'
+                  ? 'border-brand bg-brand text-white'
                   : 'border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-white'
               }`}
             >

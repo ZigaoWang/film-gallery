@@ -157,7 +157,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               aria-current={type === tab.id ? 'page' : undefined}
               className={`py-3 text-sm font-medium transition-colors whitespace-nowrap border-b-2 ${
                 type === tab.id
-                  ? 'text-white border-[#D32F2F]'
+                  ? 'text-white border-brand'
                   : 'text-neutral-500 hover:text-white border-transparent'
               }`}
             >
@@ -186,7 +186,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             {type === 'all' && <h2 className="text-xl font-bold text-white mb-6">Users</h2>}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {users.map(user => (
-                <Link key={user.id} href={`/${user.username}`} className="flex items-center gap-4 p-4 bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors">
+                <Link key={user.id} href={`/${user.username}`} className="flex items-center gap-4 p-4 bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors">
                   <div className="w-12 h-12 bg-neutral-800 flex items-center justify-center text-white font-bold overflow-hidden shrink-0">
                     {user.avatar ? <Image src={user.avatar} alt="" width={48} height={48} className="w-full h-full object-cover" /> : (user.name || user.username).charAt(0).toUpperCase()}
                   </div>
@@ -211,7 +211,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <Link
                     key={camera.id}
                     href={canonicalCameraPath(camera)}
-                    className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors overflow-hidden"
+                    className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors overflow-hidden"
                   >
                     {/* Photo Grid */}
                     <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -260,7 +260,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+                        <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                           {camera.brand ? `${camera.brand} ${camera.name}` : camera.name}
                         </h3>
                         <p className="text-neutral-500">{camera._count.photos} photos</p>
@@ -292,7 +292,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <Link
                     key={film.id}
                     href={canonicalFilmPath(film)}
-                    className="group bg-neutral-900 border border-neutral-800 hover:border-[#D32F2F] transition-colors overflow-hidden"
+                    className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors overflow-hidden"
                   >
                     {/* Photo Grid */}
                     <div className="grid grid-cols-4 gap-px bg-neutral-800">
@@ -335,7 +335,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
+                        <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                           {film.brand ? `${film.brand} ${film.name}` : film.name}
                         </h3>
                         <div className="flex items-center gap-2 text-neutral-500">

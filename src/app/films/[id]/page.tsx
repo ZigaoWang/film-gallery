@@ -371,7 +371,7 @@ export default async function FilmDetailPage({ params }: Params) {
             <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
               <div>
                 {filmStock.brand && (
-                  <div className="text-[#D32F2F] text-xs font-medium uppercase tracking-widest mb-1">{filmStock.brand}</div>
+                  <div className="text-brand text-xs font-medium uppercase tracking-widest mb-1">{filmStock.brand}</div>
                 )}
                 <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight leading-tight">
                   {filmStock.name}
@@ -548,7 +548,7 @@ export default async function FilmDetailPage({ params }: Params) {
                   <Link
                     key={cam.id}
                     href={comboUrl(filmStock.slug, cam.slug)}
-                    className="text-sm px-3 py-1.5 border border-neutral-800 text-neutral-300 hover:border-[#D32F2F] hover:text-white transition-colors"
+                    className="text-sm px-3 py-1.5 border border-neutral-800 text-neutral-300 hover:border-brand hover:text-white transition-colors"
                   >
                     {camName} <span className="text-neutral-600">({cam._count.photos})</span>
                   </Link>
@@ -556,7 +556,7 @@ export default async function FilmDetailPage({ params }: Params) {
                   <Link
                     key={cam.id}
                     href={canonicalCameraPath(cam)}
-                    className="text-sm px-3 py-1.5 border border-neutral-800 text-neutral-300 hover:border-[#D32F2F] hover:text-white transition-colors"
+                    className="text-sm px-3 py-1.5 border border-neutral-800 text-neutral-300 hover:border-brand hover:text-white transition-colors"
                   >
                     {camName} <span className="text-neutral-600">({cam._count.photos})</span>
                   </Link>

@@ -19,7 +19,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex items-center justify-center px-6">
       <div className="max-w-md text-center">
-        <p className="text-[#D32F2F] text-xs uppercase tracking-wide font-bold mb-3">Something went wrong</p>
+        <p className="text-brand text-xs uppercase tracking-wide font-bold mb-3">Something went wrong</p>
         <h1 className="text-3xl font-black text-white mb-3 tracking-tight">This page didn&apos;t load</h1>
         <p className="text-neutral-500 mb-8">
           The problem is on our side, not yours. Trying again often works. Nothing you did has been lost.
@@ -28,7 +28,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           <button
             onClick={reset}
             className="inline-flex items-center justify-center h-10 px-5 text-sm uppercase tracking-wide font-bold
-                       bg-[#D32F2F] text-white hover:bg-[#B71C1C] transition-colors"
+                       bg-brand text-white hover:bg-brand-dark transition-colors"
           >
             Try again
           </button>

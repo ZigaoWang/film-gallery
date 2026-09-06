@@ -12,12 +12,13 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import sharp from 'sharp'
+import { BRAND_RED } from '@/lib/constants'
 
 export const OG_SIZE = { width: 1200, height: 630 }
 export const OG_CONTENT_TYPE = 'image/png'
 
 const BG = '#0a0a0a'
-const RED = '#D32F2F'
+const RED = BRAND_RED
 const MUTED = '#8f8f8f'
 
 const FONT_DIR = join(process.cwd(), 'public', 'fonts')
