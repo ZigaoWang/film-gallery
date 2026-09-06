@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { hiddenUserIds } from '@/lib/blocks'
+import { bylineUserSelect } from '@/lib/publicUser'
 
 export async function GET(
   req: NextRequest,
@@ -16,9 +20,19 @@ export async function GET(
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
+  // The same rule the feeds apply. This route did not read the session at all,
+  // so a blocked account was still named in the list, with a link to the
+  // profile the block exists to keep out of the reader's way.
+  const session = await getServerSession(authOptions)
+  const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null
+  const hidden = await hiddenUserIds(viewerId)
+
   const followers = await prisma.follow.findMany({
-    where: { followingId: user.id },
-    include: { follower: { select: { username: true, name: true, avatar: true } } },
+    where: {
+      followingId: user.id,
+      ...(hidden.length > 0 ? { followerId: { notIn: hidden } } : {}),
+    },
+    include: { follower: { select: bylineUserSelect } },
     orderBy: { createdAt: 'desc' }
   })
 

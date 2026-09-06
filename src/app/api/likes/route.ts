@@ -8,7 +8,7 @@ import { bylineUserSelect } from '@/lib/publicUser'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
 import { readJsonObject, invalidBody } from '@/lib/requestBody'
-import { blockedFromInteracting } from '@/lib/blocks'
+import { blockedFromInteracting, hiddenUserIds } from '@/lib/blocks'
 
 export async function GET(req: NextRequest) {
   const photoId = req.nextUrl.searchParams.get('photoId')
@@ -27,8 +27,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Photo not found' }, { status: 404 })
   }
 
+  // The same rule already applied to the comments under the photo. Without it
+  // a blocked account was still named in the list of people who liked it.
+  const hidden = await hiddenUserIds(viewerId)
+
   const likes = await prisma.like.findMany({
-    where: { photoId },
+    where: { photoId, ...(hidden.length > 0 ? { userId: { notIn: hidden } } : {}) },
     include: { user: { select: bylineUserSelect } },
     orderBy: { createdAt: 'desc' }
   })
