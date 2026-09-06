@@ -67,7 +67,7 @@ export default function HeaderBar({ user }: { user?: HeaderUser }) {
                 href="/login"
                 className="text-xs text-neutral-400 hover:text-white transition-colors uppercase tracking-wide font-medium"
               >
-                Sign In
+                Sign in
               </Link>
               <ButtonLink href="/register" size="sm">
                 Join
