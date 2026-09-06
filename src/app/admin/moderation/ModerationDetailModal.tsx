@@ -230,7 +230,7 @@ export default function ModerationDetailModal({
 
             {/* AFTER (EDITABLE) */}
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-neutral-300 uppercase">After</h3>
+              <h3 className="text-lg font-bold text-neutral-500 uppercase">After</h3>
 
               {Object.keys(submission.proposedData || {}).length === 0 && (
                 <p className="text-sm text-neutral-500">
@@ -346,20 +346,16 @@ export default function ModerationDetailModal({
 
         {/* Actions - Sticky Bottom */}
         <div className="p-6 border-t border-neutral-800 flex gap-3 sticky bottom-0 bg-neutral-900">
-          <button
+          <Button
             onClick={handleApprove}
-            disabled={processing}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 font-medium disabled:opacity-50"
-          >
+            disabled={processing} className="flex-1">
             {processing ? 'Approving…' : 'Approve Changes'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onReject}
-            disabled={processing}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 font-medium disabled:opacity-50"
-          >
+            disabled={processing} variant="secondary" className="flex-1">
             {processing ? 'Rejecting…' : 'Reject'}
-          </button>
+          </Button>
           <Button
             onClick={onClose}
             disabled={processing} variant="secondary">
