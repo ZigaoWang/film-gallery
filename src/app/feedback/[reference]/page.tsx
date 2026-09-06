@@ -15,6 +15,9 @@ import {
   waitDescription,
 } from '@/lib/feedback'
 import { formatDate } from '@/lib/formatDate'
+import { headers } from 'next/headers'
+import { clientIp, rateLimit } from '@/lib/rateLimit'
+import { LIMITS, limitKey } from '@/lib/rateLimitPolicy'
 
 // A capability URL: it must never be indexed, and it must never be cached
 // where another reader could be served it.
@@ -30,6 +33,24 @@ const TONE: Record<string, string> = {
   progress: 'border-[#D32F2F] text-white bg-[#D32F2F]/10',
   good: 'border-emerald-700 text-emerald-300 bg-emerald-950/40',
   muted: 'border-neutral-800 text-neutral-500 bg-neutral-900/60',
+}
+
+/** Shown instead of the thread when the address has asked too many times. */
+function TooManyLookups() {
+  return (
+    <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
+      <Header />
+      <main className="flex-1 w-full max-w-md mx-auto px-4 md:px-6 py-10 md:py-16">
+        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-3">
+          Too many attempts
+        </h1>
+        <p className="text-neutral-400 text-sm leading-relaxed">
+          Wait a few minutes and open your link again.
+        </p>
+      </main>
+      <Footer />
+    </div>
+  )
 }
 
 /**
@@ -50,6 +71,18 @@ export default async function FeedbackStatusPage({
   // or without the prefix, lands on their thread rather than a 404.
   const normalized = normalizeFeedbackReference(decodeURIComponent(reference))
   if (!normalized) notFound()
+
+  // The limit written for this page, which was declared in the policy and then
+  // never wired to anything, so the one endpoint it names was the one endpoint
+  // without it. Fifty random bits are what actually stand between a stranger
+  // and somebody's thread; this is here so the page cannot be ground for free
+  // database lookups while they try.
+  const limited = rateLimit(
+    limitKey('feedback-lookup', clientIp(await headers())),
+    LIMITS.feedbackLookup.perIp.limit,
+    LIMITS.feedbackLookup.perIp.windowMs
+  )
+  if (!limited.ok) return <TooManyLookups />
 
   const thread = await prisma.feedback.findUnique({
     where: { reference: normalized },
