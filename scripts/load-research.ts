@@ -115,6 +115,30 @@ function passageSupports(field: string, value: unknown, passage: string): boolea
     .some(w => text.includes(w))
 }
 
+/**
+ * Sellers, whose product copy is not a source.
+ *
+ * Retailers reproduce and mistype each other's specifications, and a listing
+ * carrying a manufacturer's own words is still a page the manufacturer does not
+ * control. The rule is easy to agree with and easy to forget under deadline, so
+ * it is enforced here rather than trusted.
+ */
+const RETAILERS = [
+  'bhphotovideo.com', 'adorama.com', 'amazon.', 'ebay.', 'walmart.com',
+  'target.com', 'freestylephoto.biz', 'uniquephoto.com', 'bestbuy.com',
+  'etsy.com', 'aliexpress.', 'alibaba.',
+]
+
+function isRetailer(url: string): boolean {
+  let host: string
+  try {
+    host = new URL(url).hostname.toLowerCase()
+  } catch {
+    return false
+  }
+  return RETAILERS.some(r => host.includes(r))
+}
+
 const [, , file, ...flags] = process.argv
 const apply = flags.includes('--apply')
 
@@ -155,6 +179,7 @@ function problemsWith(entry: Result): string[] {
       continue
     }
     if (!cited.source) problems.push(`${field}: no source`)
+    else if (isRetailer(cited.source)) problems.push(`${field}: cited to a retailer`)
     else if (!cited.passage) problems.push(`${field}: source with no passage`)
 
     const allowed = ENUMS[field]
@@ -166,6 +191,7 @@ function problemsWith(entry: Result): string[] {
   for (const [i, p] of (entry.description ?? []).entries()) {
     if (p.editorial) continue
     if (!p.source) problems.push(`description paragraph ${i + 1}: no source`)
+    else if (isRetailer(p.source)) problems.push(`description paragraph ${i + 1}: cited to a retailer`)
     else if (!p.passage) problems.push(`description paragraph ${i + 1}: source with no passage`)
     // A passage identical to our own sentence means nothing was read; it is
     // the site quoting itself.
