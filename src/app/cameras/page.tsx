@@ -12,6 +12,9 @@ import { displayName, gearImageAlt } from '@/lib/seo/alt'
 import { canonicalCameraPath } from '@/lib/seo/resolve'
 import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { hiddenUserIds, hiddenFilter } from '@/lib/blocks'
 import BrowseFilters from '@/components/BrowseFilters'
 import EmptyState, { CameraIcon } from '@/components/ui/EmptyState'
 import { FORMATS } from '@/lib/constants'
@@ -52,6 +55,12 @@ export default async function CamerasPage({
   const bodyType = toBodyType(typeParam ?? null)
   const format = FORMATS.find(f => f === formatParam)
 
+  // The block rule, which the camera and film detail pages already apply and
+  // this index did not: a blocked account's photograph still turned up in the
+  // preview strip on a card, and in the count printed under it.
+  const session = await getServerSession(authOptions)
+  const hidden = await hiddenUserIds((session?.user as { id?: string } | undefined)?.id)
+
   // Counts come from the unfiltered set, so a chip still reports how many it
   // would match while another filter is applied — the same rule the film
   // index follows.
@@ -62,7 +71,7 @@ export default async function CamerasPage({
         ...(format ? { format } : {}),
       },
       include: {
-        _count: { select: { photos: { where: { ...PUBLIC_PHOTO } } } }
+        _count: { select: { photos: { where: { ...PUBLIC_PHOTO, ...hiddenFilter(hidden) } } } }
       },
       orderBy: { name: 'asc' }
     }),
@@ -83,6 +92,7 @@ export default async function CamerasPage({
       FROM "Photo"
       WHERE "cameraId" IN (${Prisma.join(cameraIds)}) AND published = true
         AND visibility = 'public'
+        AND (${hidden.length === 0} OR "userId" <> ALL(${hidden}))
     ) p WHERE rn <= 4
   ` : []
 

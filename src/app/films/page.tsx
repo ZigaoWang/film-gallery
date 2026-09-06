@@ -15,6 +15,9 @@ import BrowseFilters from '@/components/BrowseFilters'
 import EmptyState, { FilmIcon } from '@/components/ui/EmptyState'
 import { COLOR_BALANCES, FILM_PROCESSES, colorBalanceLabel, filmProcessLabel, toColorBalance, toFilmProcess } from '@/lib/filmFields'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { hiddenUserIds, hiddenFilter } from '@/lib/blocks'
 
 export const metadata: Metadata = {
   title: 'Film Stocks',
@@ -40,6 +43,12 @@ export default async function FilmsPage({
   const process = toFilmProcess(processParam)
   const colorBalance = toColorBalance(balanceParam)
 
+  // The block rule, which the film and camera detail pages already apply and
+  // this index did not: a blocked account's photograph still turned up in the
+  // preview strip on a card, and in the count printed under it.
+  const session = await getServerSession(authOptions)
+  const hidden = await hiddenUserIds((session?.user as { id?: string } | undefined)?.id)
+
   // Counts come from the unfiltered set, so a filter chip still shows how many
   // it would match while another filter is active.
   const [filmStocks, processCounts, balanceCounts] = await Promise.all([
@@ -49,7 +58,7 @@ export default async function FilmsPage({
         ...(colorBalance ? { colorBalance } : {}),
       },
       include: {
-        _count: { select: { photos: { where: { ...PUBLIC_PHOTO } } } }
+        _count: { select: { photos: { where: { ...PUBLIC_PHOTO, ...hiddenFilter(hidden) } } } }
       },
       orderBy: { name: 'asc' }
     }),
@@ -78,6 +87,7 @@ export default async function FilmsPage({
       FROM "Photo"
       WHERE "filmStockId" IN (${Prisma.join(filmStockIds)}) AND published = true
         AND visibility = 'public'
+        AND (${hidden.length === 0} OR "userId" <> ALL(${hidden}))
     ) p WHERE rn <= 4
   ` : []
 
