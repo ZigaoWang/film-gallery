@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Combobox from '@/components/Combobox'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
 import type { FilmStockOption } from '@/lib/filmSearch'
@@ -191,8 +192,9 @@ export default function ManagePhotos() {
     }
   }
 
+  // No busy flag of its own: the dialog owns that while onConfirm is in flight,
+  // and the editing bar behind it cannot be reached anyway.
   const removeSelected = async () => {
-    setBusy(true)
     try {
       const res = await fetch('/api/photos/bulk', {
         method: 'DELETE',
@@ -207,8 +209,6 @@ export default function ManagePhotos() {
       await load()
     } catch {
       toast('Could not reach the server', 'error')
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -272,6 +272,7 @@ export default function ManagePhotos() {
               key={photo.id}
               onClick={e => toggle(index, e.shiftKey)}
               aria-pressed={isSelected}
+              aria-label={`Select ${photo.caption?.trim() || `photo ${index + 1}`}`}
               className={`relative aspect-square bg-neutral-900 overflow-hidden group transition-all ${
                 isSelected ? 'ring-2 ring-[#D32F2F]' : 'hover:opacity-80'
               }`}
@@ -397,41 +398,18 @@ export default function ManagePhotos() {
         </div>
       )}
 
-      {confirmingDelete && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setConfirmingDelete(false)}>
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="bulk-delete-title"
-            className="bg-neutral-900 border border-neutral-800 max-w-md w-full p-6"
-            onClick={e => e.stopPropagation()}
-          >
-            <h2 id="bulk-delete-title" className="text-lg font-bold text-white mb-2">
-              Delete {selected.size} photo{selected.size === 1 ? '' : 's'}?
-            </h2>
-            <p className="text-neutral-400 text-sm mb-6">
-              The image files are removed from storage as well, along with their likes and comments.
-              This cannot be undone.
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setConfirmingDelete(false)}
-                disabled={busy}
-                className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-40"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={removeSelected}
-                disabled={busy}
-                className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-[#D32F2F] text-white hover:bg-[#B71C1C] disabled:opacity-40"
-              >
-                {busy ? 'Deleting…' : `Delete ${selected.size}`}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={confirmingDelete}
+        title={`Delete ${selected.size} photo${selected.size === 1 ? '' : 's'}?`}
+        confirmLabel={`Delete ${selected.size}`}
+        busyLabel="Deleting…"
+        destructive
+        onConfirm={removeSelected}
+        onClose={() => setConfirmingDelete(false)}
+      >
+        The image files are removed from storage as well, along with their likes and comments.
+        This cannot be undone.
+      </ConfirmDialog>
     </div>
   )
 }
