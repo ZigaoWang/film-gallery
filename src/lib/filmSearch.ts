@@ -1,5 +1,3 @@
-import type { Prisma } from '@prisma/client'
-
 export { usefulAliases } from './aliases'
 
 /**
@@ -8,8 +6,8 @@ export { usefulAliases } from './aliases'
  * Nothing here may import the database module, directly or transitively. Seven
  * client components import this file for the pickers, so a runtime dependency
  * on Prisma reaching it puts the whole client in the browser bundle. The query
- * itself lives in catalogueSearch, which is server only. `Prisma` below is a
- * type-only import and is erased at build time.
+ * itself lives in catalogueSearch, which is server only, and nothing in this
+ * file may grow a second copy of it.
  *
  * Film stock lookup, alternate names included.
  *
@@ -17,12 +15,6 @@ export { usefulAliases } from './aliases'
  * to anyone buying it in 35mm, and Kentmere Pan 400 is often written "Kentmere
  * 400". Those live in the `aliases` array, and searching has to cover them or
  * the stock is simply unfindable by the name people actually use.
- *
- * Aliases were previously matched with Prisma's `hasSome`, which is exact
- * array containment — so "5219" worked but "vision" never matched "VISION3
- * 500T", and a lowercase query only matched if that exact casing happened to
- * be stored. This unnests the array and compares with ILIKE, so alternate
- * names behave like every other searchable field.
  */
 
 /**
@@ -47,24 +39,7 @@ export interface FilmMatch {
   matchedAlias: string | null
 }
 
-/**
- * The same idea for a Prisma `where`, for callers that only need filtering and
- * not the matched alias. Aliases still go through a raw subquery, because
- * Prisma cannot express a case-insensitive search inside an array column.
- */
-export function filmStockSearchWhere(query: string): Prisma.FilmStockWhereInput {
-  const q = query.trim()
-  if (!q) return {}
-  return {
-    OR: [
-      { name: { contains: q, mode: 'insensitive' } },
-      { manufacturer: { contains: q, mode: 'insensitive' } },
-      { brand: { contains: q, mode: 'insensitive' } },
-    ],
-  }
-}
-
-/** Client-side equivalent, for pickers that already hold the full list. */
+/** For pickers that already hold the full list and filter in the browser. */
 export function filmMatchesQuery(
   film: { name: string; brand?: string | null; manufacturer?: string | null; aliases?: string[] },
   query: string
