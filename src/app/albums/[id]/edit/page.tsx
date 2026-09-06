@@ -25,14 +25,6 @@ type AlbumPhoto = {
   photo: Photo
 }
 
-type Album = {
-  id: string
-  name: string
-  description: string | null
-  public: boolean
-  photos: AlbumPhoto[]
-}
-
 export default function EditAlbumPage() {
   const params = useParams()
   const albumId = params?.id as string
@@ -41,7 +33,6 @@ export default function EditAlbumPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const [album, setAlbum] = useState<Album | null>(null)
   const [allPhotos, setAllPhotos] = useState<Photo[]>([])
   const [albumName, setAlbumName] = useState('')
   const [description, setDescription] = useState('')
@@ -78,7 +69,6 @@ export default function EditAlbumPage() {
           setLoading(false)
           return
         }
-        setAlbum(albumData)
         setAlbumName(albumData.name || '')
         setDescription(albumData.description || '')
         setIsPublic(albumData.public || false)
