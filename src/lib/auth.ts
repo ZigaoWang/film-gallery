@@ -5,6 +5,21 @@ import bcrypt from 'bcryptjs'
 import { rateLimit, clientIp } from './rateLimit'
 import { LIMITS, limitKey } from './rateLimitPolicy'
 
+/**
+ * Compared against when no account matched, so that both answers cost the same.
+ *
+ * Returning early on a missing account answered in about a millisecond, while a
+ * wrong password spent the ~400ms bcrypt costs at this work factor. The gap is
+ * far wider than network jitter, so timing the sign-in form told an attacker
+ * which addresses are registered, one request at a time and without tripping
+ * anything: a failed sign-in is a perfectly ordinary event.
+ *
+ * A literal rather than a hash computed at import, which would spend that same
+ * 400ms blocking the first request to reach the process. It hashes a string no
+ * password can be, and the result is discarded either way.
+ */
+const ABSENT_ACCOUNT_HASH = '$2b$12$u3AKW.Yrh0G0c1bwQHgKgu4pzAj1nf86gznygNveAQAPMXOjuQoJe'
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -47,10 +62,13 @@ export const authOptions: NextAuthOptions = {
           omit: { passwordHash: false, email: false }
         })
 
-        if (!user) return null
-
-        const valid = await bcrypt.compare(credentials.password, user.passwordHash)
-        if (!valid) return null
+        // The comparison runs either way, so a missing account and a wrong
+        // password take the same time to refuse.
+        const valid = await bcrypt.compare(
+          credentials.password,
+          user?.passwordHash ?? ABSENT_ACCOUNT_HASH
+        )
+        if (!user || !valid) return null
 
         if (!user.emailVerified) {
           throw new Error('EMAIL_NOT_VERIFIED')
