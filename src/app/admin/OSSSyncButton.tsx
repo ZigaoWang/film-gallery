@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/components/ui/Toast'
 import { apiErrorMessage } from '@/lib/apiError'
@@ -77,7 +78,7 @@ export default function OSSSyncButton() {
               <div className="text-neutral-500 text-xs">DB Records</div>
             </div>
             <div>
-              <div className={`font-bold ${status.orphaned > 0 ? 'text-yellow-500' : 'text-green-500'}`}>
+              <div className={`font-bold ${status.orphaned > 0 ? 'text-yellow-500' : 'text-green-400'}`}>
                 {status.orphaned}
               </div>
               <div className="text-neutral-500 text-xs">Orphaned</div>
@@ -85,17 +86,13 @@ export default function OSSSyncButton() {
           </div>
 
           {status.orphaned > 0 && (
-            <button
-              onClick={() => setConfirming(true)}
-              disabled={loading}
-              className="w-full text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 disabled:opacity-50"
-            >
+            <Button size="sm" fullWidth onClick={() => setConfirming(true)} disabled={loading}>
               {loading ? 'Deleting…' : `Delete ${status.orphaned} orphaned files`}
-            </button>
+            </Button>
           )}
 
           {status.orphaned === 0 && (
-            <div className="text-center text-green-500 text-sm">All files synced</div>
+            <div className="text-center text-green-400 text-sm">All files synced</div>
           )}
         </div>
       )}
