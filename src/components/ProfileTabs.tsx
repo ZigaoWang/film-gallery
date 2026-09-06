@@ -552,7 +552,6 @@ function ActivityHeatmap({ photoDays, onDayClick, joinedDate }: {
 function CameraCard({ item, onClick, isActive }: { item: GearItem; onClick: () => void; isActive: boolean }) {
   const displayImage = item.imageStatus === 'approved' ? item.imageUrl : null
   const photos = item.photos.slice(0, 4)
-  const isDisposable = item.cameraType === 'DISPOSABLE'
 
   return (
     <button
@@ -595,11 +594,6 @@ function CameraCard({ item, onClick, isActive }: { item: GearItem; onClick: () =
             <h3 className="text-lg font-bold group-hover:text-[#D32F2F] transition-colors truncate">
               {item.brand ? `${item.brand} ${item.name}` : item.name}
             </h3>
-            {isDisposable && (
-              <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 border border-amber-500/40 text-amber-400 bg-amber-500/10">
-                Disposable
-              </span>
-            )}
           </div>
           <p className="text-neutral-500">{item.count} photo{item.count !== 1 ? 's' : ''}</p>
         </div>

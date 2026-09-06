@@ -163,6 +163,15 @@ export default async function FilmDetailPage({ params }: Params) {
 
   // Cameras this film has actually been shot with — powers the long-tail combo
   // pages and gives the crawler real internal links out of this page.
+  // The other half of the disposable link: a single-use camera arrives loaded
+  // with one stock, and someone on that stock's page is well served by knowing
+  // which cameras come with it already inside.
+  const loadedInto = await prisma.camera.findMany({
+    where: { defaultFilmStockId: filmStock.id },
+    select: { id: true, name: true, slug: true, brand: true },
+    orderBy: { name: 'asc' },
+  })
+
   // Blocked accounts are excluded here too. Without it the list counted frames
   // the grid below refuses to show, so a body could appear with a count of one
   // and lead to a combo page that renders nothing.
@@ -238,6 +247,7 @@ export default async function FilmDetailPage({ params }: Params) {
 
   // Aliases that add something the name does not already say.
   const alternateNames = usefulAliases(name, filmStock.aliases)
+  const loadedList = loadedInto.map(c => ({ ...c, label: displayName(c) ?? c.name }))
 
   const processLabel = filmProcessLabel(filmStock.process)
   const balanceLabel = colorBalanceLabel(filmStock.colorBalance)
@@ -482,6 +492,20 @@ export default async function FilmDetailPage({ params }: Params) {
                 {/* Alternate names and product codes. Useful to a reader who
                     knows the stock as "5219", and it puts that string on the
                     page for anyone searching it. */}
+                {loadedList.length > 0 && (
+                  <p className="mt-3 text-sm text-neutral-500">
+                    {loadedList.length === 1 ? 'Loaded in' : 'Loaded in'}{' '}
+                    {loadedList.map((c, i) => (
+                      <span key={c.id}>
+                        {i > 0 && ', '}
+                        <Link href={canonicalCameraPath(c)} className={textLinkClass}>
+                          {c.label}
+                        </Link>
+                      </span>
+                    ))}
+                  </p>
+                )}
+
                 {alternateNames.length > 0 && (
                   <p className="mt-3 text-sm text-neutral-500">
                     Also known as{' '}

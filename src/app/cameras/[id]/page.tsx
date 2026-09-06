@@ -15,6 +15,7 @@ import { resolveCameraSlug, lookupCamera, canonicalFilmPath } from '@/lib/seo/re
 import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld'
 import { displayName, gearImageAlt, article } from '@/lib/seo/alt'
 import { usefulAliases } from '@/lib/aliases'
+import { textLinkClass } from '@/components/ui/TextLink'
 import CompletenessNote from '@/components/CompletenessNote'
 import { citationsByField } from '@/lib/citations'
 import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
@@ -134,6 +135,17 @@ export default async function CameraDetailPage({ params }: Params) {
   }))
 
   // Films actually shot on this body — the reverse side of the combo pages.
+  // A disposable arrives loaded, and the film in it is the whole reason its
+  // photographs look the way they do. Naming it here, and naming the camera on
+  // that film's page, is the one link the catalogue could already store and
+  // never showed.
+  const loadedFilm = camera.defaultFilmStockId
+    ? await prisma.filmStock.findUnique({
+        where: { id: camera.defaultFilmStockId },
+        select: { name: true, slug: true, id: true, brand: true },
+      })
+    : null
+
   // Blocked accounts excluded, so the counts here agree with the grid; see the
   // film page for what the mismatch looked like.
   const pairedFilms = await prisma.filmStock.findMany({
@@ -285,6 +297,15 @@ export default async function CameraDetailPage({ params }: Params) {
                     ))}
                 </div>
               </div>
+
+              {loadedFilm && (
+                <p className="mt-3 text-sm text-neutral-500">
+                  Comes loaded with{' '}
+                  <Link href={canonicalFilmPath(loadedFilm)} className={textLinkClass}>
+                    {displayName(loadedFilm) ?? loadedFilm.name}
+                  </Link>
+                </p>
+              )}
 
               {alternateNames.length > 0 && (
                 <p className="mt-3 text-sm text-neutral-500">

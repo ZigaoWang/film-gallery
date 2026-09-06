@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
+import { displayName } from '@/lib/seo/alt'
 
 type SearchResult = {
   photos: { id: string; thumbnailPath: string; caption: string | null }[]
@@ -169,7 +170,7 @@ export default function SearchBar() {
                   <div className="px-3 py-2 text-neutral-500 text-xs uppercase">Cameras</div>
                   {results.cameras.map(c => (
                     <Link key={c.id} href={canonicalCameraPath(c)} onClick={() => { setOpen(false); setExpanded(false) }} className="block px-3 py-2 hover:bg-neutral-800">
-                      <span className="text-white text-sm">{c.brand ? `${c.brand} ${c.name}` : c.name}</span>
+                      <span className="text-white text-sm">{displayName(c) ?? c.name}</span>
                       <span className="text-neutral-500 text-xs ml-2">{c._count.photos} photos</span>
                     </Link>
                   ))}
@@ -180,7 +181,7 @@ export default function SearchBar() {
                   <div className="px-3 py-2 text-neutral-500 text-xs uppercase">Films</div>
                   {results.films.map(f => (
                     <Link key={f.id} href={canonicalFilmPath(f)} onClick={() => { setOpen(false); setExpanded(false) }} className="block px-3 py-2 hover:bg-neutral-800">
-                      <span className="text-white text-sm">{f.brand ? `${f.brand} ${f.name}` : f.name}</span>
+                      <span className="text-white text-sm">{displayName(f) ?? f.name}</span>
                       <span className="text-neutral-500 text-xs ml-2">{f._count.photos} photos</span>
                     </Link>
                   ))}
