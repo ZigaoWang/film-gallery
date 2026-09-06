@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useId, useRef } from 'react'
+import { useId, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useDialogBehavior } from './dialog'
 
 /**
  * An overlay dialog, with the behavior a dialog has to have.
@@ -38,31 +39,7 @@ export default function Modal({
 }) {
   const titleId = useId()
   const closeRef = useRef<HTMLButtonElement>(null)
-  const openerRef = useRef<HTMLElement | null>(null)
-
-  useEffect(() => {
-    if (!open) return
-
-    // Remembered before focus moves, so it can be handed back on close.
-    openerRef.current = document.activeElement as HTMLElement | null
-    closeRef.current?.focus()
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKeyDown)
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previousOverflow
-      // Back to the control that opened this, so closing a dialog does not
-      // drop a keyboard user at the top of the document.
-      openerRef.current?.focus()
-    }
-  }, [open, onClose])
+  const panelRef = useDialogBehavior({ open, onClose, initialFocus: closeRef })
 
   if (!open) return null
 
@@ -74,10 +51,12 @@ export default function Modal({
       onClick={onClose}
     >
       <div
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`w-full ${width} border border-neutral-800 bg-neutral-900 shadow-xl`}
+        className={`w-full ${width} border border-neutral-800 bg-neutral-900 shadow-xl focus:outline-none`}
         onClick={event => event.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">

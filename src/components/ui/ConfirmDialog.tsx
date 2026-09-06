@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Button from './Button'
+import { useDialogBehavior } from './dialog'
 
 /**
  * Confirmation before something that cannot be undone.
@@ -37,24 +38,13 @@ export default function ConfirmDialog({
 }) {
   const [busy, setBusy] = useState(false)
   const cancelRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    cancelRef.current?.focus()
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !busy) onClose()
-    }
-    window.addEventListener('keydown', onKeyDown)
-
-    // The page behind must not scroll while a modal is up.
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previous
-    }
-  }, [open, busy, onClose])
+  // Escape is ignored while the action is in flight: the dialog is the only
+  // thing reporting that something is still happening.
+  const panelRef = useDialogBehavior({
+    open,
+    onClose: () => { if (!busy) onClose() },
+    initialFocus: cancelRef,
+  })
 
   if (!open) return null
 
@@ -76,10 +66,12 @@ export default function ConfirmDialog({
       onClick={() => !busy && onClose()}
     >
       <div
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
-        className="bg-neutral-900 border border-neutral-800 max-w-md w-full p-6"
+        className="bg-neutral-900 border border-neutral-800 max-w-md w-full p-6 focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="confirm-title" className="text-lg font-bold text-white mb-2">
