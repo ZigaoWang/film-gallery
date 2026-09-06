@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { REPORT_REASONS, REPORT_TARGET_NOUNS, type ReportTarget } from '@/lib/reportTypes'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from './ui/Toast'
 import Button, { ButtonLink } from './ui/Button'
 import { fieldClass, fieldClassMultiline } from './ui/Field'
+import { useDialogBehavior } from './ui/dialog'
 
 /**
  * The report dialog, opened from an item's overflow menu.
@@ -32,19 +33,7 @@ export default function ReportDialog({
   const [detail, setDetail] = useState('')
   const [busy, setBusy] = useState(false)
   const firstFieldRef = useRef<HTMLSelectElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    firstFieldRef.current?.focus()
-    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKeyDown)
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previous
-    }
-  }, [open, onClose])
+  const panelRef = useDialogBehavior({ open, onClose, initialFocus: firstFieldRef })
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,10 +75,12 @@ export default function ReportDialog({
       {open && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={onClose}>
           <div
+            ref={panelRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="report-title"
-            className="bg-neutral-900 border border-neutral-800 max-w-md w-full"
+            className="bg-neutral-900 border border-neutral-800 max-w-md w-full focus:outline-none"
             onClick={e => e.stopPropagation()}
           >
             <div className="px-6 py-4 border-b border-neutral-800">

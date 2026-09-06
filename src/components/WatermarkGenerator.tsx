@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
+import { useDialogBehavior } from '@/components/ui/dialog'
 
 interface WatermarkProps {
   photoId: string
@@ -71,6 +72,10 @@ async function describeFailure(response: Response): Promise<string> {
 }
 
 export default function WatermarkGenerator({ photoId, camera, filmStock, takenDate, onClose }: WatermarkProps) {
+  // Always open: the parent mounts this component only while the dialog is
+  // showing, and unmounts it to close.
+  const panelRef = useDialogBehavior({ open: true, onClose })
+
   const [style, setStyle] = useState<ExportStyle>('clean')
   const supports = SUPPORTS[style]
   const [format, setFormat] = useState<ExportFormat>('post')
@@ -203,11 +208,19 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
 
   return (
     <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-neutral-900 max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="watermark-title"
+        className="bg-neutral-900 max-w-4xl w-full max-h-[90vh] overflow-y-auto focus:outline-none"
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-neutral-800 sticky top-0 bg-neutral-900 z-10">
           <div>
-            <h2 className="text-white font-bold text-xl">Download with Watermark</h2>
+            <h2 id="watermark-title" className="text-white font-bold text-xl">Download with Watermark</h2>
             <p className="text-neutral-500 text-sm mt-1">Choose a style for your photo</p>
           </div>
           <button

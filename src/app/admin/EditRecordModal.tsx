@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { ADMIN_RESOURCES, type FieldSpec, type ResourceName } from '@/lib/admin/resources'
+import { useDialogBehavior } from '@/components/ui/dialog'
 import { FieldInput, toInput, useReferenceOptions } from './fieldControls'
 
 type Row = Record<string, unknown>
@@ -24,7 +25,8 @@ export default function EditRecordModal({
 }) {
   const spec = ADMIN_RESOURCES[resource]
   const fields = Object.entries(spec.editable) as [string, FieldSpec][]
-  const dialogRef = useRef<HTMLDivElement>(null)
+  // Mounted only while it is open, so the dialog is open whenever it exists.
+  const panelRef = useDialogBehavior({ open: true, onClose })
   const options = useReferenceOptions(resource)
 
   const [values, setValues] = useState<Record<string, unknown>>(() => {
@@ -32,17 +34,6 @@ export default function EditRecordModal({
     for (const [name, field] of fields) initial[name] = toInput(field, row[name])
     return initial
   })
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKeyDown)
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previous
-    }
-  }, [onClose])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,11 +51,12 @@ export default function EditRecordModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-start justify-center p-4 overflow-y-auto" onClick={onClose}>
       <div
-        ref={dialogRef}
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-record-title"
-        className="bg-neutral-900 border border-neutral-800 max-w-2xl w-full my-8"
+        className="bg-neutral-900 border border-neutral-800 max-w-2xl w-full my-8 focus:outline-none"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">

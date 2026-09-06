@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ADMIN_RESOURCES, UNIQUE_FIELDS, type FieldSpec, type ResourceName } from '@/lib/admin/resources'
+import { useDialogBehavior } from '@/components/ui/dialog'
 import { FieldInput, useReferenceOptions } from './fieldControls'
 
 /**
@@ -38,16 +39,9 @@ export default function BulkEditModal({
     return initial
   })
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKeyDown)
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = previous
-    }
-  }, [onClose])
+  // The table mounts this only while it is open, so there is no closed state to
+  // report.
+  const panelRef = useDialogBehavior({ open: true, onClose })
 
   const chosen = fields.filter(([name]) => enabled[name])
 
@@ -62,10 +56,12 @@ export default function BulkEditModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-start justify-center p-4 overflow-y-auto" onClick={onClose}>
       <div
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="bulk-edit-title"
-        className="bg-neutral-900 border border-neutral-800 max-w-2xl w-full my-8"
+        className="bg-neutral-900 border border-neutral-800 max-w-2xl w-full my-8 focus:outline-none"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">

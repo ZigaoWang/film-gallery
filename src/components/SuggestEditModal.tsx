@@ -11,6 +11,7 @@ import { useToast } from './ui/Toast'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
+import { useDialogBehavior } from '@/components/ui/dialog'
 import type { FilmStockOption } from '@/lib/filmSearch'
 
 
@@ -163,11 +164,24 @@ export default function SuggestEditModal({
     }
   }, [previewUrl])
 
+  // The sign-in prompt stands in for the whole form, so only one of these two
+  // overlays is ever on screen. Each gets its own call, keyed to the condition
+  // that renders it, so the one that is not showing does not lock the page.
+  const signInPanelRef = useDialogBehavior({ open: !session, onClose })
+  const panelRef = useDialogBehavior({ open: !!session, onClose })
+
   if (!session) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div className="bg-neutral-900 border border-neutral-800 p-8 max-w-md w-full">
-          <h2 className="text-xl font-bold text-white mb-4">Sign in required</h2>
+        <div
+          ref={signInPanelRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="suggest-edit-signin-title"
+          className="bg-neutral-900 border border-neutral-800 p-8 max-w-md w-full focus:outline-none"
+        >
+          <h2 id="suggest-edit-signin-title" className="text-xl font-bold text-white mb-4">Sign in required</h2>
           <p className="text-neutral-400 mb-6">
             You need to sign in to suggest edits.
           </p>
@@ -294,11 +308,18 @@ export default function SuggestEditModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto p-4 md:p-6">
-      <div className="bg-neutral-900 border border-neutral-800 w-full max-w-2xl my-4 md:my-8">
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="suggest-edit-title"
+        className="bg-neutral-900 border border-neutral-800 w-full max-w-2xl my-4 md:my-8 focus:outline-none"
+      >
         <div className="p-4 md:p-6">
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-white">Suggest Edit</h2>
+              <h2 id="suggest-edit-title" className="text-xl md:text-2xl font-bold text-white">Suggest Edit</h2>
               <p className="text-neutral-500 text-sm mt-1">
                 {brand ? `${brand} ${name}` : name}
               </p>

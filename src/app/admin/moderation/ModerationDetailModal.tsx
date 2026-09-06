@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
+import { useDialogBehavior } from '@/components/ui/dialog'
 
 type Submission = {
   submissionId: string
@@ -42,6 +43,15 @@ export default function ModerationDetailModal({
   onReject,
   processing
 }: Props) {
+  // The queue mounts this only for the submission being reviewed, so it is open
+  // for as long as it exists. Escape is ignored while a decision is in flight,
+  // the same way the close and cancel buttons are disabled: the modal is the
+  // only thing reporting that the approve or reject is still running.
+  const panelRef = useDialogBehavior({
+    open: true,
+    onClose: () => { if (!processing) onClose() },
+  })
+
   // The edit form starts from the proposed data and diverges as the reviewer
   // types, so it is state rather than a derived value. Resetting it in an
   // effect rendered the previous submission's values for one frame when the
@@ -114,11 +124,18 @@ export default function ModerationDetailModal({
 
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-start justify-center overflow-y-auto">
-      <div className="bg-neutral-900 border border-neutral-800 w-full max-w-5xl my-8 mx-4">
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="moderation-detail-title"
+        className="bg-neutral-900 border border-neutral-800 w-full max-w-5xl my-8 mx-4 focus:outline-none"
+      >
         {/* Header */}
         <div className="p-6 border-b border-neutral-800 flex items-center justify-between sticky top-0 bg-neutral-900 z-10">
           <div>
-            <h2 className="text-2xl font-bold text-white">{submission.name}</h2>
+            <h2 id="moderation-detail-title" className="text-2xl font-bold text-white">{submission.name}</h2>
             {submission.brand && (
               <p className="text-neutral-500">{submission.brand}</p>
             )}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import Image from 'next/image'
 import Combobox from '@/components/Combobox'
 import { FORMATS } from '@/lib/constants'
@@ -10,6 +10,7 @@ import type { NewItemPayload } from '@/lib/newItemForm'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
+import { useDialogBehavior } from '@/components/ui/dialog'
 import type { FilmStockOption } from '@/lib/filmSearch'
 
 
@@ -49,6 +50,17 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
   const [customFormat, setCustomFormat] = useState('')
 
   const typeLabel = type === 'camera' ? 'Camera' : 'Film Stock'
+
+  const titleId = useId()
+  const nameRef = useRef<HTMLInputElement>(null)
+  // Every caller renders this modal only while it is open, so there is no
+  // `open` prop to pass through. Escape is ignored while the create is in
+  // flight, matching the Cancel button, which is disabled for the same reason.
+  const panelRef = useDialogBehavior({
+    open: true,
+    onClose: () => { if (!loading) onCancel() },
+    initialFocus: nameRef,
+  })
 
   // Clean up object URL on unmount to prevent memory leaks
   useEffect(() => {
@@ -118,12 +130,19 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto p-4 md:p-6">
-      <div className="bg-neutral-900 border border-neutral-800 w-full max-w-2xl my-4 md:my-8">
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="bg-neutral-900 border border-neutral-800 w-full max-w-2xl my-4 md:my-8 focus:outline-none"
+      >
         <div className="p-4 md:p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-white">Add New {typeLabel}</h2>
+              <h2 id={titleId} className="text-xl md:text-2xl font-bold text-white">Add New {typeLabel}</h2>
               <p className="text-neutral-500 text-sm mt-1">Enter details below</p>
             </div>
             <button
@@ -152,13 +171,18 @@ export default function NewItemModal({ type, initialName = '', onSubmit, onCance
             {/* Name */}
             <div>
               <FieldLabel required>{typeLabel} name</FieldLabel>
+              {/* Focused through the dialog hook rather than with autoFocus.
+                  autoFocus lands during the commit, before the hook has read
+                  which element opened the modal, so the hook recorded this
+                  input as the opener and closing handed focus back to a field
+                  that no longer existed. */}
               <input
+                ref={nameRef}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={type === 'camera' ? 'e.g. Canon AE-1, Leica M6…' : 'e.g. Portra 400, HP5 Plus…'}
                 className={`${fieldClass}`}
-                autoFocus
                 disabled={loading}
               />
             </div>

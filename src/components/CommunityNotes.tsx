@@ -9,6 +9,7 @@ import { useToast } from './ui/Toast'
 import { linkify } from '@/lib/linkify'
 import ItemActions from './ItemActions'
 import ConfirmDialog from './ui/ConfirmDialog'
+import { useDialogBehavior } from './ui/dialog'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
@@ -80,6 +81,11 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
   const [savingEdit, setSavingEdit] = useState(false)
   const [voting, setVoting] = useState<Set<string>>(new Set())
   const composerRef = useRef<HTMLTextAreaElement>(null)
+  const panelRef = useDialogBehavior({
+    open: showComposer,
+    onClose: () => setShowComposer(false),
+    initialFocus: composerRef,
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -100,26 +106,6 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
       })
     return () => { cancelled = true }
   }, [targetType, targetId])
-
-  // Autofocus composer on open + lock body scroll
-  useEffect(() => {
-    if (showComposer) {
-      composerRef.current?.focus()
-      const prev = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-      return () => { document.body.style.overflow = prev }
-    }
-  }, [showComposer])
-
-  // ESC closes composer
-  useEffect(() => {
-    if (!showComposer) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowComposer(false)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [showComposer])
 
   const sorted = useMemo(() => {
     if (!notes) return []
@@ -507,13 +493,18 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
           onClick={() => setShowComposer(false)}
         >
           <div
-            className="bg-neutral-900 border border-neutral-800 w-full max-w-2xl my-4 md:my-8 animate-fade-in"
+            ref={panelRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="community-note-composer-title"
+            className="bg-neutral-900 border border-neutral-800 w-full max-w-2xl my-4 md:my-8 animate-fade-in focus:outline-none"
             onClick={e => e.stopPropagation()}
           >
             <div className="p-4 md:p-6">
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">Post a Community Note</h2>
+                  <h2 id="community-note-composer-title" className="text-xl md:text-2xl font-bold text-white">Post a Community Note</h2>
                   <p className="text-neutral-500 text-sm mt-1">{targetLabel}</p>
                 </div>
                 <button
