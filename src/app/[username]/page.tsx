@@ -11,6 +11,7 @@ import ItemActions from '@/components/ItemActions'
 import { ButtonLink } from '@/components/ui/Button'
 import FollowersModal from '@/components/FollowersModal'
 import ProfileTabs from '@/components/ProfileTabs'
+import EmptyState from '@/components/ui/EmptyState'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import type { Metadata } from 'next'
@@ -86,12 +87,24 @@ export default async function UserPage({
   const isOwn = currentUserId === user.id
 
   // Only relevant on someone else's profile, so it is not queried on your own.
-  const blockRecord = currentUserId && !isOwn
-    ? await prisma.block.findUnique({
-        where: { blockerId_blockedId: { blockerId: currentUserId, blockedId: user.id } },
-        select: { id: true },
+  //
+  // Both directions are read. Whether you blocked them decides what the
+  // actions menu offers; whether either of you blocked the other decides
+  // whether their photographs appear at all, because a block is stored once
+  // and applied both ways.
+  const blocks = currentUserId && !isOwn
+    ? await prisma.block.findMany({
+        where: {
+          OR: [
+            { blockerId: currentUserId, blockedId: user.id },
+            { blockerId: user.id, blockedId: currentUserId },
+          ],
+        },
+        select: { blockerId: true },
       })
-    : null
+    : []
+  const viewerBlockedThem = blocks.some(b => b.blockerId === currentUserId)
+  const isBlocked = blocks.length > 0
 
   // Checked at render as well as on save. Rows written before the API
   // validated this field can still hold anything, including a `javascript:`
@@ -102,7 +115,13 @@ export default async function UserPage({
   // re-roll it: the grid runs in paging mode, which restores the exact photo
   // list, offset and seed it cached before navigating away.
   const featuredSeed = randomSeed()
-  const firstPage = await getProfileFirstPage(user.id, featuredSeed, FEED_FIRST_PAGE + 1, currentUserId)
+  // None of their work is loaded while a block stands in either direction.
+  // /api/photos already refuses to page a blocked account, so this first
+  // screen was the only place their photographs still appeared, and they
+  // vanished the moment the reader scrolled or changed the sort.
+  const firstPage = isBlocked
+    ? []
+    : await getProfileFirstPage(user.id, featuredSeed, FEED_FIRST_PAGE + 1, currentUserId)
 
   const [isFollowingRecord, userLikes, cameraUsage, filmUsage, gearPreviews, photoDays] = await Promise.all([
     currentUserId && !isOwn
@@ -110,26 +129,26 @@ export default async function UserPage({
           where: { followerId_followingId: { followerId: currentUserId, followingId: user.id } }
         })
       : Promise.resolve(null),
-    currentUserId
+    currentUserId && firstPage.length > 0
       ? prisma.like.findMany({
           where: { userId: currentUserId, photoId: { in: firstPage.map(p => p.id) } },
           select: { photoId: true }
         })
       : Promise.resolve([]),
-    prisma.photo.groupBy({
+    isBlocked ? Promise.resolve([]) : prisma.photo.groupBy({
       by: ['cameraId'],
       where: { userId: user.id, ...visibleToViewer(currentUserId), cameraId: { not: null } },
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } }
     }),
-    prisma.photo.groupBy({
+    isBlocked ? Promise.resolve([]) : prisma.photo.groupBy({
       by: ['filmStockId'],
       where: { userId: user.id, ...visibleToViewer(currentUserId), filmStockId: { not: null } },
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } }
     }),
-    getGearPreviews(user.id, currentUserId),
-    getPhotoDays(user.id, currentUserId),
+    isBlocked ? Promise.resolve([]) : getGearPreviews(user.id, currentUserId),
+    isBlocked ? Promise.resolve([]) : getPhotoDays(user.id, currentUserId),
   ])
 
   const cameraIds = cameraUsage.map(c => c.cameraId!).filter(Boolean)
@@ -204,7 +223,7 @@ export default async function UserPage({
 
   // Counted across every photo, not just the page that was fetched — summing
   // summing the fetched page would report the likes on the first thirty only.
-  const totalLikes = await prisma.like.count({
+  const totalLikes = isBlocked ? 0 : await prisma.like.count({
     where: { photo: { userId: user.id, ...visibleToViewer(currentUserId) } },
   })
   const joinDate = formatMonth(user.createdAt)
@@ -259,7 +278,7 @@ export default async function UserPage({
                         // Reporting still is: the dialog explains the sign-in.
                         block={
                           currentUserId
-                            ? { username: user.username, initiallyBlocked: Boolean(blockRecord) }
+                            ? { username: user.username, initiallyBlocked: viewerBlockedThem }
                             : undefined
                         }
                       />
@@ -334,6 +353,22 @@ export default async function UserPage({
           </div>
         </div>
 
+        {isBlocked ? (
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+            <EmptyState
+              message={
+                viewerBlockedThem
+                  ? 'You blocked this account, so their photographs are hidden.'
+                  : 'These photographs are not available to you.'
+              }
+            />
+            {viewerBlockedThem && (
+              <p className="mt-4 text-center text-xs text-neutral-600">
+                Unblock them from the actions menu to see their work again.
+              </p>
+            )}
+          </div>
+        ) : (
         <ProfileTabs
           initialOffset={hasMorePhotos ? FEED_FIRST_PAGE : null}
           username={user.username}
@@ -350,6 +385,7 @@ export default async function UserPage({
           // about which day an account was created.
           joinedDate={user.createdAt.toISOString().split('T')[0]}
         />
+        )}
       </main>
 
       <Footer />
