@@ -126,13 +126,10 @@ export interface ResourceSpec {
  */
 export const VALUE_LABELS: Record<string, Record<string, string>> = {
   process: { C41: 'C-41', E6: 'E-6', ECN2: 'ECN-2', BW: 'Black & white', OTHER: 'Other' },
-  chromaticity: { COLOR: 'Color', MONOCHROME: 'Monochrome' },
+  chromaticity: { COLOR: 'Colour', MONOCHROME: 'Monochrome' },
   polarity: { NEGATIVE: 'Negative', POSITIVE: 'Positive', DIRECT_POSITIVE: 'Direct positive' },
   manufacturerStatus: {
-    SAME_AS_BRAND: 'Brand coats its own',
-    KNOWN: 'Confirmed maker',
-    ATTRIBUTED: 'Reported maker',
-    UNKNOWN: 'Not established',
+    SAME_AS_BRAND: 'The brand itself', KNOWN: 'Confirmed', ATTRIBUTED: 'Reported', UNKNOWN: 'Not established',
   },
   colorBalance: { DAYLIGHT: 'Daylight', TUNGSTEN: 'Tungsten', NA: 'N/A' },
   visibility: { PUBLIC: 'Public', PRIVATE: 'Private' },
@@ -165,14 +162,14 @@ export function displayValue(column: string, value: unknown): string {
 }
 
 const FILM_PROCESS = ['C41', 'E6', 'ECN2', 'BW', 'OTHER'] as const
-const CHROMATICITY = ['COLOR', 'MONOCHROME'] as const
-const POLARITY = ['NEGATIVE', 'POSITIVE', 'DIRECT_POSITIVE'] as const
-const MANUFACTURER_STATUS = ['SAME_AS_BRAND', 'KNOWN', 'ATTRIBUTED', 'UNKNOWN'] as const
 const COLOR_BALANCE = ['DAYLIGHT', 'TUNGSTEN', 'NA'] as const
 const VISIBILITY = ['PUBLIC', 'PRIVATE'] as const
 const IMAGE_STATUS = ['none', 'pending', 'approved', 'rejected'] as const
 const CAMERA_BODY_TYPES = ['SLR', 'RANGEFINDER', 'COMPACT', 'TLR', 'FOLDING', 'VIEW', 'INSTANT', 'DISPOSABLE'] as const
 const FRAME_FORMAT_VALUES = ['FULL_FRAME', 'HALF_FRAME', 'PANORAMIC', 'SPROCKET_HOLE'] as const
+const CHROMATICITY = ['COLOR', 'MONOCHROME'] as const
+const POLARITY = ['NEGATIVE', 'POSITIVE', 'DIRECT_POSITIVE'] as const
+const MANUFACTURER_STATUS = ['SAME_AS_BRAND', 'KNOWN', 'ATTRIBUTED', 'UNKNOWN'] as const
 
 export const ADMIN_RESOURCES = {
   users: {
@@ -300,15 +297,13 @@ export const ADMIN_RESOURCES = {
       iso: { kind: 'number', label: 'ISO', min: 1, max: 100000 },
       process: { kind: 'enum', label: 'Process', options: FILM_PROCESS },
       colorBalance: { kind: 'enum', label: 'Colour balance', options: COLOR_BALANCE },
-      chromaticity: { kind: 'enum', label: 'Colour or mono', options: CHROMATICITY, help: 'Independent of process: XP2 Super is monochrome and develops in C-41.' },
+      chromaticity: { kind: 'enum', label: 'Colour or mono', options: CHROMATICITY, help: 'Independent of process: XP2 Super is black and white developed in C-41.' },
       polarity: { kind: 'enum', label: 'Negative or positive', options: POLARITY },
-      // The maker and how confidently it is known travel together: the column
-      // pair is constrained so that KNOWN and ATTRIBUTED require a maker and
-      // SAME_AS_BRAND and UNKNOWN forbid one. Editing either without the other
-      // was impossible from any form, so the claim the page renders was the one
-      // thing nobody could correct.
-      manufacturerStatus: { kind: 'enum', label: 'Maker confidence', options: MANUFACTURER_STATUS, help: 'KNOWN needs a source stating it outright. Reported is the honest answer far more often.' },
-      manufacturedByBrandId: { kind: 'reference', label: 'Made by', source: 'brands', help: 'Leave blank unless the maker differs from the brand.' },
+      // What the page actually renders for "made by". The legacy `manufacturer`
+      // text column above is not it, so without these two the displayed claim
+      // was the one field an admin could not correct.
+      manufacturerStatus: { kind: 'enum', label: 'Maker is', options: MANUFACTURER_STATUS, help: 'KNOWN needs a source stating it outright. ATTRIBUTED is reported but unconfirmed, and is the honest answer more often.' },
+      manufacturedByBrandId: { kind: 'reference', label: 'Made by', source: 'brands', help: 'Required for KNOWN and ATTRIBUTED. Must be empty for the other two.' },
       filmType: { kind: 'text', label: 'Type', maxLength: 60 },
       // A stock can be sold in more than one gauge, so this column is a list.
       format: { kind: 'stringList', label: 'Format', help: 'Comma separated. 35mm, 120, sheet sizes.' },

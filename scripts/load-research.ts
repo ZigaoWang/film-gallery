@@ -195,6 +195,9 @@ async function main() {
   let skipped = 0
 
   for (const entry of results) {
+    // A results file may carry a trailing note rather than an entry.
+    if (!entry.entityType) continue
+
     const target = await findEntity(entry)
     if (!target) {
       console.error(`  SKIP  ${entry.name}: no such record`)
