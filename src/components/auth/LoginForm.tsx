@@ -5,7 +5,7 @@ import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, PasswordInput } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { apiErrorMessage } from '@/lib/apiError'
 import { textLinkClass } from '@/components/ui/TextLink'
@@ -166,13 +166,11 @@ function LoginFormFields() {
 
         <div>
           <FieldLabel htmlFor="login-password" required>Password</FieldLabel>
-          <input
+          <PasswordInput
             id="login-password"
-            type="password"
             autoComplete="current-password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className={fieldClass}
             required
           />
         </div>

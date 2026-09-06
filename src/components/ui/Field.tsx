@@ -1,3 +1,7 @@
+'use client'
+
+import { useState } from 'react'
+
 /**
  * Form controls. One look for every input, textarea and select on the site.
  *
@@ -68,6 +72,59 @@ export function FieldSelect({
     <select className={`${SINGLE_LINE} ${className}`.trim()} {...props}>
       {children}
     </select>
+  )
+}
+
+/**
+ * A password box with a control that shows what has been typed.
+ *
+ * Every password on the site was write-only. That is the wrong default on a
+ * phone, where the keyboard is small, autocorrect is close by and the field
+ * gives no way to check what landed in it: the cost of a typo is a failed
+ * sign-in on an existing account, and on the sign-up form it is an account
+ * whose password nobody knows, discovered at the next sign-in.
+ *
+ * Built here rather than on one form, because a reveal on Register and not on
+ * Reset is worse than none: the two would then behave differently for the same
+ * job, which is the thing this codebase's shared primitives exist to stop.
+ *
+ * The control is a real button, so it is reachable by keyboard and announced,
+ * and `aria-pressed` says which state it is in. It is deliberately outside the
+ * tab order's way of the submit button only in the sense that it comes after
+ * the field it belongs to, which is where somebody checking their typing
+ * expects to find it. The field starts hidden every time; nothing remembers
+ * that it was revealed.
+ */
+export function PasswordInput({
+  className = '',
+  ...props
+}: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>) {
+  const [revealed, setRevealed] = useState(false)
+
+  return (
+    <div className="relative">
+      <input
+        type={revealed ? 'text' : 'password'}
+        // Room for the button, so a long password does not run underneath it.
+        className={`${SINGLE_LINE} pr-16 ${className}`.trim()}
+        {...props}
+      />
+      <button
+        type="button"
+        onClick={() => setRevealed(v => !v)}
+        aria-pressed={revealed}
+        aria-label={revealed ? 'Hide password' : 'Show password'}
+        // Disabled with the field, so a form mid-submit cannot be poked at.
+        disabled={props.disabled}
+        className="absolute inset-y-0 right-0 px-3 text-xs font-medium uppercase tracking-wide
+                   text-neutral-500 transition-colors hover:text-neutral-300
+                   disabled:cursor-not-allowed disabled:text-neutral-700
+                   focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-[-2px]
+                   focus-visible:outline-brand"
+      >
+        {revealed ? 'Hide' : 'Show'}
+      </button>
+    </div>
   )
 }
 

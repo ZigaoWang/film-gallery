@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { fieldClass, PasswordInput } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { apiErrorMessage } from '@/lib/apiError'
 import { textLinkClass } from '@/components/ui/TextLink'
@@ -130,13 +130,11 @@ export default function RegisterForm() {
 
       <div>
         <FieldLabel htmlFor="register-password" required>Password</FieldLabel>
-        <input
+        <PasswordInput
           id="register-password"
-          type="password"
           autoComplete="new-password"
           value={form.password}
           onChange={e => setForm({ ...form, password: e.target.value })}
-          className={`${fieldClass}`}
           required
           minLength={MIN_PASSWORD_LENGTH}
           aria-describedby="password-hint"
@@ -152,13 +150,11 @@ export default function RegisterForm() {
           and the first sign-in fails for no visible reason. */}
       <div>
         <FieldLabel htmlFor="register-confirm-password" required>Confirm password</FieldLabel>
-        <input
+        <PasswordInput
           id="register-confirm-password"
-          type="password"
           autoComplete="new-password"
           value={confirmPassword}
           onChange={e => setConfirmPassword(e.target.value)}
-          className={fieldClass}
           required
         />
       </div>

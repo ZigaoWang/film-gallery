@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { fieldClass } from '@/components/ui/Field'
+import { PasswordInput } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { apiErrorMessage } from '@/lib/apiError'
 import { textLinkClass } from '@/components/ui/TextLink'
@@ -90,13 +90,11 @@ function ResetPasswordFields() {
 
       <div>
         <FieldLabel htmlFor="new-password" required>New password</FieldLabel>
-        <input
+        <PasswordInput
           id="new-password"
-          type="password"
           autoComplete="new-password"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className={fieldClass}
           required
           minLength={MIN_PASSWORD_LENGTH}
           disabled={!token}
@@ -109,13 +107,11 @@ function ResetPasswordFields() {
 
       <div>
         <FieldLabel htmlFor="confirm-password" required>Confirm password</FieldLabel>
-        <input
+        <PasswordInput
           id="confirm-password"
-          type="password"
           autoComplete="new-password"
           value={confirmPassword}
           onChange={e => setConfirmPassword(e.target.value)}
-          className={fieldClass}
           required
           disabled={!token}
         />
