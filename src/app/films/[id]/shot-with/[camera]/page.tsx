@@ -1,24 +1,23 @@
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import MasonryGrid from '@/components/MasonryGrid'
+import GearCard from '@/components/GearCard'
 import JsonLd from '@/components/JsonLd'
 import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { lookupFilm, lookupCamera, canonicalFilmPath, canonicalCameraPath } from '@/lib/seo/resolve'
+import { lookupFilm, lookupCamera, canonicalFilmPath } from '@/lib/seo/resolve'
 import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
-import { displayName, article, gearImageAlt } from '@/lib/seo/alt'
+import { displayName, article } from '@/lib/seo/alt'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE } from '@/lib/photoFeed'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
-import { bodyTypeLabel, bodyTypeProse } from '@/lib/cameraFields'
+import { bodyTypeLabel } from '@/lib/cameraFields'
 import { colorBalanceLabel, filmProcessLabel } from '@/lib/filmFields'
-import { textLinkClass } from '@/components/ui/TextLink'
 import { formatMonth } from '@/lib/formatDate'
 
 /**
@@ -98,71 +97,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     alternates: { canonical },
   }
 }
-
-/** One half of the pairing, drawn the way the catalog draws it everywhere else. */
-function GearPanel({
-  href,
-  eyebrow,
-  name,
-  imageUrl,
-  imageAlt,
-  specs,
-  icon,
-}: {
-  href: string
-  eyebrow: string | null
-  name: string
-  imageUrl: string | null
-  imageAlt: string
-  specs: string[]
-  icon: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex gap-4 border border-neutral-800 bg-gradient-to-br from-neutral-900 to-neutral-950 p-4
-                 transition-colors hover:border-neutral-700
-                 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                 focus-visible:outline-brand"
-    >
-      <div className="flex h-24 w-24 shrink-0 items-center justify-center bg-neutral-900/50">
-        {imageUrl ? (
-          <Image src={imageUrl} alt={imageAlt} width={96} height={96} className="h-full w-full object-contain" />
-        ) : (
-          <span className="text-neutral-700">{icon}</span>
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
-        {eyebrow && (
-          <div className="mb-1 text-[11px] font-medium uppercase tracking-widest text-brand">{eyebrow}</div>
-        )}
-        <h2 className="mb-2 font-bold leading-tight text-white group-hover:underline underline-offset-2">
-          {name}
-        </h2>
-        <div className="flex flex-wrap gap-1.5">
-          {specs.map(s => (
-            <span key={s} className="border border-neutral-700 px-2 py-0.5 text-xs text-neutral-300">
-              {s}
-            </span>
-          ))}
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-const FilmIcon = (
-  <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-  </svg>
-)
-
-const CameraIcon = (
-  <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-)
 
 /** A row of sibling pairings, which is real navigation rather than a footer of links. */
 function RelatedPairs({
@@ -352,7 +286,12 @@ export default async function ComboPage({ params }: Params) {
             <li aria-hidden>/</li>
             <li><Link href={canonicalFilmPath(film)} className="hover:text-white">{filmName}</Link></li>
             <li aria-hidden>/</li>
-            <li aria-current="page" className="text-neutral-300">{cameraName}</li>
+            {/* The relationship, not the camera. A trail ending in "Canon
+                Autoboy S" under "Kodak UltraMax 400" reads as the camera being
+                a kind of the film, which is what the URL's shape implies and
+                the page does not mean. The structured data always said "Shot
+                with"; only the visible trail had dropped it. */}
+            <li aria-current="page" className="text-neutral-300">Shot with {article(cameraName)} {cameraName}</li>
           </ol>
         </nav>
 
@@ -368,47 +307,12 @@ export default async function ComboPage({ params }: Params) {
           </p>
         </header>
 
-        {/* Both halves, each linking to its own page. The pairing is the
-            subject of this page and neither of them was on it. */}
+        {/* The same card the photo page uses for the same two things. Both
+            halves are shown because the pairing belongs to neither of them. */}
         <div className="mb-10 grid gap-4 md:grid-cols-2">
-          <GearPanel
-            href={canonicalFilmPath(film)}
-            eyebrow={film.manufacturer || film.brand}
-            name={film.name}
-            imageUrl={film.imageStatus === 'approved' ? film.imageUrl : null}
-            imageAlt={gearImageAlt(film, 'film')}
-            specs={filmSpecs}
-            icon={FilmIcon}
-          />
-          <GearPanel
-            href={canonicalCameraPath(camera)}
-            eyebrow={camera.brand}
-            name={camera.name}
-            imageUrl={camera.imageStatus === 'approved' ? camera.imageUrl : null}
-            imageAlt={gearImageAlt(camera, 'camera')}
-            specs={cameraSpecs}
-            icon={CameraIcon}
-          />
+          <GearCard kind="film" gear={film} specs={filmSpecs} />
+          <GearCard kind="camera" gear={camera} specs={cameraSpecs} />
         </div>
-
-        {/* What the pairing is, in the site's voice, from the two records. Only
-            what they actually state: a stock with no process and a body with no
-            type produce a shorter sentence rather than a padded one. */}
-        {(film.summary || camera.bodyType) && (
-          <div className="mb-10 max-w-3xl space-y-3 text-sm leading-relaxed text-neutral-400">
-            {film.summary && <p>{film.summary}</p>}
-            {camera.bodyType && (
-              <p>
-                Shot here on {bodyTypeProse(camera.bodyType)}
-                {camera.format ? ` in ${camera.format}` : ''}
-                {camera.year ? `, introduced in ${camera.year}` : ''}.{' '}
-                <Link href={canonicalCameraPath(camera)} className={textLinkClass}>
-                  More about the {camera.name}
-                </Link>
-              </p>
-            )}
-          </div>
-        )}
 
         <div>
           <div className="mb-6 flex items-center justify-between">

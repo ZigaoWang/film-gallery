@@ -11,14 +11,15 @@ import OwnerControls from './OwnerControls'
 import LikeButton from '@/components/LikeButton'
 import CommentSection from '@/components/CommentSection'
 import Lightbox from '@/components/Lightbox'
+import GearCard from '@/components/GearCard'
 import WatermarkButton from '@/components/WatermarkButton'
 import PhotoActions from './PhotoActions'
 import type { Metadata } from 'next'
 import { blurHashToDataURL } from '@/lib/blurhash'
 import JsonLd from '@/components/JsonLd'
-import { photoAlt, photoTitle, photoDescription, photographerName, displayName, gearImageAlt } from '@/lib/seo/alt'
+import { photoAlt, photoTitle, photoDescription, photographerName, displayName } from '@/lib/seo/alt'
 import { photoJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
-import { canonicalFilmPath, canonicalCameraPath } from '@/lib/seo/resolve'
+import { canonicalFilmPath } from '@/lib/seo/resolve'
 import { SITE_URL } from '@/lib/seo/site'
 import { publicUserSelect } from '@/lib/publicUser'
 import { feedWhere, parseFeedScope } from '@/lib/photoFeed'
@@ -352,73 +353,18 @@ export default async function PhotoPage({
                 </div>
               </div>
 
-              {/* Camera and Film Cards Below Photo */}
+              {/* One card for both, from the shared component. This was two
+                  inline copies differing only in the icon and the label, and a
+                  third had since grown on the film and camera pairing page. */}
               {(photo.camera || photo.filmStock) && (
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {photo.camera && (
-                    <Link
-                      href={canonicalCameraPath(photo.camera)}
-                      className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-all p-4 flex items-center gap-4"
-                    >
-                      <div className="relative w-20 h-16 flex-shrink-0 flex items-center justify-center">
-                        {photo.camera.imageUrl && photo.camera.imageStatus === 'approved' ? (
-                          <Image
-                            src={photo.camera.imageUrl}
-                            alt={gearImageAlt(photo.camera, 'camera')}
-                            fill
-                            className="object-contain"
-                          />
-                        ) : (
-                          <svg className="w-8 h-8 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-neutral-500 mb-1 uppercase tracking-wide">Camera</div>
-                        <div className="text-white font-semibold group-hover:text-brand transition-colors truncate">
-                          {photo.camera.brand ? `${photo.camera.brand} ${photo.camera.name}` : photo.camera.name}
-                        </div>
-                      </div>
-                      <svg className="w-5 h-5 text-neutral-600 group-hover:text-brand transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  )}
-
+                  {photo.camera && <GearCard kind="camera" gear={photo.camera} />}
                   {photo.filmStock && (
-                    <Link
-                      href={canonicalFilmPath(photo.filmStock)}
-                      className="group bg-neutral-900 border border-neutral-800 hover:border-brand transition-all p-4 flex items-center gap-4"
-                    >
-                      <div className="relative w-20 h-16 flex-shrink-0 flex items-center justify-center">
-                        {photo.filmStock.imageUrl && photo.filmStock.imageStatus === 'approved' ? (
-                          <Image
-                            src={photo.filmStock.imageUrl}
-                            alt={gearImageAlt(photo.filmStock, 'film')}
-                            fill
-                            className="object-contain"
-                          />
-                        ) : (
-                          <svg className="w-8 h-8 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-neutral-500 mb-1 uppercase tracking-wide">Film Stock</div>
-                        <div className="text-white font-semibold group-hover:text-brand transition-colors truncate">
-                          {photo.filmStock.brand ? `${photo.filmStock.brand} ${photo.filmStock.name}` : photo.filmStock.name}
-                        </div>
-                        {photo.filmStock.iso && (
-                          <div className="text-xs text-neutral-500">ISO {photo.filmStock.iso}</div>
-                        )}
-                      </div>
-                      <svg className="w-5 h-5 text-neutral-600 group-hover:text-brand transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
+                    <GearCard
+                      kind="film"
+                      gear={photo.filmStock}
+                      specs={photo.filmStock.iso ? [`ISO ${photo.filmStock.iso}`] : []}
+                    />
                   )}
                 </div>
               )}
