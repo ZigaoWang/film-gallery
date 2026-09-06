@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db'
-import { REPORT_TARGETS, type ReportTarget } from './reportTypes'
+import { type ReportTarget } from './reportTypes'
 
 /**
  * Turning a report's `(targetType, targetId)` back into something a moderator

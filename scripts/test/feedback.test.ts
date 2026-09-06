@@ -31,7 +31,8 @@ let fail = 0
 
 function check(name: string, got: unknown, want: unknown) {
   const ok = JSON.stringify(got) === JSON.stringify(want)
-  ok ? pass++ : fail++
+  if (ok) pass++
+  else fail++
   console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${name}${ok ? '' : `  got=${JSON.stringify(got)} want=${JSON.stringify(want)}`}`)
 }
 

@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
 }
 
 // DELETE: Admin endpoint to force cleanup all unpublished photos
-export async function DELETE(req: NextRequest) {
+export async function DELETE() {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
