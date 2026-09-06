@@ -176,8 +176,8 @@ export default function GuidelinesPage() {
             <span className="text-white">&hellip;</span> menu on it.
           </p>
           <p className="text-neutral-300 leading-relaxed mt-3">
-            For anything else &mdash; a bug, or a photo of yours you think we removed unfairly
-            &mdash; use{' '}
+            For anything else, including a bug or a photo of yours you think we removed
+            unfairly, use{' '}
             <Link
               href="/feedback"
               className={textLinkClass}

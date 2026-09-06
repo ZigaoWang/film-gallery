@@ -88,8 +88,8 @@ export const NOT_ALLOWED: Rule[] = [
     body:
       'No nudity, no partial or implied nudity, no lingerie, no suggestive posing, nothing sexual ' +
       'in any form. It comes down on sight and there is no warning first. There is a real ' +
-      'tradition of nude photography on film and this is not a judgement about that work \u2014 ' +
-      'the line simply has to sit somewhere obvious rather than somewhere arguable, and this is ' +
+      'tradition of nude photography on film and this is not a judgment about that work. The ' +
+      'line simply has to sit somewhere obvious rather than somewhere arguable, and this is ' +
       'not the site for it.',
   },
   {

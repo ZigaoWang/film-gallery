@@ -64,7 +64,7 @@ check('falls back to any sourced claim when none matches the url',
 console.log('what the reader is told')
 check('the passage is quoted',
   citationTitle({ url: WIKI, passage: 'contract manufactured by Kodak' }),
-  '“contract manufactured by Kodak” — opens the source')
+  '“contract manufactured by Kodak” (opens the source)')
 
 check('a missing passage says so rather than implying a check',
   citationTitle({ url: WIKI, passage: null }),
