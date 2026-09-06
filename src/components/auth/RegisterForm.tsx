@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MIN_PASSWORD_LENGTH } from '@/lib/password'
+import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
@@ -11,6 +11,8 @@ import { textLinkClass } from '@/components/ui/TextLink'
 
 export default function RegisterForm() {
   const [form, setForm] = useState({ email: '', password: '', username: '', name: '' })
+  // Held outside `form` because that object is sent as the request body.
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,6 +26,17 @@ export default function RegisterForm() {
     }
     if (form.username.length < 3 || form.username.length > 20) {
       setError('Username must be 3-20 characters')
+      return
+    }
+    if (form.password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+    // The shared rule, so this form cannot accept something the server will
+    // then refuse for a reason it never mentioned.
+    const problem = passwordProblem(form.password)
+    if (problem) {
+      setError(problem)
       return
     }
     setLoading(true)
@@ -132,6 +145,22 @@ export default function RegisterForm() {
         <p id="password-hint" className="text-neutral-500 text-xs mt-1.5">
           At least {MIN_PASSWORD_LENGTH} characters.
         </p>
+      </div>
+
+      {/* Sign-up is the one password form where a typo cannot be undone by the
+          person who made it: the account is created, the address is verified,
+          and the first sign-in fails for no visible reason. */}
+      <div>
+        <FieldLabel htmlFor="register-confirm-password" required>Confirm password</FieldLabel>
+        <input
+          id="register-confirm-password"
+          type="password"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          className={fieldClass}
+          required
+        />
       </div>
 
       {/* A real checkbox that has to be ticked, not a line of small
