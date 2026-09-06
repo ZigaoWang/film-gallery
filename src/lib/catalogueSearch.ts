@@ -77,13 +77,17 @@ export async function searchCatalogue(
     ' OR '
   )
 
+  // An alias only explains a match the name does not. The subquery used to run
+  // for every row, so "500T" against a stock named "Kodak Vision3 500T (5219)"
+  // came back with an alias too, and the result printed "Also known as Vision3
+  // 500T" underneath a title that already said it.
   return prisma.$queryRaw<CatalogueMatch[]>`
     SELECT e.id,
-           (
+           CASE WHEN e.name ILIKE ${like} THEN NULL ELSE (
              SELECT a FROM unnest(e."aliases") AS a
              WHERE a ILIKE ${like}
              LIMIT 1
-           ) AS "matchedAlias"
+           ) END AS "matchedAlias"
     FROM ${table} e
     LEFT JOIN "Brand" b ON b.id = e."brandId"
     WHERE e.name ILIKE ${like}
