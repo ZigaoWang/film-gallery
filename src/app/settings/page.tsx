@@ -288,16 +288,16 @@ export default function SettingsPage() {
           <form onSubmit={handlePasswordChange} className="space-y-5">
             <div>
               <FieldLabel>Current password</FieldLabel>
-              <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className={fieldClass} />
+              <input type="password" autoComplete="current-password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className={fieldClass} />
             </div>
             <div>
               <FieldLabel>New password</FieldLabel>
-              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={MIN_PASSWORD_LENGTH} className={fieldClass} aria-describedby="new-password-hint" />
+              <input type="password" autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={MIN_PASSWORD_LENGTH} className={fieldClass} aria-describedby="new-password-hint" />
               <p id="new-password-hint" className="text-neutral-600 text-xs mt-1">At least {MIN_PASSWORD_LENGTH} characters.</p>
             </div>
             <div>
               <FieldLabel>Confirm new password</FieldLabel>
-              <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className={fieldClass} />
+              <input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className={fieldClass} />
             </div>
             <div className="pt-2">
               {/* The shared component, like every other submit on the site.
