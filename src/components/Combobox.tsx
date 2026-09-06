@@ -117,20 +117,32 @@ export default function Combobox({ options, value, onChange, placeholder, label,
     setActive(-1)
   }
 
+  /**
+   * A row's mousedown raises `isSelectingRef` so the blur it causes cannot
+   * commit something else while the click is still on its way. Every path that
+   * raises it has to lower it again: choosing "Add New" never did, so the flag
+   * stayed raised for the life of the field and every later blur was skipped,
+   * leaving unmatched text on screen.
+   */
+  const releaseSelecting = () => {
+    selectTimer.current = setTimeout(() => {
+      isSelectingRef.current = false
+    }, 200)
+  }
+
   const handleSelect = (o: Option) => {
     isSelectingRef.current = true
     onChange(o.id)
     setQuery(getDisplayName(o))
     close()
-    selectTimer.current = setTimeout(() => {
-      isSelectingRef.current = false
-    }, 200)
+    releaseSelecting()
   }
 
   const chooseRow = (row: Row) => {
     if (row.kind === 'add') {
       onAddNewClick?.()
       close()
+      releaseSelecting()
       return
     }
     handleSelect(row.option)
@@ -203,8 +215,13 @@ export default function Combobox({ options, value, onChange, placeholder, label,
       } else if (filtered.length === 1) {
         onChange(filtered[0].id)
         setQuery(getDisplayName(filtered[0]))
-      } else if (selected) {
-        setQuery(getDisplayName(selected))
+      } else {
+        // Text that matched nothing was never a selection, and leaving it in
+        // the field reads as one: the form said "Portra 401" while it was
+        // about to save whatever the field held before, or nothing at all.
+        // So show what is actually selected, and empty when that is nothing,
+        // which is a real answer here for a camera or a film stock.
+        setQuery(selected ? getDisplayName(selected) : '')
       }
 
       close()
@@ -285,7 +302,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
                 <button
                   {...shared}
                   key="add-new"
-                  onClick={() => { onAddNewClick?.(); close() }}
+                  onClick={() => chooseRow(row)}
                   className={`w-full px-3 py-2 text-left text-sm text-[#D32F2F] border-b border-neutral-800 transition-colors ${
                     highlighted ? 'bg-neutral-800' : ''
                   }`}
