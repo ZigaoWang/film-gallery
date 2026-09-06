@@ -135,3 +135,32 @@ export function worthAdding(type: CatalogType, draft: CatalogDraft): string[] {
 
   return missing
 }
+
+/**
+ * The description as paragraphs, with the summary line removed if it is still
+ * the first one.
+ *
+ * The summary is derived from the description's opening line, so the two hold
+ * the same sentence and the page was printing it twice: once as the lead and
+ * again at the top of the prose below it. The writing standard's first rule
+ * about these two fields is that the description never restates the summary.
+ *
+ * Removed at render rather than on save. Stripping it from the stored text
+ * would mean the next edit derives its summary from whatever line came second,
+ * so the entry would lose a sentence every time somebody corrected a typo.
+ *
+ * Splitting on any run of newlines rather than on a blank line only: people
+ * press return once between paragraphs at least as often as twice, and the
+ * blank-line rule rendered those as a single run-on block.
+ */
+export function descriptionParagraphs(
+  description: string | null | undefined,
+  summary: string | null | undefined
+): string[] {
+  const text = (description ?? '').replace(/\r\n/g, '\n').trim()
+  if (!text) return []
+
+  const paragraphs = text.split(/\n\s*\n|\n/).map(p => p.trim()).filter(Boolean)
+  if (summary && paragraphs[0] === summary.trim()) paragraphs.shift()
+  return paragraphs
+}

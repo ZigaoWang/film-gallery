@@ -22,6 +22,7 @@ import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
 import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
+import { descriptionParagraphs } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
 import { bodyTypeLabel, bodyTypeProse } from '@/lib/cameraFields'
@@ -287,11 +288,10 @@ export default async function CameraDetailPage({ params }: Params) {
                 )}
 
                 <div className="space-y-3 text-sm leading-relaxed text-neutral-400">
-                  {(displayDescription ||
+                  {descriptionParagraphs(displayDescription ||
                     `${name} is ${bodyTypeProse(camera.bodyType)}${
                       camera.format ? ` shooting ${camera.format}` : ''
-                    }${camera.year ? `, introduced in ${camera.year}` : ''}.`)
-                    .split('\n\n')
+                    }${camera.year ? `, introduced in ${camera.year}` : ''}.`, camera.summary)
                     .map((para, i) => (
                       <p key={i}>{para}</p>
                     ))}

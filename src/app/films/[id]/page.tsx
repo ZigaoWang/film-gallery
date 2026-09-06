@@ -19,6 +19,7 @@ import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
 import { colorBalanceLabel, filmFormatLabel, filmProcessLabel, filmTypeLabel } from '@/lib/filmFields'
 import { usefulAliases } from '@/lib/filmSearch'
 import type { FilmProcess } from '@prisma/client'
+import { descriptionParagraphs } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
 import ManufacturerValue from '@/components/ManufacturerValue'
@@ -472,7 +473,7 @@ export default async function FilmDetailPage({ params }: Params) {
                 )}
 
                 <div className="space-y-3 text-sm leading-relaxed text-neutral-400">
-                  {(displayDescription ||
+                  {descriptionParagraphs(displayDescription ||
                     `${name} is a ${typeLabel?.toLowerCase() ?? 'film'} stock${
                       filmStock.iso ? ` rated at ISO ${filmStock.iso}` : ''
                     }${
@@ -482,8 +483,7 @@ export default async function FilmDetailPage({ params }: Params) {
                       filmStock.format.length > 0
                         ? ` in ${filmStock.format.join(' and ')} format`
                         : ''
-                    }.`)
-                    .split('\n\n')
+                    }.`, filmStock.summary)
                     .map((para, i) => (
                       <p key={i}>{para}</p>
                     ))}
