@@ -11,6 +11,17 @@ import { apiErrorMessage } from '@/lib/apiError'
 import { textLinkClass } from '@/components/ui/TextLink'
 import { sameOriginPath } from '@/lib/validation'
 
+/**
+ * What /verify sends people back here with. It redirects instead of rendering,
+ * because it is reached by clicking a link in an email, so this code is the
+ * only account of what went wrong. Every code but one went unread, which left
+ * the reader on a login page that gave no reason for sending them there.
+ */
+const VERIFY_ERRORS: Record<string, string> = {
+  invalid: 'That verification link is not valid. Sign in and we can send a new one.',
+  expired: 'That verification link has expired. Sign in and we can send a new one.'
+}
+
 function LoginFormFields() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -21,11 +32,9 @@ function LoginFormFields() {
   // Read once at mount rather than pushed in by an effect: both messages are
   // cleared as soon as the form is submitted, so re-deriving them on every
   // searchParams change would resurrect a notice the user had moved past.
-  const [error, setError] = useState(() =>
-    searchParams.get('error') === 'invalid' ? 'Invalid or expired verification link.' : ''
-  )
+  const [error, setError] = useState(() => VERIFY_ERRORS[searchParams.get('error') ?? ''] ?? '')
   const [success, setSuccess] = useState(() =>
-    searchParams.get('verified') === 'true' ? 'Email verified! You can now sign in.' : ''
+    searchParams.get('verified') === 'true' ? 'Email verified. You can now sign in.' : ''
   )
   const [loading, setLoading] = useState(false)
   const [showResend, setShowResend] = useState(false)
@@ -102,7 +111,7 @@ function LoginFormFields() {
         body: JSON.stringify({ email })
       })
       if (res.ok) {
-        setSuccess('Verification email sent! Check your inbox.')
+        setSuccess('Verification email sent. Check your inbox.')
         setError('')
         setShowResend(false)
       } else {
