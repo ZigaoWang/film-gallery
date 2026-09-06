@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button, { ButtonLink } from '@/components/ui/Button'
+import VisibilityToggle from '@/components/ui/VisibilityToggle'
 import { useToast } from '@/components/ui/Toast'
 import { apiErrorMessage } from '@/lib/apiError'
 
@@ -136,25 +137,15 @@ export default function CreateAlbumPage() {
                 </div>
 
                 <div className="pt-3 border-t border-neutral-800">
-                  <label className="flex items-center justify-between cursor-pointer group">
-                    <div>
-                      <span className="block text-neutral-400 text-xs uppercase tracking-wider">Public Album</span>
-                      <span className="text-neutral-500 text-xs">Others can discover and view this album</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsPublic(!isPublic)}
-                      className={`relative w-12 h-6 rounded-full transition-colors ${
-                        isPublic ? 'bg-[#D32F2F]' : 'bg-neutral-700'
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                          isPublic ? 'left-7' : 'left-1'
-                        }`}
-                      />
-                    </button>
-                  </label>
+                  {/* An album is public or private the same way a photo is, so
+                      it uses the same control. The album API stores it as a
+                      boolean, which is the only reason for the mapping. */}
+                  <VisibilityToggle
+                    value={isPublic ? 'PUBLIC' : 'PRIVATE'}
+                    onChange={next => setIsPublic(next === 'PUBLIC')}
+                    label="Who can see this album"
+                    hint={isPublic ? 'Anyone can find this album on AvoidXray.' : 'Only you can see this album.'}
+                  />
                 </div>
 
                 <div className="pt-3 border-t border-neutral-800">
@@ -198,10 +189,12 @@ export default function CreateAlbumPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                  {Array.isArray(photos) && photos.map(photo => (
+                  {Array.isArray(photos) && photos.map((photo, index) => (
                     <button
                       key={photo.id}
                       onClick={() => togglePhoto(photo.id)}
+                      aria-pressed={selectedPhotoIds.includes(photo.id)}
+                      aria-label={`Select ${photo.caption?.trim() || `photo ${index + 1}`}`}
                       className={`aspect-square relative overflow-hidden transition-all ${
                         selectedPhotoIds.includes(photo.id)
                           ? 'ring-4 ring-[#D32F2F] scale-[0.95]'
