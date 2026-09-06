@@ -343,7 +343,15 @@ export function ProfileSkeleton() {
   )
 }
 
-/** A film stock or camera page: breadcrumb, hero panel, then the grid. */
+/**
+ * A film stock or camera page: breadcrumb, hero panel, the paired-gear row,
+ * Community Notes, then the grid.
+ *
+ * The two middle sections were missing. The photographs came up roughly where
+ * the "Shot with" heading belongs and were then pushed down by close to 400px
+ * the moment the page answered, which is the largest jump on the site. Both
+ * pages carry both sections, in this order, under different headings.
+ */
 export function GearDetailSkeleton() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6 md:py-16">
@@ -361,6 +369,55 @@ export function GearDetailSkeleton() {
               <Bar className="h-7 w-16" delay={480} />
             </div>
           </div>
+        </div>
+      </div>
+      {/* The cameras a film has been shot with, or the films a camera has shot.
+          Reserved even though the row is dropped for gear nobody has uploaded
+          for yet: the pages people actually open have photographs, and the
+          masonry below makes the same assumption. */}
+      <div className="mb-10">
+        {/* h-7 is the line height of the text-lg heading. */}
+        <Bar className="mb-4 h-7 w-28" />
+        <div className="flex flex-wrap gap-2">
+          {/* Fixed, repeating widths rather than random ones: a skeleton must
+              render identically on the server and the client. h-[34px] is
+              px-3 py-1.5 around text-sm, plus the pill's border. */}
+          {['w-32', 'w-24', 'w-40', 'w-28', 'w-36'].map((width, i) => (
+            <Bar key={i} className={`h-[34px] ${width}`} delay={i * 160} />
+          ))}
+        </div>
+      </div>
+      {/* Community Notes. It fetches its notes from the browser, so what lands
+          when the server answers is its heading, its standing line and its own
+          two-row placeholder list, and that is what is reproduced here rather
+          than any arrangement of real notes. */}
+      <div className="mb-10">
+        <div className="mb-2 flex items-center justify-between gap-4">
+          {/* h-8 is the line height of the text-2xl heading; the button beside
+              it is h-8 in every one of its states. */}
+          <Bar className="h-8 w-52" />
+          <Bar className="h-8 w-28" delay={160} />
+        </div>
+        {/* The sentence under the heading is long enough to take a second line
+            below the widest breakpoint, and one bar left the notes twenty
+            pixels high on a phone. */}
+        <div className="mb-6">
+          <Bar className="h-5 w-full max-w-2xl" />
+          <Bar className="h-5 w-1/2 max-w-sm lg:hidden" delay={160} />
+        </div>
+        <div className="space-y-4">
+          {[0, 1].map(i => (
+            <div key={i} className="flex gap-3">
+              {/* A 36px avatar beside three lines of text, as CommunityNotes
+                  draws them while it waits. */}
+              <Bar className="h-9 w-9 flex-shrink-0" delay={i * 160} />
+              <div className="flex-1 space-y-2">
+                <Bar className="h-3 w-32" delay={i * 160} />
+                <Bar className="h-3 w-full" delay={i * 160 + 80} />
+                <Bar className="h-3 w-3/4" delay={i * 160 + 160} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
       {/* The "Photos" heading and its count, which the grid sits under. */}
