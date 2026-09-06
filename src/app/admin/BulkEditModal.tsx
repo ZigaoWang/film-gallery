@@ -2,8 +2,24 @@
 
 import { useState } from 'react'
 import { ADMIN_RESOURCES, UNIQUE_FIELDS, type FieldSpec, type ResourceName } from '@/lib/admin/resources'
+import Button from '@/components/ui/Button'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useDialogBehavior } from '@/components/ui/dialog'
 import { FieldInput, useReferenceOptions } from './fieldControls'
+
+/**
+ * Fields that hand out or take away privileges, and so are confirmed before
+ * they are written across a selection.
+ *
+ * Deleting a selection makes the count be typed back, but editing one went
+ * through on the first click whatever the field was, and `isAdmin` on users has
+ * the same reach: one Apply grants or revokes administrator on every ticked
+ * account. Named per resource, like UNIQUE_FIELDS, so the step stays on the few
+ * fields that earn it and a caption or a visibility flag is still one click.
+ */
+const PRIVILEGE_FIELDS: Partial<Record<ResourceName, readonly string[]>> = {
+  users: ['isAdmin'],
+}
 
 /**
  * Applies one set of changes to a whole selection.
@@ -38,20 +54,37 @@ export default function BulkEditModal({
     for (const [name, field] of fields) initial[name] = field.kind === 'boolean' ? false : ''
     return initial
   })
+  const [confirming, setConfirming] = useState(false)
 
   // The table mounts this only while it is open, so there is no closed state to
-  // report.
-  const panelRef = useDialogBehavior({ open: true, onClose })
+  // report. Escape belongs to the confirmation while that is up: one press
+  // closing both dialogs would throw away the form behind it.
+  const panelRef = useDialogBehavior({ open: true, onClose: () => { if (!confirming) onClose() } })
 
   const chosen = fields.filter(([name]) => enabled[name])
+  const privileged = PRIVILEGE_FIELDS[resource] ?? []
+  const escalating = chosen.filter(([name]) => privileged.includes(name))
+
+  const apply = async () => {
+    const changes: Record<string, unknown> = {}
+    for (const [name] of chosen) changes[name] = values[name]
+    const saved = await onSave(changes)
+    // A save that failed leaves the form open and a toast saying why, both of
+    // them behind this dialog.
+    if (!saved) setConfirming(false)
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (chosen.length === 0) return
-    const changes: Record<string, unknown> = {}
-    for (const [name] of chosen) changes[name] = values[name]
-    await onSave(changes)
+    if (escalating.length > 0) {
+      setConfirming(true)
+      return
+    }
+    await apply()
   }
+
+  const noun = count === 1 ? spec.label.toLowerCase() : spec.plural.toLowerCase()
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-start justify-center p-4 overflow-y-auto" onClick={onClose}>
@@ -67,7 +100,7 @@ export default function BulkEditModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
           <div>
             <h2 id="bulk-edit-title" className="text-lg font-bold text-white">
-              Edit {count} {count === 1 ? spec.label.toLowerCase() : spec.plural.toLowerCase()}
+              Edit {count} {noun}
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
               Only the fields you tick are changed. The rest are left as they are.
@@ -117,25 +150,31 @@ export default function BulkEditModal({
                 : `${chosen.length} ${chosen.length === 1 ? 'field' : 'fields'} will be written to all ${count}`}
             </p>
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={busy}
-                className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-40"
-              >
+              <Button type="button" variant="secondary" size="sm" onClick={onClose} disabled={busy}>
                 Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={busy || chosen.length === 0}
-                className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-[#D32F2F] text-white hover:bg-[#B71C1C]
-                           disabled:opacity-40 disabled:cursor-not-allowed"
-              >
+              </Button>
+              <Button type="submit" variant="primary" size="sm" disabled={busy || chosen.length === 0}>
                 {busy ? 'Saving…' : `Apply to ${count}`}
-              </button>
+              </Button>
             </div>
           </div>
         </form>
+
+        <ConfirmDialog
+          open={confirming}
+          title={`Change ${escalating.map(([, field]) => field.label.toLowerCase()).join(' and ')} for ${count} ${noun}?`}
+          confirmLabel={`Apply to ${count}`}
+          busyLabel="Saving…"
+          destructive
+          onConfirm={apply}
+          onClose={() => setConfirming(false)}
+        >
+          {escalating.map(([name, field]) => (
+            <p key={name}>
+              {field.label} will be {values[name] === true ? 'granted to' : 'removed from'} all {count} {noun}.
+            </p>
+          ))}
+        </ConfirmDialog>
       </div>
     </div>
   )
