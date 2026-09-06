@@ -9,6 +9,7 @@ import { isTooLarge } from '@/lib/sharpConfig'
 import { validateFileSize, validateImageType, VALIDATION_LIMITS } from '@/lib/validation'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
+import { refuseOversizedBody } from '@/lib/requestBody'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -26,6 +27,13 @@ export async function POST(req: NextRequest) {
     'Too many uploads in a short time. Please wait a little and continue.'
   )
   if (limited) return limited
+
+  const oversized = refuseOversizedBody(
+    req,
+    VALIDATION_LIMITS.MAX_UPLOAD_BODY_MB * 1024 * 1024,
+    `That upload is too large. Send at most ${VALIDATION_LIMITS.MAX_UPLOAD_BODY_MB}MB in one request.`
+  )
+  if (oversized) return oversized
 
   const formData = await req.formData()
   const files = formData.getAll('files') as File[]

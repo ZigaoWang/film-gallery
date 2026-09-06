@@ -185,6 +185,19 @@ export const VALIDATION_LIMITS = {
    * only ever bites a request that was not made by it.
    */
   MAX_FILES_PER_UPLOAD: 25,
+  /**
+   * Total bytes one upload request may declare.
+   *
+   * The count above bounds how much work a request asks for; this bounds how
+   * much memory it takes to accept, which is the number that decides whether
+   * the box survives. Multipart parsing buffers the whole body, so twenty-five
+   * files at the per-file cap was a 2.5GB allocation on a 2GB machine.
+   *
+   * Sized for one full-size original plus multipart overhead, which is what
+   * the upload page actually sends. A caller batching several files is still
+   * free to, as long as they add up to less than this.
+   */
+  MAX_UPLOAD_BODY_MB: 108,
   MAX_DESCRIPTION_LENGTH: 2000,
   MAX_CUSTOM_FIELD_LENGTH: 100,
   YEAR_MIN: 1800,

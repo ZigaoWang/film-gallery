@@ -25,6 +25,32 @@ export function invalidBody(): NextResponse {
 }
 
 /**
+ * Refuses a request that declares a body larger than `maxBytes`, before
+ * anything has read it.
+ *
+ * `req.formData()` buffers the whole body into memory to parse it, so every
+ * size check written after that call has already paid the cost it was meant to
+ * prevent. The upload route's own limits permitted twenty-five files of a
+ * hundred megabytes each, which is 2.5GB arriving on a machine with 2GB of
+ * memory, and `bodySizeLimit` in next.config only governs Server Actions, not
+ * route handlers, so nothing above this was enforcing anything.
+ *
+ * Content-Length can be absent or dishonest, so this is a cheap first gate and
+ * not the only one. The per-file checks downstream still stand.
+ */
+export function refuseOversizedBody(
+  req: Request,
+  maxBytes: number,
+  message: string
+): NextResponse | null {
+  const declared = Number(req.headers.get('content-length'))
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    return NextResponse.json({ error: message }, { status: 413 })
+  }
+  return null
+}
+
+/**
  * A string field, or undefined when it is absent or some other type.
  *
  * A truthiness check is not a type check: `{"name": 123}` passes `if (!name)`

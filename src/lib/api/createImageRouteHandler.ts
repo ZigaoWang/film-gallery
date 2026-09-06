@@ -6,6 +6,7 @@ import { uploadToOSS, deleteFromOSS } from '@/lib/oss'
 import { sendAdminModerationNotification } from '@/lib/email'
 import { processItemImage } from '@/lib/imageProcessing'
 import { sanitizeString, validateFileSize, validateImageType, VALIDATION_LIMITS } from '@/lib/validation'
+import { refuseOversizedBody } from '@/lib/requestBody'
 import { extractKeyFromUrl, generateImageKey } from '@/lib/ossUtils'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
@@ -144,6 +145,16 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
       // Anyone signed in may propose a change. A contributor's edit becomes a
       // revision and is worked in /admin/revisions, the same screen that
       // reviews an administrator's own edits and anything generated.
+
+      // The per-file check further down runs after the body has already been
+      // buffered into memory, so it bounds what is stored rather than what is
+      // accepted. This bounds the accepting.
+      const oversized = refuseOversizedBody(
+        req,
+        (VALIDATION_LIMITS.MAX_IMAGE_SIZE_MB + 2) * 1024 * 1024,
+        `Please choose an image under ${VALIDATION_LIMITS.MAX_IMAGE_SIZE_MB}MB.`
+      )
+      if (oversized) return oversized
 
       // Parse form data
       const formData = await req.formData()

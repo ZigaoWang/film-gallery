@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { uploadToOSS } from '@/lib/oss'
 import { validateFileSize, validateImageType, VALIDATION_LIMITS } from '@/lib/validation'
+import { refuseOversizedBody } from '@/lib/requestBody'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
 import { randomUUID } from 'crypto'
@@ -32,6 +33,15 @@ export async function POST(req: NextRequest) {
     'Too many avatar changes in a short time. Please wait a little and try again.'
   )
   if (limited) return limited
+
+  // The per-file check below runs after the body has already been buffered, so
+  // it bounds what is stored rather than what is accepted.
+  const oversized = refuseOversizedBody(
+    req,
+    (VALIDATION_LIMITS.MAX_IMAGE_SIZE_MB + 2) * 1024 * 1024,
+    `Please choose an image under ${VALIDATION_LIMITS.MAX_IMAGE_SIZE_MB}MB.`
+  )
+  if (oversized) return oversized
 
   const formData = await req.formData()
   const file = formData.get('file')
