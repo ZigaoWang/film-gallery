@@ -213,7 +213,14 @@ export default function ModerationDetailModal({
 
             {/* AFTER (EDITABLE) */}
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-green-500 uppercase">After (Editable)</h3>
+              <h3 className="text-lg font-bold text-neutral-300 uppercase">After</h3>
+
+              {Object.keys(submission.proposedData || {}).length === 0 && (
+                <p className="text-sm text-neutral-500">
+                  This submission proposes an image. Field edits are reviewed in the
+                  revisions queue.
+                </p>
+              )}
 
               {/* Image */}
               <div>
@@ -256,6 +263,26 @@ export default function ModerationDetailModal({
                   const currentValue = editedData[key] !== undefined
                     ? editedData[key]
                     : (newValue !== undefined ? newValue : oldValue)
+
+                  // Only a field this submission proposes can be saved.
+                  // Approving sends the proposed keys, so anything typed into
+                  // the rest was discarded without a word, and an image-only
+                  // submission proposes nothing at all, which is now every new
+                  // one. Writing them back is not the fix either: originalData
+                  // holds display-formatted values, and "C-41" or "Point &
+                  // shoot" is not what those columns take.
+                  if (!(key in (submission.proposedData || {}))) {
+                    return (
+                      <div key={key} className="border-b border-neutral-800 pb-3">
+                        <div className="text-xs text-neutral-600 uppercase mb-1">{key}</div>
+                        <div className="text-neutral-500">
+                          {oldValue !== undefined && oldValue !== null && oldValue !== ''
+                            ? String(oldValue)
+                            : <span className="italic text-neutral-700">Empty</span>}
+                        </div>
+                      </div>
+                    )
+                  }
 
                   return (
                     <div key={key} className={`border-b pb-3 ${hasChanged ? 'border-yellow-500' : 'border-neutral-800'}`}>
