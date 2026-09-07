@@ -337,6 +337,8 @@ export const ADMIN_RESOURCES = {
       resolvingPowerLpmm: { kind: 'number', label: 'Resolving power', min: 1, max: 1000, help: 'Lines per millimetre, at the contrast the maker quotes.' },
       baseMaterial: { kind: 'enum', label: 'Base', options: FILM_BASES },
       hasRemjet: { kind: 'boolean', label: 'Remjet backing' },
+      parentStockId: { kind: 'reference', label: 'Respooled from', source: 'films', help: 'The stock this is repackaged from, e.g. CineStill 800T from Kodak Vision3 500T. Leave blank for an original stock.' },
+      respoolNotes: { kind: 'longtext', label: 'Respool notes', maxLength: 300, help: 'What changed in the respool, in a sentence or two. Shown under "Respooled from" on the public page.' },
       latitudeUnderStops: { kind: 'number', label: 'Latitude under', min: 0, max: 10, help: 'Stops of underexposure the maker claims it tolerates.' },
       latitudeOverStops: { kind: 'number', label: 'Latitude over', min: 0, max: 10 },
       process: { kind: 'enum', label: 'Process', options: FILM_PROCESS },
@@ -477,7 +479,7 @@ export const FIELD_GROUPS: Partial<Record<ResourceName, readonly { title: string
     { title: 'Identity', fields: ['name', 'manufacturer', 'brand', 'aliases', 'iso', 'format', 'exposures'] },
     { title: 'Classification', fields: ['process', 'colorBalance', 'chromaticity', 'polarity', 'manufacturerStatus', 'manufacturedByBrandId'] },
     { title: 'Measured', fields: ['rmsGranularity', 'resolvingPowerLpmm', 'latitudeUnderStops', 'latitudeOverStops'] },
-    { title: 'Stock', fields: ['baseMaterial', 'hasRemjet'] },
+    { title: 'Stock', fields: ['baseMaterial', 'hasRemjet', 'parentStockId', 'respoolNotes'] },
     { title: 'Media & status', fields: ['description', 'imageStatus'] },
   ],
 }
