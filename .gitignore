@@ -61,3 +61,8 @@ next-env.d.ts
 # are build output rather than something to keep in the history.
 /AGENTS.md
 /CLAUDE.md
+
+# Generated from the live database by scripts/catalog-worklist.ts. A snapshot of
+# the catalog does not belong in a public repository, and it is stale the moment
+# somebody edits an entry.
+/catalog-worklist.md
