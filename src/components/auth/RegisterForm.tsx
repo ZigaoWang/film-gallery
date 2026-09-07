@@ -171,7 +171,10 @@ export default function RegisterForm() {
           checked={acceptedTerms}
           onChange={e => setAcceptedTerms(e.target.checked)}
           required
-          className="mt-0.5 h-4 w-4 flex-shrink-0 accent-brand"
+          // h-5, matching the checkboxes on the upload form. This one was h-4,
+          // so the single tick that records consent was the smallest target on
+          // the site and a different size from every other checkbox in it.
+          className="mt-0.5 h-5 w-5 flex-shrink-0 accent-brand"
         />
         <label htmlFor="accept-terms" className="text-neutral-400 text-sm leading-relaxed">
           {/* Age sits in the same tick rather than in a date-of-birth

@@ -339,13 +339,13 @@ export default async function PhotoPage({
                       photo navigated client-side. Same two buttons, two
                       different speeds, depending on which one you reached for. */}
                   {prevPhoto ? (
-                    <Link href={`/photos/${prevPhoto.id}${navSuffix}`} className="flex items-center gap-2 text-neutral-400 hover:text-white text-sm transition-colors">
+                    <Link href={`/photos/${prevPhoto.id}${navSuffix}`} className="-my-3 flex items-center gap-2 py-3 text-neutral-400 hover:text-white text-sm transition-colors">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                       Previous
                     </Link>
                   ) : <span />}
                   {nextPhoto ? (
-                    <Link href={`/photos/${nextPhoto.id}${navSuffix}`} className="flex items-center gap-2 text-neutral-400 hover:text-white text-sm transition-colors">
+                    <Link href={`/photos/${nextPhoto.id}${navSuffix}`} className="-my-3 flex items-center gap-2 py-3 text-neutral-400 hover:text-white text-sm transition-colors">
                       Next
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                     </Link>

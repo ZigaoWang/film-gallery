@@ -55,7 +55,10 @@ export default function LikeButton({
           onClick={toggle}
           aria-label={label}
           aria-pressed={liked}
-          className={`transition-colors focus-visible:outline focus-visible:outline-1
+          // The heart is 20px, so the button around it was a 20px target,
+          // under the 24px minimum, for the main thing you do to a photograph.
+          // Negative margin so a bigger hit area costs no layout.
+          className={`-m-1.5 p-1.5 transition-colors focus-visible:outline focus-visible:outline-1
                       focus-visible:outline-offset-2 focus-visible:outline-brand
                       ${liked ? 'text-brand' : 'text-neutral-500 hover:text-white'}`}
         >
