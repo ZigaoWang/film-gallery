@@ -13,6 +13,7 @@ import {
   summaryFromDescription,
   worthAdding,
 } from '@/lib/catalogForm'
+import CatalogWritingGuide from '@/components/CatalogWritingGuide'
 import type { FilmStockOption } from '@/lib/filmSearch'
 
 /**
@@ -273,6 +274,7 @@ export default function CatalogFields({
             link previews show.
           </FieldHint>
         )}
+        <CatalogWritingGuide type={type} />
       </div>
 
       {isCamera ? (
