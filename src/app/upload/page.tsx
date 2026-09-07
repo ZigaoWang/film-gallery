@@ -880,7 +880,7 @@ function UploadPageContent() {
                               type="text"
                               value={albumName}
                               onChange={e => setAlbumName(e.target.value)}
-                              placeholder="e.g., Summer 2024, Street Photography…"
+                              placeholder="e.g. Summer 2024, Street Photography…"
                               className={`${fieldClass}`}
                             />
                           </div>
