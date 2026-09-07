@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useToast } from './ui/Toast'
 import FieldLabel from '@/components/ui/FieldLabel'
-import { FieldHint, fieldClass } from '@/components/ui/Field'
+import { FieldHint } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { useDialogBehavior } from '@/components/ui/dialog'
 import CatalogFields from '@/components/CatalogFields'
@@ -102,7 +102,6 @@ export default function SuggestEditModal({
 
   const [draft, setDraft] = useState<CatalogDraft>(initial)
 
-  const [sourceUrl, setSourceUrl] = useState('')
   const isDisposable = draft.bodyType === 'DISPOSABLE'
 
   useEffect(() => {
@@ -228,7 +227,6 @@ export default function SuggestEditModal({
       }
       formData.append('description', draft.description)
       for (const [key, value] of changed) formData.append(key, value)
-      if (sourceUrl.trim()) formData.append('sourceUrl', sourceUrl.trim())
 
       const endpoint = type === 'camera' ? `/api/cameras/${id}/image` : `/api/filmstocks/${id}/image`
       const res = await fetch(endpoint, {
@@ -297,31 +295,6 @@ export default function SuggestEditModal({
             idPrefix={fieldId}
             showRenameNote
           />
-
-          {/* Where this came from.
-              Until now nothing on the site could attach a source at all: the
-              pipeline stored citations and the only way to supply one was a
-              script run over SSH, so every value a reader saw was uncited
-              unless a maintainer had loaded it by hand. One box rather than one
-              per field, because somebody read one page and it told them
-              several things. */}
-          <div>
-            <FieldLabel htmlFor={`${fieldId}-source`}>Source</FieldLabel>
-            <input
-              id={`${fieldId}-source`}
-              type="url"
-              inputMode="url"
-              value={sourceUrl}
-              onChange={e => setSourceUrl(e.target.value)}
-              placeholder="https://…"
-              disabled={uploading}
-              className={fieldClass}
-            />
-            <FieldHint>
-              Optional. The page you read this on, so the next reader can check
-              it. It is recorded against everything you changed here.
-            </FieldHint>
-          </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {currentImage && (

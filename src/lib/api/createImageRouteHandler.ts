@@ -225,34 +225,6 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
         }
       }
 
-      /**
-       * Where the submitter read this, attached to every field they changed.
-       *
-       * One box rather than one per field, because a contributor read one page
-       * and it told them several things, and asking for a URL beside each
-       * control would be a form nobody finishes. The pipeline stores citations
-       * per field, so it is fanned out here.
-       *
-       * Refused unless it parses as http or https: a citation that does not
-       * resolve is worse than none, because it looks checked.
-       */
-      const rawSource = (formData.get('sourceUrl') as string | null)?.trim() || ''
-      let sourceUrl: string | null = null
-      if (rawSource) {
-        try {
-          const parsed = new URL(rawSource)
-          if (parsed.protocol === 'http:' || parsed.protocol === 'https:') sourceUrl = parsed.toString()
-        } catch {
-          sourceUrl = null
-        }
-        if (!sourceUrl) {
-          return NextResponse.json(
-            { success: false, error: 'That source needs to be a full http or https link' } as ApiResponse,
-            { status: 400 }
-          )
-        }
-      }
-
       // Prepare proposed data
       const proposedData: ResourceUpdate = {}
       if (descriptionChanged) proposedData.description = description
@@ -315,16 +287,12 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
       // This was the last direct write path: the admin table was unified
       // earlier and this form was not, which is how a rename applied here
       // skipped the reslug that the pipeline now performs.
-      const sourceUrls = sourceUrl
-        ? Object.fromEntries(Object.keys(proposedData).map(field => [field, sourceUrl]))
-        : undefined
-
       if (user?.isAdmin) {
         const entityType = config.resourceType === 'filmstock' ? 'FILM_STOCK' : 'CAMERA'
 
         let refused: string[] = []
         if (Object.keys(proposedData).length > 0) {
-          const applied = await applyAdminEdit(entityType, resourceId, proposedData, userId, sourceUrls)
+          const applied = await applyAdminEdit(entityType, resourceId, proposedData, userId)
           if ('error' in applied) {
             return NextResponse.json(
               { success: false, error: applied.error } as ApiResponse,
@@ -388,7 +356,6 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
         // approved, because the column takes C41 and COMPACT. The admin branch
         // above already submits proposedData; the two now agree.
         payload: proposedData,
-        sourceUrls,
         source: 'USER',
         submittedById: userId,
       })
