@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
-import { blurPlaceholder } from '@/lib/blurhash'
+import { blurPlaceholder, BLUR_SIZE } from '@/lib/blurhash'
 import { photoAlt, gearImageAlt } from '@/lib/seo/alt'
 
 interface PhotoItem {
@@ -104,8 +104,21 @@ function calculateColumns(items: MasonryItem[], columnCount: number): MasonryIte
  * top rows really are all visible at once. Budget is per column rather than
  * global: only the first few items down each column are on screen before the
  * fold, and beyond that the placeholder is never seen.
+ *
+ * Four was too few, and the way it failed was specific. Tiles are a fraction of
+ * the viewport width, so a narrower screen makes them smaller and fits *more*
+ * of them down a column, not fewer: eight columns at 1024px wide gives tiles
+ * around 128px, and six or seven of those stack up before the fold. Everything
+ * past the fourth painted from flat black and then popped in when its image
+ * arrived. Because the markup runs column by column, so did the loading, and
+ * the hero assembled itself left to right in front of the reader.
+ *
+ * Eight covers the fold at the widths that were failing, and at BLUR_SIZE.hero
+ * it is cheaper than four were: sixty-four 16px placeholders come to less than
+ * thirty-two 32px ones, because the cost of a placeholder grows with the square
+ * of its size.
  */
-const HERO_BLUR_PER_COLUMN = 4
+const HERO_BLUR_PER_COLUMN = 8
 
 export default function HeroMasonry({ items, onReady }: HeroMasonryProps) {
   const loadedCount = useRef(0)
@@ -184,7 +197,7 @@ export default function HeroMasonry({ items, onReady }: HeroMasonryProps) {
                     fill
                     className="object-cover"
                     sizes="12.5vw"
-                    {...blurPlaceholder(item.blurHash, itemIndex, HERO_BLUR_PER_COLUMN)}
+                    {...blurPlaceholder(item.blurHash, itemIndex, HERO_BLUR_PER_COLUMN, BLUR_SIZE.hero)}
                     onLoad={handleImageLoad}
                   />
                 </div>

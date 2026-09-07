@@ -42,6 +42,16 @@ export const BLUR_SIZE = {
   large: 32,
   /** The 100px preview tiles on the index cards, where 32 is invisible detail. */
   tile: 16,
+  /**
+   * The homepage hero collage.
+   *
+   * Its tiles are around 240px, between the two above, but they sit under an
+   * overlay that is 90% black at first paint and 65% at its lightest. Detail
+   * that dark is detail nobody can see, so the hero spends its budget on
+   * coverage instead of resolution: at 16px every tile above the fold can have
+   * a placeholder for less than the first four cost at 32.
+   */
+  hero: 16,
 } as const
 
 /**
