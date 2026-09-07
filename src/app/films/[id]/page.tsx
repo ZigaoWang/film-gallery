@@ -30,14 +30,9 @@ import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
 import ManufacturerValue from '@/components/ManufacturerValue'
 import { textLinkClass } from '@/components/ui/TextLink'
-import SourceLink from '@/components/SourceLink'
 import SpecChip from '@/components/SpecChip'
-import { citationsByField, citationTitle } from '@/lib/citations'
-import CompletenessNote from '@/components/CompletenessNote'
 import SpecTable from '@/components/SpecTable'
 import { filmSpecGroups } from '@/lib/specs'
-import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
-import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { MANUFACTURER_EXPLAINER } from '@/lib/manufacturer'
 
 // Photo order is shuffled per request, so the page can't be statically cached.
@@ -206,30 +201,11 @@ export default async function FilmDetailPage({ params }: Params) {
     orderBy: { name: 'asc' },
   })
 
-  // The brands either side of the manufacturer question, and the source behind
-  // the claim when there is one. Read together so the row can always render.
-  const [brands, citations] = await Promise.all([
-    prisma.brand.findMany({
-      where: { id: { in: [filmStock.brandId, filmStock.manufacturedByBrandId].filter((v): v is string => !!v) } },
-      select: { id: true, name: true },
-    }),
-    // Every field on this stock that carries a citation. Absence is the
-    // ordinary case and is left unmarked.
-    prisma.fieldProvenance.findMany({
-      where: { entityType: 'FILM_STOCK', entityId: filmStock.id },
-      select: { fieldName: true, sourceUrl: true, claims: true },
-    }),
-  ])
-  // The link and the words behind it, together. A citation whose passage was
-  // never recorded still gets a link; the tooltip says the passage is missing
-  // rather than implying the source was checked.
-  const citationFor = citationsByField(citations)
-  const sourceFor = new Map(Array.from(citationFor, ([field, c]) => [field, c.url]))
-  // Every claim across every field, for the composition shown at the foot.
-  const allClaims = citations.flatMap(
-    c => (c.claims ?? []) as Array<{ url?: string | null; editorial?: boolean | null }>
-  )
-  const completeness = completenessOf('FILM_STOCK', filmStock as unknown as Record<string, unknown>, new Set(sourceFor.keys()), allClaims, NOT_YET_STARTED)
+  // The brands either side of the manufacturer question.
+  const brands = await prisma.brand.findMany({
+    where: { id: { in: [filmStock.brandId, filmStock.manufacturedByBrandId].filter((v): v is string => !!v) } },
+    select: { id: true, name: true },
+  })
   const brandName = brands.find(b => b.id === filmStock.brandId)?.name ?? filmStock.name
   const manufacturerName = brands.find(b => b.id === filmStock.manufacturedByBrandId)?.name ?? null
 
@@ -296,13 +272,7 @@ export default async function FilmDetailPage({ params }: Params) {
     filmStock.iso && { label: 'ISO', value: `ISO ${filmStock.iso}`, showLabel: false },
     // N/A is deliberately not shown: "not applicable" is not a specification.
     balanceLabel && balanceLabel !== 'N/A'
-      ? {
-          label: 'Balance',
-          value: balanceLabel,
-          showLabel: true,
-          field: 'colorBalance',
-          sourceUrl: sourceFor.get('colorBalance') ?? null,
-        }
+      ? { label: 'Balance', value: balanceLabel, showLabel: true }
       : null,
     !typeIsRedundant && { label: 'Type', value: typeLabel!, showLabel: false },
     filmStock.format.length > 0 && {
@@ -315,14 +285,7 @@ export default async function FilmDetailPage({ params }: Params) {
       value: `${exposures} exp`,
       showLabel: false,
     },
-  ].filter(Boolean) as Array<{
-    label: string
-    value: string
-    showLabel: boolean
-    /** The provenance field behind this chip, for the citation's passage. */
-    field?: string
-    sourceUrl?: string | null
-  }>
+  ].filter(Boolean) as Array<{ label: string; value: string; showLabel: boolean }>
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
@@ -404,7 +367,6 @@ export default async function FilmDetailPage({ params }: Params) {
                   {specs.map((s) => (
                     <SpecChip key={s.label} label={s.showLabel ? s.label : undefined}>
                       {s.value}
-                      <SourceLink url={s.sourceUrl} title={citationTitle(s.field ? citationFor.get(s.field) : undefined)} />
                     </SpecChip>
                   ))}
                   <span className="text-xs text-neutral-500">{totalPhotos} photos</span>
@@ -420,8 +382,6 @@ export default async function FilmDetailPage({ params }: Params) {
                     status={filmStock.manufacturerStatus}
                     brandName={brandName}
                     manufacturerName={manufacturerName}
-                    sourceUrl={sourceFor.get('manufacturerStatus')}
-                    sourceTitle={citationTitle(citationFor.get('manufacturerStatus'))}
                   />
                   {/* Explained only where there is something to explain. On a
                       stock whose brand coats its own film the row reads as the
@@ -532,11 +492,7 @@ export default async function FilmDetailPage({ params }: Params) {
                 )}
               </div>
 
-              <SpecTable
-                groups={filmSpecGroups(filmStock)}
-                sourceFor={field => sourceFor.get(field) ?? null}
-                titleFor={field => citationTitle(citationFor.get(field))}
-              />
+              <SpecTable groups={filmSpecGroups(filmStock)} />
 
               <div className="mt-6">
                 <SuggestEditButton
@@ -615,10 +571,6 @@ export default async function FilmDetailPage({ params }: Params) {
             scopeQuery={`&filmStockId=${filmStock.id}`}
           />
         </div>
-        <CompletenessNote
-          completeness={completeness}
-          labelFor={f => ADMIN_RESOURCES.films.editable[f as keyof typeof ADMIN_RESOURCES.films.editable]?.label ?? f}
-        />
       </main>
 
       <Footer />

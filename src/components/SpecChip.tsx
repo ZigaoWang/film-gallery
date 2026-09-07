@@ -11,8 +11,6 @@ import type { ReactNode } from 'react'
  *
  * `label` is the quiet prefix the film page puts in front of a value whose
  * meaning is not obvious from the value alone, as in "Balance Daylight".
- * Children rather than a `value` prop, because the detail pages hang a
- * SourceLink inside the chip and the card does not.
  */
 export default function SpecChip({
   label,

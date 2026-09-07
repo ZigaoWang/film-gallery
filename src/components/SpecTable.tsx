@@ -1,4 +1,3 @@
-import SourceLink from '@/components/SourceLink'
 import type { SpecGroup } from '@/lib/specs'
 
 /**
@@ -13,24 +12,8 @@ import type { SpecGroup } from '@/lib/specs'
  * A label and a value in two columns instead, grouped under the thing they
  * describe. Scanning for "what aperture" means running down one column, which
  * is the entire argument for a table over a pile of chips.
- *
- * Each row carries its own citation, because each row is its own claim. That
- * was already how the provenance table worked and there was nowhere to show it:
- * a page had five citable fields, so a source could only ever be attached to
- * the record in general. A weight and a maximum aperture come from different
- * pages and now say so.
  */
-export default function SpecTable({
-  groups,
-  sourceFor,
-  titleFor,
-}: {
-  groups: SpecGroup[]
-  /** The page a field's value came from, by field name. */
-  sourceFor: (field: string) => string | null
-  /** The passage behind that page, shown on hover. */
-  titleFor: (field: string) => string | undefined
-}) {
+export default function SpecTable({ groups }: { groups: SpecGroup[] }) {
   if (groups.length === 0) return null
 
   return (
@@ -51,10 +34,7 @@ export default function SpecTable({
                   {/* Fixed-width term so the values line up into a column that
                       can be run down with the eye. */}
                   <dt className="w-36 shrink-0 text-neutral-500">{row.label}</dt>
-                  <dd className="min-w-0 flex-1 text-neutral-200">
-                    {row.value}
-                    <SourceLink url={sourceFor(row.field)} title={titleFor(row.field)} />
-                  </dd>
+                  <dd className="min-w-0 flex-1 text-neutral-200">{row.value}</dd>
                 </div>
               ))}
             </dl>

@@ -24,8 +24,6 @@ export interface ManufacturerInput {
   brandName: string
   /** The company that coats it, when that is recorded. */
   manufacturerName?: string | null
-  /** Where the claim came from, for the ones that are reported rather than known. */
-  sourceUrl?: string | null
 }
 
 export interface ManufacturerDisplay {
@@ -33,8 +31,6 @@ export interface ManufacturerDisplay {
   value: string
   /** A plain qualifier, shown after the name. Null when none is needed. */
   qualifier: string | null
-  /** Attached to the qualifier, never to the name. */
-  sourceUrl: string | null
   /** True when nobody has established it, so the value is a conclusion. */
   unconfirmed: boolean
 }
@@ -45,38 +41,28 @@ export interface ManufacturerDisplay {
  * look identical, and those are different claims.
  */
 export function manufacturerDisplay(input: ManufacturerInput): ManufacturerDisplay {
-  const { status, brandName, manufacturerName, sourceUrl } = input
+  const { status, brandName, manufacturerName } = input
 
   switch (status) {
     // The brand coats its own film. Just the name: a qualifier here would
     // imply a distinction that does not exist.
     case 'SAME_AS_BRAND':
-      return { value: brandName, qualifier: null, sourceUrl: null, unconfirmed: false }
+      return { value: brandName, qualifier: null, unconfirmed: false }
 
     // Confirmed to be someone else. The name alone is informative, because it
     // differs from the brand the reader just read at the top of the page.
     case 'KNOWN':
-      return {
-        value: manufacturerName ?? brandName,
-        qualifier: null,
-        sourceUrl: sourceUrl ?? null,
-        unconfirmed: false,
-      }
+      return { value: manufacturerName ?? brandName, qualifier: null, unconfirmed: false }
 
     // Widely reported, never confirmed. The qualifier is the feature.
     case 'ATTRIBUTED':
-      return {
-        value: manufacturerName ?? brandName,
-        qualifier: 'reported',
-        sourceUrl: sourceUrl ?? null,
-        unconfirmed: false,
-      }
+      return { value: manufacturerName ?? brandName, qualifier: 'reported', unconfirmed: false }
 
     // A researched conclusion, not an empty field. "Unknown" reads as though
     // nobody filled it in; "Not confirmed" says somebody looked.
     case 'UNKNOWN':
     default:
-      return { value: 'Not confirmed', qualifier: null, sourceUrl: null, unconfirmed: true }
+      return { value: 'Not confirmed', qualifier: null, unconfirmed: true }
   }
 }
 

@@ -16,14 +16,9 @@ import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld
 import { displayName, gearImageAlt, article, makerAside } from '@/lib/seo/alt'
 import { usefulAliases } from '@/lib/aliases'
 import { textLinkClass } from '@/components/ui/TextLink'
-import CompletenessNote from '@/components/CompletenessNote'
 import SpecTable from '@/components/SpecTable'
 import { cameraSpecGroups } from '@/lib/specs'
-import { citationsByField, citationTitle } from '@/lib/citations'
-import SourceLink from '@/components/SourceLink'
 import SpecChip from '@/components/SpecChip'
-import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
-import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
 import { descriptionParagraphs, summaryFromDescription } from '@/lib/catalogForm'
@@ -178,29 +173,7 @@ export default async function CameraDetailPage({ params }: Params) {
   // Aliases that add something the name does not already say.
   const alternateNames = usefulAliases(name, camera.aliases)
 
-  // Which fields carry a source, for the completeness note at the foot.
-  const provenance = await prisma.fieldProvenance.findMany({
-    where: { entityType: 'CAMERA', entityId: camera.id },
-    select: { fieldName: true, sourceUrl: true, claims: true },
-  })
-  // Same resolution the film page uses, so a citation cannot be presented one
-  // way here and another way there.
-  const citationFor = citationsByField(provenance)
-  const citedFields = new Set(citationFor.keys())
-  const allClaims = provenance.flatMap(
-    p => (p.claims ?? []) as Array<{ url?: string | null; editorial?: boolean | null }>
-  )
   const mount = lensMount(camera)
-  // Scored on the derived mount, not the stored one. A point & shoot with an
-  // empty column has answered the question, and counting it as unfilled marked
-  // fourteen of nineteen cameras incomplete for a field they cannot have.
-  const completeness = completenessOf(
-    'CAMERA',
-    { ...camera, mountType: mount } as unknown as Record<string, unknown>,
-    citedFields,
-    allClaims,
-    NOT_YET_STARTED
-  )
   const displayImage = camera.imageStatus === 'approved' ? camera.imageUrl : null
   // Not gated on imageStatus. That column tracks the moderation state of the
   // product photograph and nothing else, so tying the prose to it meant
@@ -212,22 +185,20 @@ export default async function CameraDetailPage({ params }: Params) {
   const leadSentence = summaryFromDescription(displayDescription)
   const canonicalPath = `/cameras/${camera.slug ?? camera.id}`
 
-  const sourceFor = new Map(Array.from(citationFor, ([field, c]) => [field, c.url]))
-
   const specs = [
-    camera.bodyType && { label: 'Type', value: bodyTypeLabel(camera.bodyType)!, field: 'bodyType' },
+    camera.bodyType && { label: 'Type', value: bodyTypeLabel(camera.bodyType)! },
     // Only when it is not the ordinary answer. Nearly every 35mm body is full
     // frame, so printing it on all of them is noise; half-frame or panoramic is
     // the thing a reader actually needs to be told.
     camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
-      && { label: 'Frame', value: frameFormatLabel(camera.frameFormat)!, field: 'frameFormat' },
-    camera.format && { label: 'Format', value: camera.format, field: 'format' },
+      && { label: 'Frame', value: frameFormatLabel(camera.frameFormat)! },
+    camera.format && { label: 'Format', value: camera.format },
     // "Fixed lens" for the bodies that cannot take another one, rather than no
     // chip at all. A reader looking at a compact wants to know the lens is part
     // of it, and silence there is indistinguishable from an unresearched field.
-    mount && { label: 'Mount', value: mount, field: 'mountType' },
-    camera.year && { label: 'Year', value: String(camera.year), field: 'year' },
-  ].filter(Boolean) as Array<{ label: string; value: string; field: string }>
+    mount && { label: 'Mount', value: mount },
+    camera.year && { label: 'Year', value: String(camera.year) },
+  ].filter(Boolean) as Array<{ label: string; value: string }>
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
@@ -306,19 +277,8 @@ export default async function CameraDetailPage({ params }: Params) {
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-2 mb-4">
-                  {/* The source beside the value, as the film page shows it.
-                      This page loaded provenance for the completeness note at
-                      the foot and then never showed any of it, so a camera
-                      whose specifications were sourced looked exactly like one
-                      where somebody had typed them in from memory. */}
                   {specs.map((s) => (
-                    <SpecChip key={s.label}>
-                      {s.value}
-                      <SourceLink
-                        url={sourceFor.get(s.field) ?? null}
-                        title={citationTitle(citationFor.get(s.field))}
-                      />
-                    </SpecChip>
+                    <SpecChip key={s.label}>{s.value}</SpecChip>
                   ))}
                   <span className="text-xs text-neutral-500">{totalPhotos} photos</span>
                 </div>
@@ -361,11 +321,7 @@ export default async function CameraDetailPage({ params }: Params) {
 
               {/* Below the prose, because the prose says what the numbers
                   mean and the numbers are what you come back to check. */}
-              <SpecTable
-                groups={cameraSpecGroups(camera)}
-                sourceFor={field => sourceFor.get(field) ?? null}
-                titleFor={field => citationTitle(citationFor.get(field))}
-              />
+              <SpecTable groups={cameraSpecGroups(camera)} />
 
               <div className="mt-6">
                 <SuggestEditButton
@@ -432,10 +388,6 @@ export default async function CameraDetailPage({ params }: Params) {
             scopeQuery={`&cameraId=${camera.id}`}
           />
         </div>
-        <CompletenessNote
-          completeness={completeness}
-          labelFor={f => ADMIN_RESOURCES.cameras.editable[f as keyof typeof ADMIN_RESOURCES.cameras.editable]?.label ?? f}
-        />
       </main>
 
       <Footer />
