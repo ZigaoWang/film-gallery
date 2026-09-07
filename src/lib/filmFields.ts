@@ -11,7 +11,6 @@ export type FilmProcessValue = (typeof FILM_PROCESSES)[number]
 export const COLOR_BALANCES = ['Daylight', 'Tungsten', 'N/A'] as const
 export type ColorBalanceValue = (typeof COLOR_BALANCES)[number]
 
-export const FILM_FORMATS = ['35mm', '120', '220', '110', '4x5', '8x10', 'Instant', 'Half-frame'] as const
 
 /**
  * Known manufacturers in their canonical casing.
