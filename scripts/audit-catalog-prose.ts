@@ -33,8 +33,12 @@ const MARKETING = /\b(iconic|legendary|cult classic|beloved|ultra-affordable|stu
  * is bounded and checkable, while "the only 35mm rangefinder capable of it" is
  * a claim about every camera there has ever been. The difference is whether
  * something narrows it, and that needs a reader.
+ *
+ * "the first" followed by a number is an ordinal rather than a claim: "the
+ * first 120 rolls had to be cut from 35mm material" says nothing about
+ * anything else ever made, and this flagged it.
  */
-const SUPERLATIVE = /\b(the only|the first|the best|the most)\b/i
+const SUPERLATIVE = /\b(the only|the best|the most)\b|\bthe first\b(?!\s+\d)/i
 
 /** Attribution turns a contested claim into a checkable one about who says it. */
 const ATTRIBUTED = /\b(kodak|ilford|fujifilm|canon|nikon|olympus|harman|lomography|reviewers?|labs?|the manufacturer) (says|calls|claims|describes|rates|reports|positions)\b/i
