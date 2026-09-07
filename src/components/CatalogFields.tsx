@@ -5,7 +5,14 @@ import Combobox from '@/components/Combobox'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { FieldHint, fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import { FORMATS } from '@/lib/constants'
-import { BODY_TYPES, BODY_TYPE_LABELS, FRAME_FORMATS, FRAME_FORMAT_LABELS } from '@/lib/cameraFields'
+import {
+  BODY_TYPES,
+  BODY_TYPE_LABELS,
+  FRAME_FORMATS,
+  FRAME_FORMAT_LABELS,
+  bodyTypeLabel,
+  toBodyType,
+} from '@/lib/cameraFields'
 import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import {
   type CatalogDraft,
@@ -370,11 +377,14 @@ export default function CatalogFields({
               </FieldHint>
             </div>
 
-            {/* Hidden where the body type already answers it. A disposable has
-                no mount to record, and asking invites an answer to a question
-                that has none. */}
-            {!fixedByBodyType && (
-              <div>
+            {/* Always rendered.
+                This was hidden whenever the body type implied a fixed lens,
+                which is most of the catalog, so for most cameras the field
+                somebody went looking for was simply not on the page. Hiding a
+                field does not answer it, it just makes it unfindable. The
+                implication is said in words underneath instead, where it can
+                be read and overridden. */}
+            <div>
                 <FieldLabel htmlFor={id('mountId')}>Lens mount</FieldLabel>
                 <select
                   id={id('mountId')}
@@ -387,11 +397,11 @@ export default function CatalogFields({
                   {mounts.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                 </select>
                 <FieldHint>
-                  Chosen from the list so two people entering the same mount
-                  agree. If the lens does not come off, pick Fixed lens.
+                  {fixedByBodyType
+                    ? `A ${(bodyTypeLabel(toBodyType(draft.bodyType)) ?? 'camera').toLowerCase()} has its lens built in, so this reads as Fixed lens on its own. Set it only to say otherwise.`
+                    : 'Chosen from the list so two people entering the same mount agree. If the lens does not come off, pick Fixed lens.'}
                 </FieldHint>
-              </div>
-            )}
+            </div>
           </div>
 
           {isDisposable && (
