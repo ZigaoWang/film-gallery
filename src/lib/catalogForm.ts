@@ -102,6 +102,28 @@ export function summaryFromDescription(description: string | null | undefined): 
   return null
 }
 
+/**
+ * Whether a stored summary came from its description rather than from a person.
+ *
+ * The two fields are kept in step by rederiving one from the other, which is
+ * only safe if a summary somebody wrote by hand is left alone. Nothing records
+ * which is which, so this asks the question the stored values can answer: a
+ * summary equal to what its own description implies was derived from it.
+ *
+ * Compared against the description as it is *now*. A summary that was derived
+ * and has since had its description reworded no longer matches, and is
+ * correctly treated as stale rather than as authored, because the caller is
+ * about to replace the description anyway.
+ */
+export function summaryWasDerived(
+  summary: string | null | undefined,
+  description: string | null | undefined
+): boolean {
+  const stored = summary?.trim()
+  if (!stored) return false
+  return stored === summaryFromDescription(description)
+}
+
 /** A value a person actually supplied. */
 function filled(value: string): boolean {
   return value.trim().length > 0
