@@ -85,6 +85,8 @@ export default function NewItemModal({
             cameraType: draft.bodyType || undefined,
             format: draft.bodyType === 'DISPOSABLE' ? '35mm' : (format || undefined),
             year: draft.year || undefined,
+            frameFormat: draft.frameFormat || undefined,
+            mountId: draft.mountId || undefined,
             defaultFilmStockId: draft.defaultFilmStockId || undefined,
           }
         : {

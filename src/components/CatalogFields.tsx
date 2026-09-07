@@ -5,7 +5,7 @@ import Combobox from '@/components/Combobox'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { FieldHint, fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import { FORMATS } from '@/lib/constants'
-import { BODY_TYPES, BODY_TYPE_LABELS } from '@/lib/cameraFields'
+import { BODY_TYPES, BODY_TYPE_LABELS, FRAME_FORMATS, FRAME_FORMAT_LABELS } from '@/lib/cameraFields'
 import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import {
   type CatalogDraft,
@@ -95,6 +95,8 @@ export default function CatalogFields({
 }) {
   const isCamera = type === 'camera'
   const [brands, setBrands] = useState<string[]>([])
+  /** The mount list, so the field is a choice rather than a typed string. */
+  const [mounts, setMounts] = useState<Array<{ id: string; name: string }>>([])
 
   // Every name in this catalog leads with its maker, so the maker is almost
   // always already sitting in the name. Reading it back saves retyping it, and
@@ -113,6 +115,17 @@ export default function CatalogFields({
     return () => { cancelled = true }
   }, [])
 
+  // Only for a camera, and only once. A film form has no use for the list.
+  useEffect(() => {
+    if (!isCamera) return
+    let cancelled = false
+    fetch('/api/mounts')
+      .then(r => (r.ok ? r.json() : []))
+      .then(rows => { if (!cancelled && Array.isArray(rows)) setMounts(rows) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [isCamera])
+
   /** The brand a name starts with, longest first so "Yes!Star" beats "Yes". */
   const makerInName = (value: string): string | null => {
     const lower = value.trim().toLowerCase()
@@ -130,6 +143,9 @@ export default function CatalogFields({
     onChange(found ? { name: value, maker: found } : { name: value })
   }
   const isDisposable = draft.bodyType === 'DISPOSABLE'
+  // Matches lensMount's rule, so the form asks exactly what the page cannot
+  // work out for itself.
+  const fixedByBodyType = ['COMPACT', 'DISPOSABLE', 'INSTANT'].includes(draft.bodyType)
   const noun = isCamera ? 'camera' : 'film'
   const id = (field: string) => `${idPrefix}-${field}`
 
@@ -329,6 +345,51 @@ export default function CatalogFields({
                   disabled={disabled}
                   className={fieldClass}
                 />
+              </div>
+            )}
+
+            {/* Both of these were admin-only, so the two facts a reader can see
+                on the page were the two a reader could not correct. */}
+            <div>
+              <FieldLabel htmlFor={id('frameFormat')}>Frame</FieldLabel>
+              <select
+                id={id('frameFormat')}
+                value={draft.frameFormat}
+                onChange={e => onChange({ frameFormat: e.target.value })}
+                disabled={disabled}
+                className={fieldClass}
+              >
+                <option value="">Not sure</option>
+                {FRAME_FORMATS.map(f => (
+                  <option key={f} value={f}>{FRAME_FORMAT_LABELS[f]}</option>
+                ))}
+              </select>
+              <FieldHint>
+                The frame it exposes. Almost every 35mm camera is full frame; a
+                panorama switch is a mask over one, not a wider frame.
+              </FieldHint>
+            </div>
+
+            {/* Hidden where the body type already answers it. A disposable has
+                no mount to record, and asking invites an answer to a question
+                that has none. */}
+            {!fixedByBodyType && (
+              <div>
+                <FieldLabel htmlFor={id('mountId')}>Lens mount</FieldLabel>
+                <select
+                  id={id('mountId')}
+                  value={draft.mountId}
+                  onChange={e => onChange({ mountId: e.target.value })}
+                  disabled={disabled}
+                  className={fieldClass}
+                >
+                  <option value="">Not sure</option>
+                  {mounts.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+                <FieldHint>
+                  Chosen from the list so two people entering the same mount
+                  agree. If the lens does not come off, pick Fixed lens.
+                </FieldHint>
               </div>
             )}
           </div>

@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { allocateSlug } from '@/lib/seo/ensureSlug'
 import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
-import { toBodyType } from '@/lib/cameraFields'
+import { toBodyType, toFrameFormat } from '@/lib/cameraFields'
 import { normalizeAliases } from '@/lib/filmFields'
 import { resolveBrand } from '@/lib/brands'
 import { enforceLimit } from '@/lib/rateLimit'
@@ -56,6 +56,8 @@ export async function POST(req: NextRequest) {
     let cameraType: string | undefined
     let format: string | undefined
     let year: number | undefined
+    let frameFormat: string | undefined
+    let mountId: string | undefined
     let defaultFilmStockId: string | undefined
     let aliasesInput: string | undefined
 
@@ -69,6 +71,8 @@ export async function POST(req: NextRequest) {
       cameraType = (formData.get('cameraType') as string) || undefined
       format = (formData.get('format') as string) || undefined
       year = asInt(formData.get('year'))
+      frameFormat = (formData.get('frameFormat') as string) || undefined
+      mountId = (formData.get('mountId') as string) || undefined
       defaultFilmStockId = (formData.get('defaultFilmStockId') as string) || undefined
       aliasesInput = (formData.get('aliases') as string) || undefined
       hasImageData = !!imageFile
@@ -80,6 +84,8 @@ export async function POST(req: NextRequest) {
       cameraType = asString(body.cameraType)
       format = asString(body.format)
       year = asInt(body.year)
+      frameFormat = asString(body.frameFormat)
+      mountId = asString(body.mountId)
       defaultFilmStockId = asString(body.defaultFilmStockId) || undefined
       aliasesInput = Array.isArray(body.aliases)
         ? body.aliases.filter((a): a is string => typeof a === 'string').join(',')
@@ -110,6 +116,14 @@ export async function POST(req: NextRequest) {
         slug: await allocateSlug('camera', name, brand),
         addedById: userId,
         bodyType,
+        // Through the enum coercion, so a member the schema does not have is
+        // dropped rather than written.
+        frameFormat: toFrameFormat(frameFormat ?? null),
+        // Verified against the table rather than trusted: an id from a stale
+        // client would otherwise be a foreign key error at insert time.
+        mountId: mountId && (await prisma.lensMount.findUnique({
+          where: { id: mountId }, select: { id: true },
+        })) ? mountId : undefined,
         format,
         year,
         defaultFilmStockId,

@@ -366,6 +366,8 @@ export default async function CameraDetailPage({ params }: Params) {
                   currentImage={displayImage}
                   currentDescription={displayDescription}
                   cameraType={camera.bodyType}
+                  frameFormat={camera.frameFormat}
+                  mountId={camera.mountId}
                   format={camera.format}
                   year={camera.year}
                   defaultFilmStockId={camera.defaultFilmStockId}

@@ -24,6 +24,8 @@ type SuggestEditModalProps = {
   currentDescription: string | null
   // Camera props
   cameraType?: string | null
+  frameFormat?: string | null
+  mountId?: string | null
   format?: string | null
   year?: number | null
   defaultFilmStockId?: string | null
@@ -45,6 +47,8 @@ export default function SuggestEditModal({
   currentImage,
   currentDescription,
   cameraType: initialCameraType,
+  frameFormat: initialFrameFormat,
+  mountId: initialMountId,
   format: initialFormat,
   year: initialYear,
   defaultFilmStockId: initialDefaultFilmStockId,
@@ -81,6 +85,8 @@ export default function SuggestEditModal({
     description: currentDescription || '',
     aliases: (initialAliases ?? []).join(', '),
     bodyType: initialCameraType || '',
+    frameFormat: initialFrameFormat || '',
+    mountId: initialMountId || '',
     format: initialFormat || '',
     year: initialYear?.toString() || '',
     defaultFilmStockId: initialDefaultFilmStockId || '',
@@ -90,7 +96,7 @@ export default function SuggestEditModal({
     colorBalance: initialColorBalance || '',
   }), [
     name, brand, type, currentDescription, initialManufacturer, initialAliases,
-    initialCameraType, initialFormat, initialYear, initialDefaultFilmStockId,
+    initialCameraType, initialFrameFormat, initialMountId, initialFormat, initialYear, initialDefaultFilmStockId,
     initialIso, initialExposures, initialProcess, initialColorBalance,
   ])
 
@@ -194,6 +200,8 @@ export default function SuggestEditModal({
     if (type === 'camera') {
       diff('brand', draft.maker, initial.maker)
       diff('bodyType', draft.bodyType, initial.bodyType)
+      diff('frameFormat', draft.frameFormat, initial.frameFormat)
+      diff('mountId', draft.mountId, initial.mountId)
       diff('year', draft.year, initial.year)
       diff('defaultFilmStockId', draft.defaultFilmStockId, initial.defaultFilmStockId)
     } else {

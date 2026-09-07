@@ -31,6 +31,11 @@ export interface CatalogDraft {
 
   // Camera
   bodyType: string
+  /** A FrameFormat member, or empty for "not checked". */
+  frameFormat: string
+  /** A LensMount id, or empty. Never free text: the point of the table is that
+      two people entering the same mount produce the same value. */
+  mountId: string
   format: string
   /** Filled only when `format` is the literal "Other". */
   customFormat: string
@@ -47,7 +52,7 @@ export interface CatalogDraft {
 export function emptyDraft(): CatalogDraft {
   return {
     name: '', maker: '', description: '', aliases: '',
-    bodyType: '', format: '', customFormat: '', year: '', defaultFilmStockId: '',
+    bodyType: '', frameFormat: '', mountId: '', format: '', customFormat: '', year: '', defaultFilmStockId: '',
     iso: '', exposures: '', process: '', colorBalance: '',
   }
 }
