@@ -336,3 +336,32 @@ const FORMAT_TO_LABEL: Record<FilmFormat, string> = {
 export function filmFormatLabel(value: FilmFormat | null | undefined): string | null {
   return value ? FORMAT_TO_LABEL[value] : null
 }
+
+/**
+ * Frames on a roll: the stock's own column if it has one, otherwise its
+ * variants.
+ *
+ * That order matters and is not the order the migration is heading in. Every
+ * writer still targets `FilmStock.exposures` - the suggest-edit form, the
+ * create route, the admin field list - and nothing yet writes a variant. Read
+ * the variant first and an edit somebody submitted and an admin approved would
+ * be applied to a column the page had stopped looking at, which is worse than
+ * the gap it was closing.
+ *
+ * So the legacy column wins while it is still the one being written, and the
+ * variants answer only where it is empty, which is most of the catalog. When
+ * the writers move across, this reverses and the column goes.
+ *
+ * Distinct counts only, so a film sold in two formats at 36 frames each does
+ * not read "36, 36".
+ */
+export function exposureCounts(
+  variants: ReadonlyArray<{ exposures: number | null }>,
+  legacy: string | null | undefined
+): string | null {
+  const recorded = legacy?.trim()
+  if (recorded) return recorded
+
+  const counts = variants.map(v => v.exposures).filter((n): n is number => n !== null)
+  return counts.length > 0 ? [...new Set(counts)].join(', ') : null
+}

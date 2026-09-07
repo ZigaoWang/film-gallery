@@ -16,7 +16,13 @@ import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld
 import { displayName, gearImageAlt, makerAside } from '@/lib/seo/alt'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
-import { colorBalanceLabel, filmFormatLabel, filmProcessLabel, filmTypeLabel } from '@/lib/filmFields'
+import {
+  colorBalanceLabel,
+  exposureCounts,
+  filmFormatLabel,
+  filmProcessLabel,
+  filmTypeLabel,
+} from '@/lib/filmFields'
 import { usefulAliases } from '@/lib/filmSearch'
 import type { FilmProcess } from '@prisma/client'
 import { descriptionParagraphs } from '@/lib/catalogForm'
@@ -277,6 +283,8 @@ export default async function FilmDetailPage({ params }: Params) {
   const typeIsRedundant =
     !typeLabel || (processLabel === 'B&W' && /black\s*&\s*white/i.test(typeLabel))
 
+  const exposures = exposureCounts(variants, filmStock.exposures)
+
   const specs = [
     processLabel && { label: 'Process', value: processLabel, showLabel: false },
     filmStock.iso && { label: 'ISO', value: `ISO ${filmStock.iso}`, showLabel: false },
@@ -296,9 +304,9 @@ export default async function FilmDetailPage({ params }: Params) {
       value: filmStock.format.join(', '),
       showLabel: false,
     },
-    filmStock.exposures && {
+    exposures && {
       label: 'Exposures',
-      value: `${filmStock.exposures} exp`,
+      value: `${exposures} exp`,
       showLabel: false,
     },
   ].filter(Boolean) as Array<{
