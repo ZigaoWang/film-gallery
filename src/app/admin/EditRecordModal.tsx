@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ADMIN_RESOURCES, type FieldSpec, type ResourceName } from '@/lib/admin/resources'
 import { useDialogBehavior } from '@/components/ui/dialog'
-import { FieldInput, toInput, useReferenceOptions } from './fieldControls'
+import { FieldInput, groupFields, toInput, useReferenceOptions } from './fieldControls'
 
 type Row = Record<string, unknown>
 
@@ -28,6 +28,8 @@ export default function EditRecordModal({
   // Mounted only while it is open, so the dialog is open whenever it exists.
   const panelRef = useDialogBehavior({ open: true, onClose })
   const options = useReferenceOptions(resource)
+
+  const groups = groupFields(resource, fields)
 
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {}
@@ -71,25 +73,36 @@ export default function EditRecordModal({
           </button>
         </div>
 
-        <form onSubmit={submit} className="p-6 grid gap-4 sm:grid-cols-2">
-          {fields.map(([name, field]) => (
-            <div key={name} className={field.kind === 'longtext' ? 'sm:col-span-2' : ''}>
-              <label htmlFor={`field-${name}`} className="block text-xs uppercase tracking-wide text-neutral-500 mb-1">
-                {field.label}
-              </label>
-              <FieldInput
-                id={`field-${name}`}
-                column={name}
-                field={field}
-                value={values[name]}
-                options={field.source ? options[field.source] : undefined}
-                onChange={v => setValues(prev => ({ ...prev, [name]: v }))}
-              />
-              {field.help && <p className="text-[11px] text-neutral-600 mt-1">{field.help}</p>}
+        <form onSubmit={submit} className="p-6 space-y-6">
+          {groups.map((group, i) => (
+            <div key={group.title ?? `_${i}`} className={i > 0 ? 'pt-6 border-t border-neutral-800' : ''}>
+              {group.title && (
+                <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500">
+                  {group.title}
+                </h3>
+              )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {group.fields.map(([name, field]) => (
+                  <div key={name} className={field.kind === 'longtext' ? 'sm:col-span-2' : ''}>
+                    <label htmlFor={`field-${name}`} className="block text-xs uppercase tracking-wide text-neutral-500 mb-1">
+                      {field.label}
+                    </label>
+                    <FieldInput
+                      id={`field-${name}`}
+                      column={name}
+                      field={field}
+                      value={values[name]}
+                      options={field.source ? options[field.source] : undefined}
+                      onChange={v => setValues(prev => ({ ...prev, [name]: v }))}
+                    />
+                    {field.help && <p className="text-[11px] text-neutral-600 mt-1">{field.help}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
 
-          <div className="sm:col-span-2 flex justify-end gap-2 pt-2 border-t border-neutral-800 mt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-neutral-800 mt-2">
             <button
               type="button"
               onClick={onClose}

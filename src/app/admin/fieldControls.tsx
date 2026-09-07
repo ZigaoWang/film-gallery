@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ADMIN_RESOURCES, displayValue, type FieldSpec, type ReferenceSource, type ResourceName } from '@/lib/admin/resources'
+import { ADMIN_RESOURCES, FIELD_GROUPS, displayValue, type FieldSpec, type ReferenceSource, type ResourceName } from '@/lib/admin/resources'
 import { displayName } from '@/lib/seo/alt'
 
 /**
@@ -60,6 +60,34 @@ export function useReferenceOptions(resource: ResourceName) {
   }, [resource])
 
   return options
+}
+
+export interface FieldGroup {
+  title: string | null
+  fields: [string, FieldSpec][]
+}
+
+/**
+ * A resource's fields as sections instead of one long list.
+ *
+ * Shared by the single-record and bulk edit modals, same reasoning as the
+ * controls above: whatever the sections look like on one record is what they
+ * look like editing forty. A resource with no entry in `FIELD_GROUPS` (every
+ * section but cameras and films — three or four fields reads fine as one
+ * block) comes back as a single unlabelled group. A field on the resource but
+ * left out of every declared group still renders, in a trailing unlabelled
+ * group, rather than silently disappearing from the form.
+ */
+export function groupFields(resource: ResourceName, fields: [string, FieldSpec][]): FieldGroup[] {
+  const declared = FIELD_GROUPS[resource]
+  if (!declared) return [{ title: null, fields }]
+
+  const placed = new Set(declared.flatMap(g => g.fields))
+  const leftover = fields.filter(([name]) => !placed.has(name))
+  const named = declared
+    .map(g => ({ title: g.title as string | null, fields: fields.filter(([name]) => g.fields.includes(name)) }))
+    .filter(g => g.fields.length > 0)
+  return leftover.length > 0 ? [...named, { title: null, fields: leftover }] : named
 }
 
 export const inputClass =

@@ -5,7 +5,7 @@ import { ADMIN_RESOURCES, UNIQUE_FIELDS, type FieldSpec, type ResourceName } fro
 import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useDialogBehavior } from '@/components/ui/dialog'
-import { FieldInput, useReferenceOptions } from './fieldControls'
+import { FieldInput, groupFields, useReferenceOptions } from './fieldControls'
 
 /**
  * Fields that hand out or take away privileges, and so are confirmed before
@@ -46,6 +46,7 @@ export default function BulkEditModal({
   const unique = UNIQUE_FIELDS[resource] ?? []
   const fields = (Object.entries(spec.editable) as [string, FieldSpec][])
     .filter(([name]) => !unique.includes(name))
+  const groups = groupFields(resource, fields)
 
   const options = useReferenceOptions(resource)
   const [enabled, setEnabled] = useState<Record<string, boolean>>({})
@@ -113,37 +114,48 @@ export default function BulkEditModal({
           </button>
         </div>
 
-        <form onSubmit={submit} className="p-6 grid gap-4 sm:grid-cols-2">
-          {fields.map(([name, field]) => {
-            const on = enabled[name] === true
-            return (
-              <div key={name} className={field.kind === 'longtext' ? 'sm:col-span-2' : ''}>
-                <label className="flex items-center gap-2 mb-1 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={on}
-                    onChange={e => setEnabled(prev => ({ ...prev, [name]: e.target.checked }))}
-                    className="w-3.5 h-3.5 accent-brand"
-                  />
-                  <span className={`text-xs uppercase tracking-wide ${on ? 'text-white' : 'text-neutral-500'}`}>
-                    {field.label}
-                  </span>
-                </label>
-                <FieldInput
-                  id={`bulk-field-${name}`}
-                  column={name}
-                  field={field}
-                  value={values[name]}
-                  disabled={!on}
-                  options={field.source ? options[field.source] : undefined}
-                  onChange={v => setValues(prev => ({ ...prev, [name]: v }))}
-                />
-                {on && field.help && <p className="text-[11px] text-neutral-600 mt-1">{field.help}</p>}
+        <form onSubmit={submit} className="p-6 space-y-6">
+          {groups.map((group, i) => (
+            <div key={group.title ?? `_${i}`} className={i > 0 ? 'pt-6 border-t border-neutral-800' : ''}>
+              {group.title && (
+                <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-neutral-500">
+                  {group.title}
+                </h3>
+              )}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {group.fields.map(([name, field]) => {
+                  const on = enabled[name] === true
+                  return (
+                    <div key={name} className={field.kind === 'longtext' ? 'sm:col-span-2' : ''}>
+                      <label className="flex items-center gap-2 mb-1 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={on}
+                          onChange={e => setEnabled(prev => ({ ...prev, [name]: e.target.checked }))}
+                          className="w-3.5 h-3.5 accent-brand"
+                        />
+                        <span className={`text-xs uppercase tracking-wide ${on ? 'text-white' : 'text-neutral-500'}`}>
+                          {field.label}
+                        </span>
+                      </label>
+                      <FieldInput
+                        id={`bulk-field-${name}`}
+                        column={name}
+                        field={field}
+                        value={values[name]}
+                        disabled={!on}
+                        options={field.source ? options[field.source] : undefined}
+                        onChange={v => setValues(prev => ({ ...prev, [name]: v }))}
+                      />
+                      {on && field.help && <p className="text-[11px] text-neutral-600 mt-1">{field.help}</p>}
+                    </div>
+                  )
+                })}
               </div>
-            )
-          })}
+            </div>
+          ))}
 
-          <div className="sm:col-span-2 flex items-center justify-between gap-2 pt-2 border-t border-neutral-800 mt-2">
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-800 mt-2">
             <p className="text-xs text-neutral-600">
               {chosen.length === 0
                 ? 'Tick a field to change it'

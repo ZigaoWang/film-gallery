@@ -415,6 +415,37 @@ export const ADMIN_RESOURCES = {
 export type ResourceName = keyof typeof ADMIN_RESOURCES
 
 /**
+ * How a resource's editable fields are grouped in the edit form.
+ *
+ * Cameras and films are the only sections with enough fields to need this —
+ * everything else has three or four and reads fine as one block. The titles
+ * here are the same ones `specs.ts` uses for the public spec table, on
+ * purpose: the "Lens" section you'd open here is the "Lens" group you just
+ * read on the live page.
+ *
+ * A field on the resource but missing from every group here still renders —
+ * `EditRecordModal` collects the leftovers into a final unlabelled group
+ * rather than dropping them, so forgetting to place a newly added field loses
+ * nothing, it just shows up unsorted until placed.
+ */
+export const FIELD_GROUPS: Partial<Record<ResourceName, readonly { title: string; fields: readonly string[] }[]>> = {
+  cameras: [
+    { title: 'Identity', fields: ['name', 'brand', 'aliases', 'bodyType', 'frameFormat', 'format', 'mountId', 'year'] },
+    { title: 'Lens', fields: ['lensName', 'focalMinMm', 'focalMaxMm', 'apertureMaxWide', 'apertureMaxTele', 'lensElements', 'lensGroups', 'closeFocusMm'] },
+    { title: 'Exposure', fields: ['focusType', 'meteringPattern', 'exposureModes', 'shutterType', 'shutterSlowestSec', 'shutterFastestSec', 'filmSpeedMin', 'filmSpeedMax'] },
+    { title: 'Body', fields: ['flash', 'batteryType', 'weightGrams'] },
+    { title: 'Media & status', fields: ['defaultFilmStockId', 'description', 'imageStatus'] },
+  ],
+  films: [
+    { title: 'Identity', fields: ['name', 'manufacturer', 'brand', 'aliases', 'iso', 'format', 'exposures'] },
+    { title: 'Classification', fields: ['process', 'colorBalance', 'chromaticity', 'polarity', 'manufacturerStatus', 'manufacturedByBrandId'] },
+    { title: 'Measured', fields: ['rmsGranularity', 'resolvingPowerLpmm', 'latitudeUnderStops', 'latitudeOverStops'] },
+    { title: 'Stock', fields: ['baseMaterial', 'hasRemjet'] },
+    { title: 'Media & status', fields: ['description', 'imageStatus'] },
+  ],
+}
+
+/**
  * Fields that are unique per record, and so cannot be written across a
  * selection: `updateMany` would give every row the same value and fail on the
  * index partway through.
