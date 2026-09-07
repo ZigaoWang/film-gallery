@@ -2,6 +2,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { displayName, gearImageAlt, makerAside, type NamedEntity } from '@/lib/seo/alt'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
+import { cameraSpecs, type CameraSpecSource } from '@/lib/cameraFields'
+import { filmSpecs, type FilmSpecSource } from '@/lib/filmFields'
 
 /**
  * A film stock or a camera, as a card that links to its page.
@@ -12,9 +14,15 @@ import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
  * second card component four pixels off the first that makes a site feel
  * unfinished.
  *
- * One card, both kinds, everywhere the pair is shown. `specs` is optional
- * because the photo page has the specifications elsewhere on it and the
- * combination page does not.
+ * One card, both kinds, everywhere the pair is shown.
+ *
+ * The chips are derived here rather than passed in. They used to be a `specs`
+ * prop, and every page filled it differently: the pairing page gave four facts
+ * per side, the photo page gave a film its ISO and a camera nothing at all, so
+ * the two cards under a photograph did not match each other. A shared component
+ * whose contents are decided by its callers is not shared in the way that
+ * matters. Taking the prop away is what makes them agree, so it is gone rather
+ * than defaulted.
  */
 
 type Gear = NamedEntity & {
@@ -23,6 +31,14 @@ type Gear = NamedEntity & {
   imageUrl?: string | null
   imageStatus?: string | null
 }
+
+/**
+ * The record each kind needs, so a page that selects too few columns fails to
+ * compile instead of quietly rendering a card with no chips on it.
+ */
+type GearCardProps =
+  | { kind: 'camera'; gear: Gear & CameraSpecSource }
+  | { kind: 'film'; gear: Gear & FilmSpecSource }
 
 const ICON = {
   camera: (
@@ -33,16 +49,10 @@ const ICON = {
   ),
 }
 
-export default function GearCard({
-  kind,
-  gear,
-  specs = [],
-}: {
-  kind: 'camera' | 'film'
-  gear: Gear
-  /** Short facts shown as chips. Omitted where the page states them already. */
-  specs?: string[]
-}) {
+export default function GearCard(props: GearCardProps) {
+  const { kind, gear } = props
+  const specs = props.kind === 'camera' ? cameraSpecs(props.gear) : filmSpecs(props.gear)
+
   // Only an approved image is shown, the same rule every other surface applies.
   const image = gear.imageStatus === 'approved' ? gear.imageUrl : null
   // Only when the name does not already lead with it, or the card reads

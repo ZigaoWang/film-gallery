@@ -337,6 +337,35 @@ export function filmFormatLabel(value: FilmFormat | null | undefined): string | 
   return value ? FORMAT_TO_LABEL[value] : null
 }
 
+/** What a film card shows about a stock. See `filmSpecs`. */
+export interface FilmSpecSource {
+  iso?: number | null
+  process?: FilmProcess | null
+  colorBalance?: ColorBalance | null
+  format?: string[]
+}
+
+/**
+ * The stock's specifications as short chips, for a card.
+ *
+ * The counterpart to `cameraSpecs`, and it exists for the same reason: the two
+ * cards under a photograph were built from two different ideas of what a
+ * specification is, so the film showed one chip and the camera none.
+ *
+ * A colour balance of N/A is left out, the same rule the film page applies. Not
+ * applicable is not a specification, and a black and white stock printing "N/A"
+ * beside its speed is answering a question nobody asked of it.
+ */
+export function filmSpecs(film: FilmSpecSource): string[] {
+  const balance = colorBalanceLabel(film.colorBalance)
+  return [
+    film.iso ? `ISO ${film.iso}` : null,
+    filmProcessLabel(film.process),
+    balance && balance !== 'N/A' ? balance : null,
+    film.format?.length ? film.format.join(', ') : null,
+  ].filter((s): s is string => Boolean(s))
+}
+
 /**
  * Frames on a roll: the stock's own column if it has one, otherwise its
  * variants.

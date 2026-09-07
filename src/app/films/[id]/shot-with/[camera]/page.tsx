@@ -16,8 +16,6 @@ import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE } from '@/lib/photoFeed'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
-import { bodyTypeLabel, lensMount } from '@/lib/cameraFields'
-import { colorBalanceLabel, filmProcessLabel } from '@/lib/filmFields'
 import { formatMonth } from '@/lib/formatDate'
 
 /**
@@ -220,20 +218,6 @@ export default async function ComboPage({ params }: Params) {
     liked: likedIds.has(p.id),
   }))
 
-  const filmSpecs = [
-    film.iso ? `ISO ${film.iso}` : null,
-    filmProcessLabel(film.process),
-    colorBalanceLabel(film.colorBalance),
-    film.format[0] ?? null,
-  ].filter((s): s is string => Boolean(s))
-
-  const cameraSpecs = [
-    bodyTypeLabel(camera.bodyType),
-    camera.format,
-    lensMount(camera),
-    camera.year ? String(camera.year) : null,
-  ].filter((s): s is string => Boolean(s))
-
   // A film stock's own record carries the maker; a camera's carries the brand.
   const cameraById = new Map(relatedCameras.map(c => [c.id, c]))
   const filmById = new Map(relatedFilms.map(f => [f.id, f]))
@@ -310,8 +294,8 @@ export default async function ComboPage({ params }: Params) {
         {/* The same card the photo page uses for the same two things. Both
             halves are shown because the pairing belongs to neither of them. */}
         <div className="mb-10 grid gap-4 md:grid-cols-2">
-          <GearCard kind="film" gear={film} specs={filmSpecs} />
-          <GearCard kind="camera" gear={camera} specs={cameraSpecs} />
+          <GearCard kind="film" gear={film} />
+          <GearCard kind="camera" gear={camera} />
         </div>
 
         <div>

@@ -359,13 +359,7 @@ export default async function PhotoPage({
               {(photo.camera || photo.filmStock) && (
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {photo.camera && <GearCard kind="camera" gear={photo.camera} />}
-                  {photo.filmStock && (
-                    <GearCard
-                      kind="film"
-                      gear={photo.filmStock}
-                      specs={photo.filmStock.iso ? [`ISO ${photo.filmStock.iso}`] : []}
-                    />
-                  )}
+                  {photo.filmStock && <GearCard kind="film" gear={photo.filmStock} />}
                 </div>
               )}
 

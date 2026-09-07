@@ -142,3 +142,39 @@ export function lensMount(camera: {
   if (recorded) return recorded
   return camera.bodyType && FIXED_LENS_BODIES.has(camera.bodyType) ? 'Fixed lens' : null
 }
+
+/** What a camera card shows about a camera. See `cameraSpecs`. */
+export interface CameraSpecSource {
+  bodyType?: CameraBodyType | null
+  frameFormat?: FrameFormat | null
+  format?: string | null
+  mountType?: string | null
+  year?: number | null
+}
+
+/**
+ * The camera's specifications as short chips, in the order the camera page
+ * prints them.
+ *
+ * Derived here rather than assembled per page. The card these feed was already
+ * one shared component, but each of the three pages using it decided for itself
+ * what to put inside: the pairing page listed four facts, the photo page listed
+ * none for a camera and one for a film, so the two cards sitting side by side
+ * under a photograph did not even match each other. Sharing the component
+ * without sharing the vocabulary is only half the job.
+ *
+ * Frame format is omitted when it is FULL_FRAME, exactly as the camera page
+ * omits it: nearly every 35mm body is full frame, so printing it on all of them
+ * is noise, and half-frame or panoramic is the thing a reader needs told.
+ */
+export function cameraSpecs(camera: CameraSpecSource): string[] {
+  return [
+    bodyTypeLabel(camera.bodyType),
+    camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
+      ? frameFormatLabel(camera.frameFormat)
+      : null,
+    camera.format?.trim() || null,
+    lensMount(camera),
+    camera.year ? String(camera.year) : null,
+  ].filter((s): s is string => Boolean(s))
+}
