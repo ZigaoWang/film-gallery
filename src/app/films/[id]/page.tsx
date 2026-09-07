@@ -34,6 +34,8 @@ import SourceLink from '@/components/SourceLink'
 import SpecChip from '@/components/SpecChip'
 import { citationsByField, citationTitle } from '@/lib/citations'
 import CompletenessNote from '@/components/CompletenessNote'
+import SpecTable from '@/components/SpecTable'
+import { filmSpecGroups } from '@/lib/specs'
 import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
 import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { MANUFACTURER_EXPLAINER } from '@/lib/manufacturer'
@@ -529,6 +531,12 @@ export default async function FilmDetailPage({ params }: Params) {
                   </p>
                 )}
               </div>
+
+              <SpecTable
+                groups={filmSpecGroups(filmStock)}
+                sourceFor={field => sourceFor.get(field) ?? null}
+                titleFor={field => citationTitle(citationFor.get(field))}
+              />
 
               <div className="mt-6">
                 <SuggestEditButton

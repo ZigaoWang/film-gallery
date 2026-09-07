@@ -17,6 +17,8 @@ import { displayName, gearImageAlt, article, makerAside } from '@/lib/seo/alt'
 import { usefulAliases } from '@/lib/aliases'
 import { textLinkClass } from '@/components/ui/TextLink'
 import CompletenessNote from '@/components/CompletenessNote'
+import SpecTable from '@/components/SpecTable'
+import { cameraSpecGroups } from '@/lib/specs'
 import { citationsByField, citationTitle } from '@/lib/citations'
 import SourceLink from '@/components/SourceLink'
 import SpecChip from '@/components/SpecChip'
@@ -356,6 +358,14 @@ export default async function CameraDetailPage({ params }: Params) {
                   <span className="text-neutral-300">{alternateNames.join(', ')}</span>
                 </p>
               )}
+
+              {/* Below the prose, because the prose says what the numbers
+                  mean and the numbers are what you come back to check. */}
+              <SpecTable
+                groups={cameraSpecGroups(camera)}
+                sourceFor={field => sourceFor.get(field) ?? null}
+                titleFor={field => citationTitle(citationFor.get(field))}
+              />
 
               <div className="mt-6">
                 <SuggestEditButton
