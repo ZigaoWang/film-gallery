@@ -98,12 +98,14 @@ export default function CommentSection({ photoId }: { photoId: string }) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-400">
+      {/* h2. On a photo page this sat under the h1 as an h3, and directly
+          above "More like this" which is an h2, so the order went 1, 3, 2. */}
+      <h2 className="text-sm font-bold uppercase tracking-wide text-neutral-400">
         {/* No count until there is one to give. It read "Comments (0)" while
             the list was still on its way, which is a statement about the
             photo, and it was wrong. */}
         Comments{status === 'ready' && ` (${comments.length})`}
-      </h3>
+      </h2>
 
       {session ? (
         <form onSubmit={handleSubmit} className="flex gap-2">
