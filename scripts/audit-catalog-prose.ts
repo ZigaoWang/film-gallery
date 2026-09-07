@@ -15,6 +15,7 @@
  */
 
 import { PrismaClient } from '@prisma/client'
+import { summaryFromDescription } from '../src/lib/catalogForm'
 
 const prisma = new PrismaClient()
 
@@ -83,8 +84,8 @@ function review(name: string, summary: string | null, description: string | null
 
 async function main() {
   const [films, cameras] = await Promise.all([
-    prisma.filmStock.findMany({ select: { name: true, summary: true, description: true }, orderBy: { name: 'asc' } }),
-    prisma.camera.findMany({ select: { name: true, summary: true, description: true }, orderBy: { name: 'asc' } }),
+    prisma.filmStock.findMany({ select: { name: true, description: true }, orderBy: { name: 'asc' } }),
+    prisma.camera.findMany({ select: { name: true, description: true }, orderBy: { name: 'asc' } }),
   ])
 
   let flagged = 0
@@ -94,7 +95,7 @@ async function main() {
     const found: Finding[] = []
     for (const row of rows) {
       total++
-      const notes = review(row.name, row.summary, row.description)
+      const notes = review(row.name, summaryFromDescription(row.description), row.description)
       if (notes.length > 0) found.push({ name: row.name, notes })
     }
     flagged += found.length

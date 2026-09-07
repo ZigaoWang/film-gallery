@@ -65,11 +65,10 @@ function problems(entry: Entry): string[] {
   }
   if (!description) found.push('no description')
 
-  // The split the catalog is built on: the summary identifies the thing and the
-  // description starts from the second one. Canon's AE-1 Program had the two
-  // byte-identical, so the page printed the same sentence twice.
+  // The summary is now the description's opening paragraph rather than a
+  // separate column, so a body that repeats it says the same thing twice.
   const first = entry.description[0]?.trim().toLowerCase() ?? ''
-  if (first === summary.toLowerCase()) found.push('description opens with the summary verbatim')
+  if (first === summary.toLowerCase()) found.push('the body repeats the summary')
   const lead = entry.name.split(/\s+/).slice(0, 2).join(' ').toLowerCase()
   if (first.startsWith(lead) || first.startsWith(`the ${lead}`)) {
     found.push('description opens by restating the name')
@@ -133,9 +132,10 @@ async function main() {
       continue
     }
 
+    // One field. The summary is the description's opening paragraph, and is
+    // computed where it is shown rather than stored beside it.
     const payload = {
-      summary: entry.summary.trim(),
-      description: entry.description.map(p => p.trim()).join('\n\n'),
+      description: [entry.summary.trim(), ...entry.description.map(p => p.trim())].join('\n\n'),
     }
 
     if (!apply) {

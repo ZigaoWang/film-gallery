@@ -16,6 +16,7 @@
 import { PrismaClient } from '@prisma/client'
 import { filmProcessLabel, colorBalanceLabel } from '../src/lib/filmFields'
 import { bodyTypeLabel, lensMount } from '../src/lib/cameraFields'
+import { summaryFromDescription } from '../src/lib/catalogForm'
 
 const prisma = new PrismaClient()
 
@@ -101,7 +102,7 @@ async function main() {
 
   console.log('\n## Film stocks\n')
   for (const f of films) {
-    const notes = problems(f.name, f.summary, f.description)
+    const notes = problems(f.name, summaryFromDescription(f.description), f.description)
     const specs = [
       f.iso && `ISO ${f.iso}`,
       filmProcessLabel(f.process),
@@ -112,14 +113,14 @@ async function main() {
 
     console.log(`### ${f.name}`)
     console.log(`\`/films/${f.slug ?? f.id}\` · ${specs || 'no specs recorded'}\n`)
-    console.log(block('Summary now', f.summary))
+    console.log(block('Summary now', summaryFromDescription(f.description)))
     console.log(block('Description now', f.description))
     console.log(notes.length ? `- **Needs work:** ${notes.join('; ')}\n` : '- Reads fine as it stands.\n')
   }
 
   console.log('\n## Cameras\n')
   for (const c of cameras) {
-    const notes = problems(c.name, c.summary, c.description)
+    const notes = problems(c.name, summaryFromDescription(c.description), c.description)
     const specs = [
       bodyTypeLabel(c.bodyType),
       c.format,
@@ -131,7 +132,7 @@ async function main() {
     console.log(`\`/cameras/${c.slug ?? c.id}\` · ${specs || 'no specs recorded'}`)
     if (c.aliases.length) console.log(`Also known as: ${c.aliases.join(', ')}`)
     console.log()
-    console.log(block('Summary now', c.summary))
+    console.log(block('Summary now', summaryFromDescription(c.description)))
     console.log(block('Description now', c.description))
     console.log(notes.length ? `- **Needs work:** ${notes.join('; ')}\n` : '- Reads fine as it stands.\n')
   }

@@ -71,7 +71,6 @@ async function main() {
     ['format', f => f.format],
     ['exposures', f => f.exposures],
     ['aliases', f => f.aliases],
-    ['summary', f => f.summary],
     ['description', f => f.description],
   ]
 
@@ -124,7 +123,6 @@ async function main() {
     ['mountType', c => c.mountType],
     ['year', c => c.year],
     ['aliases', c => c.aliases],
-    ['summary', c => c.summary],
     ['description', c => c.description],
   ]
 
