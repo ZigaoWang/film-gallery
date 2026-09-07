@@ -330,12 +330,21 @@ export async function applyAdminEdit(
   entityType: EntityType,
   entityId: string,
   payload: Record<string, unknown>,
-  adminId: string
+  adminId: string,
+  /**
+   * Where the values came from, one entry per field.
+   *
+   * Optional because most admin edits are corrections to wording rather than
+   * new claims. When it is supplied the citation lands with the value, in the
+   * same transaction, which is the only way the two cannot disagree.
+   */
+  sourceUrls?: Record<string, string>
 ): Promise<ApplyResult | { error: string }> {
   const revision = await submitRevision({
     entityType,
     entityId,
     payload,
+    sourceUrls,
     source: 'ADMIN',
     submittedById: adminId,
   })
