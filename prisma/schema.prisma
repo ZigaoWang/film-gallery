@@ -141,8 +141,14 @@ model Camera {
   id                 String     @id @default(cuid())
   slug               String?    @unique
   name               String
-  /// Superseded by `brandId`. Populated on exactly one of the seventeen rows
-  /// this replaced, with the brand folded into `name` on the other sixteen.
+  /// The maker's name as text, for display.
+  ///
+  /// `brandId` is the queryable relation and the source of truth; this is the
+  /// string `displayName` reads, the same job `manufacturer` does on a film
+  /// stock, which has no brand text column of its own. It was populated on
+  /// three rows of nineteen and null on the rest, so the edit form showed a
+  /// brand for some cameras and an empty box for the others. Kept in step with
+  /// the relation on write, and every camera name also leads with it.
   brand              String?
   /// Nullable, unlike a film's. Not every camera has an identifiable brand:
   /// null means "not yet identified" and lands in the research backlog rather

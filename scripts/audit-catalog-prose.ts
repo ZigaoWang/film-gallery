@@ -60,6 +60,9 @@ function review(name: string, summary: string | null, description: string | null
   }
 
   if (!summary) notes.push('no summary')
+  // OPTI200 had the two byte-identical, so the page stripped the duplicate
+  // paragraph and rendered a lead with no description under it at all.
+  else if (summary.trim() === text) notes.push('description is a copy of the summary')
   if (words < MIN_WORDS) notes.push(`only ${words} words`)
   if (words > MAX_WORDS) notes.push(`${words} words, over the ${MAX_WORDS} ceiling`)
 
