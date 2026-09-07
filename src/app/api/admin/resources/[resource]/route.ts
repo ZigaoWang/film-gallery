@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { currentUserId, requireAdmin } from '@/lib/admin/auth'
 import { isResourceName } from '@/lib/admin/resources'
-import { deleteResource, listResource, updateResource } from '@/lib/admin/repository'
+import { createResource, deleteResource, listResource, updateResource } from '@/lib/admin/repository'
 import { parseIntParam } from '@/lib/validation'
 
 /**
@@ -31,6 +31,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ reso
   })
 
   return NextResponse.json(result)
+}
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ resource: string }> }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
+  const { resource } = await params
+  if (!isResourceName(resource)) {
+    return NextResponse.json({ error: 'Unknown section' }, { status: 404 })
+  }
+
+  const body = await req.json().catch(() => null)
+  if (!body || typeof body !== 'object') {
+    return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
+  }
+
+  const result = await createResource(resource, body as Record<string, unknown>)
+  if ('error' in result) return NextResponse.json({ error: result.error }, { status: 400 })
+  return NextResponse.json(result, { status: 201 })
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ resource: string }> }) {

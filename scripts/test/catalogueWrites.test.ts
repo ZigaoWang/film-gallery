@@ -65,6 +65,15 @@ const ALLOWED: Array<{ file: string; why: string }> = [
     file: 'src/app/api/admin/moderation/filmstock/[id]/route.ts',
     why: 'As above.',
   },
+  {
+    file: 'src/lib/admin/repository.ts',
+    why: 'The brand rows a camera or film points at, edited the same way this ' +
+      'file already writes users, photos and comments directly: a company name ' +
+      'and its aliases are reference data, not a claim that needs a citation or ' +
+      'a review queue. Camera and film writes in this file still funnel through ' +
+      'applyAdminEdit a few lines up; only the prisma.brand.* calls in the ' +
+      'generic switch match this pattern.',
+  },
 ]
 
 const allowedFiles = new Set(ALLOWED.map(a => a.file))

@@ -2,12 +2,13 @@ import { prisma } from '@/lib/db'
 import { Prisma } from '@prisma/client'
 import { deleteFromOSS } from '@/lib/oss'
 import { extractKeyFromUrl } from '@/lib/ossUtils'
-import { ADMIN_RESOURCES, UNIQUE_FIELDS, coerceField, type ResourceName } from './resources'
+import { ADMIN_RESOURCES, UNIQUE_FIELDS, coerceEditableFields, coerceField, type ResourceName, type ResourceSpec } from './resources'
 import { safeHttpUrl, sanitizeHandle } from '@/lib/validation'
 import { resolveTarget, type ReportTarget } from '@/lib/reports'
 import { applyAdminEdit } from '@/lib/revisions'
 import { currentUserId } from './auth'
 import { displayName } from '@/lib/seo/alt'
+import { slugify, uniqueSlug } from '@/lib/seo/slug'
 
 /**
  * Reads and writes behind the admin sections.
@@ -210,6 +211,41 @@ export async function listResource(resource: ResourceName, params: ListParams): 
       }
     }
 
+    case 'brands': {
+      const [rows, total] = await Promise.all([
+        prisma.brand.findMany({
+          where, orderBy, skip, take,
+          include: { _count: { select: { cameras: true, filmStocks: true, manufacturedFilms: true } } },
+        }),
+        prisma.brand.count({ where }),
+      ])
+      return {
+        total,
+        rows: rows.map(b => ({
+          id: b.id, name: b.name, aliases: b.aliases, description: b.description,
+          cameraCount: b._count.cameras,
+          filmCount: b._count.filmStocks + b._count.manufacturedFilms,
+        })),
+      }
+    }
+
+    case 'mounts': {
+      const [rows, total] = await Promise.all([
+        prisma.lensMount.findMany({
+          where, orderBy, skip, take,
+          include: { _count: { select: { cameras: true } } },
+        }),
+        prisma.lensMount.count({ where }),
+      ])
+      return {
+        total,
+        rows: rows.map(m => ({
+          id: m.id, name: m.name, aliases: m.aliases, fixed: m.fixed,
+          referenceUrl: m.referenceUrl, cameraCount: m._count.cameras,
+        })),
+      }
+    }
+
     case 'albums': {
       const [rows, total] = await Promise.all([
         prisma.collection.findMany({
@@ -393,6 +429,8 @@ export async function updateResource(
       case 'users': await prisma.user.update({ where: { id }, data }); break
       case 'photos': await prisma.photo.update({ where: { id }, data }); break
       case 'comments': await prisma.comment.update({ where: { id }, data }); break
+      case 'brands': await prisma.brand.update({ where: { id }, data }); break
+      case 'mounts': await prisma.lensMount.update({ where: { id }, data }); break
       case 'albums': await prisma.collection.update({ where: { id }, data }); break
       case 'notes': await prisma.communityNote.update({ where: { id }, data }); break
       case 'reports': await prisma.report.update({ where: { id }, data }); break
@@ -406,6 +444,73 @@ export async function updateResource(
     }
     console.error(`[admin] update ${resource}/${id} failed:`, error)
     return { error: 'Could not save the change' }
+  }
+}
+
+/** A value that counts as filled in, for the required-field check on create. */
+function hasValue(value: unknown): boolean {
+  if (value === null || value === undefined) return false
+  if (Array.isArray(value)) return value.length > 0
+  if (typeof value === 'string') return value.trim().length > 0
+  return true
+}
+
+/**
+ * Adds a new row to a resource that allows it.
+ *
+ * Only the reference tables (brands, mounts) support this today. Cameras and
+ * films are created through their own add flow, which does more than a
+ * generic form could — duplicate detection, image upload, a slug allocated
+ * against the brand. Built on `coerceEditableFields`, the same allowlist and
+ * coercion the edit path uses, so a value this refuses is a value editing
+ * would refuse too.
+ */
+export async function createResource(
+  resource: ResourceName,
+  body: Record<string, unknown>
+): Promise<{ error: string } | { id: string }> {
+  // Widened from the const-asserted literal: only a couple of resources carry
+  // `creatable`, so the union type does not expose it without this.
+  const spec: ResourceSpec = ADMIN_RESOURCES[resource]
+  if (!spec.creatable) return { error: 'This section does not support adding new records' }
+
+  const coerced = coerceEditableFields(resource, body)
+  if ('error' in coerced) return coerced
+
+  const missing = Object.entries(spec.editable)
+    .filter(([name, field]) => field.required && !hasValue(coerced.data[name]))
+    .map(([, field]) => field.label)
+  if (missing.length > 0) {
+    return { error: `${missing.join(', ')} ${missing.length === 1 ? 'is' : 'are'} required` }
+  }
+
+  const name = String(coerced.data.name ?? '').trim()
+
+  try {
+    switch (resource) {
+      case 'brands': {
+        const taken = new Set((await prisma.brand.findMany({ select: { slug: true } })).map(b => b.slug))
+        const row = await prisma.brand.create({
+          data: { ...coerced.data, slug: uniqueSlug(slugify(name), taken) } as Prisma.BrandCreateInput,
+        })
+        return { id: row.id }
+      }
+      case 'mounts': {
+        const taken = new Set((await prisma.lensMount.findMany({ select: { slug: true } })).map(m => m.slug))
+        const row = await prisma.lensMount.create({
+          data: { ...coerced.data, slug: uniqueSlug(slugify(name), taken) } as Prisma.LensMountCreateInput,
+        })
+        return { id: row.id }
+      }
+      default:
+        return { error: 'This section does not support adding new records' }
+    }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return { error: 'A record with that value already exists' }
+    }
+    console.error(`[admin] create ${resource} failed:`, error)
+    return { error: 'Could not create that record' }
   }
 }
 
@@ -497,6 +602,8 @@ export async function bulkUpdateResource(
       case 'albums': return { updated: (await prisma.collection.updateMany({ where, data })).count }
       case 'notes': return { updated: (await prisma.communityNote.updateMany({ where, data })).count }
       case 'reports': return { updated: (await prisma.report.updateMany({ where, data })).count }
+      case 'brands': return { updated: (await prisma.brand.updateMany({ where, data })).count }
+      case 'mounts': return { updated: (await prisma.lensMount.updateMany({ where, data })).count }
     }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -551,6 +658,8 @@ export async function bulkDeleteResource(
       case 'comments': return { deleted: (await prisma.comment.deleteMany({ where })).count }
       case 'cameras': return { deleted: (await prisma.camera.deleteMany({ where })).count }
       case 'films': return { deleted: (await prisma.filmStock.deleteMany({ where })).count }
+      case 'brands': return { deleted: (await prisma.brand.deleteMany({ where })).count }
+      case 'mounts': return { deleted: (await prisma.lensMount.deleteMany({ where })).count }
       case 'albums': return { deleted: (await prisma.collection.deleteMany({ where })).count }
       case 'notes': return { deleted: (await prisma.communityNote.deleteMany({ where })).count }
       case 'reports': return { deleted: (await prisma.report.deleteMany({ where })).count }
@@ -605,6 +714,8 @@ export async function deleteResource(
       case 'comments': await prisma.comment.delete({ where: { id } }); return { ok: true }
       case 'cameras': await prisma.camera.delete({ where: { id } }); return { ok: true }
       case 'films': await prisma.filmStock.delete({ where: { id } }); return { ok: true }
+      case 'brands': await prisma.brand.delete({ where: { id } }); return { ok: true }
+      case 'mounts': await prisma.lensMount.delete({ where: { id } }); return { ok: true }
       case 'albums': await prisma.collection.delete({ where: { id } }); return { ok: true }
       case 'notes': await prisma.communityNote.delete({ where: { id } }); return { ok: true }
       case 'reports': await prisma.report.delete({ where: { id } }); return { ok: true }

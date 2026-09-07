@@ -8,17 +8,22 @@ import { FieldInput, groupFields, toInput, useReferenceOptions } from './fieldCo
 type Row = Record<string, unknown>
 
 /**
- * Edits one record, with a form built from the resource's own field specs.
+ * Edits one record, or adds a new one, with a form built from the resource's
+ * own field specs.
  *
  * Only fields the server will accept are rendered, so the form cannot offer
  * something the API then refuses — the allowlist in lib/admin/resources is the
  * single description of what is editable, used by both sides.
+ *
+ * `row: null` is create mode: every field starts empty and every value the
+ * admin fills in is submitted, rather than only what changed against a
+ * baseline that does not exist yet.
  */
 export default function EditRecordModal({
   resource, row, busy, onClose, onSave,
 }: {
   resource: ResourceName
-  row: Row
+  row: Row | null
   busy: boolean
   onClose: () => void
   onSave: (changes: Record<string, unknown>) => Promise<boolean>
@@ -33,12 +38,18 @@ export default function EditRecordModal({
 
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {}
-    for (const [name, field] of fields) initial[name] = toInput(field, row[name])
+    for (const [name, field] of fields) initial[name] = toInput(field, row?.[name])
     return initial
   })
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!row) {
+      await onSave(values)
+      return
+    }
+
     // Only what actually changed, so an untouched field is never rewritten and
     // a concurrent edit elsewhere is not silently reverted.
     const changes: Record<string, unknown> = {}
@@ -63,8 +74,10 @@ export default function EditRecordModal({
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
           <div>
-            <h2 id="edit-record-title" className="text-lg font-bold text-white">Edit {spec.label.toLowerCase()}</h2>
-            <p className="text-xs text-neutral-600 font-mono mt-0.5">{String(row.id)}</p>
+            <h2 id="edit-record-title" className="text-lg font-bold text-white">
+              {row ? `Edit ${spec.label.toLowerCase()}` : `New ${spec.label.toLowerCase()}`}
+            </h2>
+            {row && <p className="text-xs text-neutral-600 font-mono mt-0.5">{String(row.id)}</p>}
           </div>
           <button onClick={onClose} aria-label="Close" className="text-neutral-500 hover:text-white p-2 -mr-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +129,7 @@ export default function EditRecordModal({
               disabled={busy}
               className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark disabled:opacity-40"
             >
-              {busy ? 'Saving…' : 'Save changes'}
+              {busy ? 'Saving…' : row ? 'Save changes' : 'Create'}
             </button>
           </div>
         </form>

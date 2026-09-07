@@ -62,6 +62,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<Row | null>(null)
+  const [creating, setCreating] = useState(false)
   const [confirming, setConfirming] = useState<Row | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -156,6 +157,30 @@ export default function ResourceTable<F extends string>({ resource, filters, def
       }
       toast(`${spec.label} updated`, 'success')
       setEditing(null)
+      await load()
+      return true
+    } catch {
+      toast('Could not reach the server', 'error')
+      return false
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const create = async (fields: Record<string, unknown>) => {
+    setBusy(true)
+    try {
+      const res = await fetch(`/api/admin/resources/${resource}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields),
+      })
+      if (!res.ok) {
+        toast(await apiErrorMessage(res, 'Could not create that'), 'error')
+        return false
+      }
+      toast(`${spec.label} created`, 'success')
+      setCreating(false)
       await load()
       return true
     } catch {
@@ -295,9 +320,19 @@ export default function ResourceTable<F extends string>({ resource, filters, def
 
   return (
     <div>
-      <header className="mb-5">
-        <h1 className="text-2xl font-black text-white tracking-tight">{spec.plural}</h1>
-        <p className="text-neutral-500 text-sm mt-1">{spec.description}</p>
+      <header className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-white tracking-tight">{spec.plural}</h1>
+          <p className="text-neutral-500 text-sm mt-1">{spec.description}</p>
+        </div>
+        {spec.creatable && (
+          <button
+            onClick={() => setCreating(true)}
+            className="shrink-0 px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark"
+          >
+            New {spec.label.toLowerCase()}
+          </button>
+        )}
       </header>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -552,6 +587,16 @@ export default function ResourceTable<F extends string>({ resource, filters, def
           busy={busy}
           onClose={() => setEditing(null)}
           onSave={changes => save(String(editing.id), changes)}
+        />
+      )}
+
+      {creating && (
+        <EditRecordModal
+          resource={resource}
+          row={null}
+          busy={busy}
+          onClose={() => setCreating(false)}
+          onSave={create}
         />
       )}
 

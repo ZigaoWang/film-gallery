@@ -54,6 +54,8 @@ export interface FieldSpec {
   help?: string
   /** For `reference`: the list to choose from. */
   source?: ReferenceSource
+  /** Only enforced when creating a record. An edit may leave it as it was. */
+  required?: boolean
 }
 
 /** A one-click action offered on a row, applied as a normal field update. */
@@ -107,6 +109,8 @@ export interface ResourceSpec {
   orderBy: Record<string, 'asc' | 'desc'>
   /** Whether rows can be removed from this section. */
   deletable: boolean
+  /** Whether a new row can be added from the table, not just edited. */
+  creatable?: boolean
   /** Shown above the table. */
   description: string
   /**
@@ -352,6 +356,39 @@ export const ADMIN_RESOURCES = {
     },
   },
 
+  brands: {
+    label: 'Brand',
+    plural: 'Brands',
+    description: 'The makers a camera or film stock can point at. Add one here before it can be chosen elsewhere.',
+    columns: ['name', 'aliases', 'cameraCount', 'filmCount'],
+    searchFields: ['name'],
+    orderBy: { name: 'asc' },
+    deletable: true,
+    creatable: true,
+    editable: {
+      name: { kind: 'text', label: 'Name', maxLength: 60, required: true },
+      aliases: { kind: 'stringList', label: 'Also known as', help: 'Comma separated. Other spellings and corporate names, e.g. "Yestar" for Yes!Star.' },
+      description: { kind: 'longtext', label: 'Description', maxLength: 500 },
+    },
+  },
+
+  mounts: {
+    label: 'Lens mount',
+    plural: 'Lens mounts',
+    description: 'What a camera can be given as its mount. Add one here before it can be chosen elsewhere.',
+    columns: ['name', 'aliases', 'fixed', 'cameraCount'],
+    searchFields: ['name'],
+    orderBy: { name: 'asc' },
+    deletable: true,
+    creatable: true,
+    editable: {
+      name: { kind: 'text', label: 'Name', maxLength: 60, required: true, help: 'As a picker shows it: "Canon FD", "M42 screw", "Fixed lens".' },
+      aliases: { kind: 'stringList', label: 'Also known as', help: 'Comma separated. "FD" for Canon FD.' },
+      fixed: { kind: 'boolean', label: 'Is the fixed-lens answer', help: 'Exactly one row should have this on: the "Fixed lens" choice for bodies whose lens does not come off.' },
+      referenceUrl: { kind: 'text', label: 'Reference', maxLength: 300, help: 'Where this mount is documented.' },
+    },
+  },
+
   albums: {
     label: 'Album',
     plural: 'Albums',
@@ -460,6 +497,8 @@ export const UNIQUE_FIELDS: Partial<Record<ResourceName, readonly string[]>> = {
   // pile of records all trying to move to the same slug.
   films: ['name'],
   cameras: ['name'],
+  brands: ['name'],
+  mounts: ['name'],
 }
 
 export function isResourceName(value: string): value is ResourceName {
@@ -467,7 +506,7 @@ export function isResourceName(value: string): value is ResourceName {
 }
 
 export const RESOURCE_ORDER: readonly ResourceName[] = [
-  'reports', 'photos', 'users', 'comments', 'cameras', 'films', 'albums', 'notes',
+  'reports', 'photos', 'users', 'comments', 'cameras', 'films', 'brands', 'mounts', 'albums', 'notes',
 ]
 
 /**
