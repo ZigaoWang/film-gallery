@@ -105,3 +105,40 @@ export function toFrameFormat(input: string | null | undefined): FrameFormat | n
   if (!input) return null
   return (FRAME_FORMATS as string[]).includes(input) ? (input as FrameFormat) : null
 }
+
+/**
+ * Body types whose lens is part of the body, so there is no mount to record.
+ *
+ * Definitional rather than a generalization: a point & shoot, a disposable and
+ * an instant camera do not take another lens, and a row saying otherwise would
+ * be wrong rather than unresearched. The types left out are the ones where it
+ * varies and only the individual camera can answer - a Leica M and an Olympus
+ * 35 SP are both rangefinders, and only one of them takes lenses.
+ */
+const FIXED_LENS_BODIES: ReadonlySet<CameraBodyType> = new Set<CameraBodyType>([
+  'COMPACT',
+  'DISPOSABLE',
+  'INSTANT',
+])
+
+/**
+ * What a camera takes for a lens, or null if nobody has established it.
+ *
+ * Fourteen of the nineteen cameras in the catalog have an empty `mountType`,
+ * and every reader of that column treated the emptiness as one thing: the
+ * public pages dropped the chip, the gap report counted a hole. For a
+ * disposable there is no hole. Answering "Fixed lens" from the body type
+ * leaves two real gaps instead of fourteen, and two is a list somebody works
+ * through.
+ *
+ * Null is reserved for the genuine gap, so callers can keep using falsiness
+ * and get the right behaviour without asking a second question.
+ */
+export function lensMount(camera: {
+  bodyType?: CameraBodyType | null
+  mountType?: string | null
+}): string | null {
+  const recorded = camera.mountType?.trim()
+  if (recorded) return recorded
+  return camera.bodyType && FIXED_LENS_BODIES.has(camera.bodyType) ? 'Fixed lens' : null
+}

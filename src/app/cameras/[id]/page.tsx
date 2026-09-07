@@ -26,7 +26,7 @@ import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
 import { descriptionParagraphs } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
-import { bodyTypeLabel, bodyTypeProse, frameFormatLabel } from '@/lib/cameraFields'
+import { bodyTypeLabel, bodyTypeProse, frameFormatLabel, lensMount } from '@/lib/cameraFields'
 import type { CameraBodyType } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
@@ -186,7 +186,17 @@ export default async function CameraDetailPage({ params }: Params) {
   const allClaims = provenance.flatMap(
     p => (p.claims ?? []) as Array<{ url?: string | null; editorial?: boolean | null }>
   )
-  const completeness = completenessOf('CAMERA', camera as unknown as Record<string, unknown>, citedFields, allClaims, NOT_YET_STARTED)
+  const mount = lensMount(camera)
+  // Scored on the derived mount, not the stored one. A point & shoot with an
+  // empty column has answered the question, and counting it as unfilled marked
+  // fourteen of nineteen cameras incomplete for a field they cannot have.
+  const completeness = completenessOf(
+    'CAMERA',
+    { ...camera, mountType: mount } as unknown as Record<string, unknown>,
+    citedFields,
+    allClaims,
+    NOT_YET_STARTED
+  )
   const displayImage = camera.imageStatus === 'approved' ? camera.imageUrl : null
   // Not gated on imageStatus. That column tracks the moderation state of the
   // product photograph and nothing else, so tying the prose to it meant
@@ -205,7 +215,10 @@ export default async function CameraDetailPage({ params }: Params) {
     camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
       && { label: 'Frame', value: frameFormatLabel(camera.frameFormat)!, field: 'frameFormat' },
     camera.format && { label: 'Format', value: camera.format, field: 'format' },
-    camera.mountType && { label: 'Mount', value: camera.mountType, field: 'mountType' },
+    // "Fixed lens" for the bodies that cannot take another one, rather than no
+    // chip at all. A reader looking at a compact wants to know the lens is part
+    // of it, and silence there is indistinguishable from an unresearched field.
+    mount && { label: 'Mount', value: mount, field: 'mountType' },
     camera.year && { label: 'Year', value: String(camera.year), field: 'year' },
   ].filter(Boolean) as Array<{ label: string; value: string; field: string }>
 

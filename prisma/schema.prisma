@@ -189,7 +189,14 @@ model Camera {
   /// been checked, and full-frame is an assumption rather than a reading.
   frameFormat        FrameFormat?
   format             String? // 35mm, Medium Format (120/220), Large Format (4x5, 8x10), APS, 110, Half-frame
-  mountType          String? // Canon FD, Nikon F, Pentax K, M42, Leica M, etc.
+  /// Canon FD, Nikon F, Pentax K, M42, Leica M, and so on.
+  ///
+  /// Null carries two meanings and cannot tell them apart on its own: nobody
+  /// has looked it up, or the lens is fixed to the body and there is no mount
+  /// to look up. `lensMount()` resolves that from `bodyType`, which settles it
+  /// for every compact, disposable and instant. Read through it rather than
+  /// reading this column directly.
+  mountType          String?
   year               Int? // Year of manufacture/release
   defaultFilmStockId String?
   defaultFilmStock   FilmStock? @relation("defaultFilm", fields: [defaultFilmStockId], references: [id])

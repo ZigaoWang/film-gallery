@@ -15,7 +15,7 @@
 
 import { PrismaClient } from '@prisma/client'
 import { filmProcessLabel, colorBalanceLabel } from '../src/lib/filmFields'
-import { bodyTypeLabel } from '../src/lib/cameraFields'
+import { bodyTypeLabel, lensMount } from '../src/lib/cameraFields'
 
 const prisma = new PrismaClient()
 
@@ -123,7 +123,7 @@ async function main() {
     const specs = [
       bodyTypeLabel(c.bodyType),
       c.format,
-      c.mountType,
+      lensMount(c),
       c.year && String(c.year),
     ].filter(Boolean).join(' · ')
 

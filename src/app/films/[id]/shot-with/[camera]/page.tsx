@@ -16,7 +16,7 @@ import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE } from '@/lib/photoFeed'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
-import { bodyTypeLabel } from '@/lib/cameraFields'
+import { bodyTypeLabel, lensMount } from '@/lib/cameraFields'
 import { colorBalanceLabel, filmProcessLabel } from '@/lib/filmFields'
 import { formatMonth } from '@/lib/formatDate'
 
@@ -230,7 +230,7 @@ export default async function ComboPage({ params }: Params) {
   const cameraSpecs = [
     bodyTypeLabel(camera.bodyType),
     camera.format,
-    camera.mountType,
+    lensMount(camera),
     camera.year ? String(camera.year) : null,
   ].filter((s): s is string => Boolean(s))
 
