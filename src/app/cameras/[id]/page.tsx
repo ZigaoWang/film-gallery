@@ -16,8 +16,6 @@ import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld
 import { displayName, gearImageAlt, article, makerAside } from '@/lib/seo/alt'
 import { usefulAliases } from '@/lib/aliases'
 import { textLinkClass } from '@/components/ui/TextLink'
-import SpecTable from '@/components/SpecTable'
-import { cameraSpecGroups } from '@/lib/specs'
 import SpecChip from '@/components/SpecChip'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
@@ -318,10 +316,6 @@ export default async function CameraDetailPage({ params }: Params) {
                   <span className="text-neutral-300">{alternateNames.join(', ')}</span>
                 </p>
               )}
-
-              {/* Below the prose, because the prose says what the numbers
-                  mean and the numbers are what you come back to check. */}
-              <SpecTable groups={cameraSpecGroups(camera)} />
 
               <div className="mt-6">
                 <SuggestEditButton

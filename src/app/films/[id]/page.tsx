@@ -31,8 +31,6 @@ import { hiddenPhotoFilter } from '@/lib/blocks'
 import ManufacturerValue from '@/components/ManufacturerValue'
 import { textLinkClass } from '@/components/ui/TextLink'
 import SpecChip from '@/components/SpecChip'
-import SpecTable from '@/components/SpecTable'
-import { filmSpecGroups } from '@/lib/specs'
 import { MANUFACTURER_EXPLAINER } from '@/lib/manufacturer'
 
 // Photo order is shuffled per request, so the page can't be statically cached.
@@ -491,8 +489,6 @@ export default async function FilmDetailPage({ params }: Params) {
                   </p>
                 )}
               </div>
-
-              <SpecTable groups={filmSpecGroups(filmStock)} />
 
               <div className="mt-6">
                 <SuggestEditButton
