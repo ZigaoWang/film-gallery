@@ -30,7 +30,15 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
     include: { _count: { select: { photos: { where: { ...PUBLIC_PHOTO } } } } }
   })
 
-  if (!user) return { title: 'User Not Found' }
+  // notFound() here rather than a title, because here it still sets the status.
+  //
+  // The page calls it too, but by then the shell has already been streamed:
+  // this route has a loading.tsx, so Next opens the response with a 200 before
+  // the page body runs and the status can no longer be changed. Every route
+  // with a loading state was answering an unknown entry with 200 and a page
+  // reading "Not Found", which is a soft 404 for a crawler to index. Metadata
+  // resolves before the shell is flushed, so the status is still open here.
+  if (!user) notFound()
 
   const displayName = user.name || user.username
   const photoCount = user._count.photos

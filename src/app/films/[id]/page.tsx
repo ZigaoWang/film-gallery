@@ -55,7 +55,15 @@ function specString(film: {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { id } = await params
   const filmStock = await lookupFilm(id)
-  if (!filmStock) return { title: 'Film Stock Not Found' }
+  // notFound() here rather than a title, because here it still sets the status.
+  //
+  // The page calls it too, but by then the shell has already been streamed:
+  // this route has a loading.tsx, so Next opens the response with a 200 before
+  // the page body runs and the status can no longer be changed. Every route
+  // with a loading state was answering an unknown entry with 200 and a page
+  // reading "Not Found", which is a soft 404 for a crawler to index. Metadata
+  // resolves before the shell is flushed, so the status is still open here.
+  if (!filmStock) notFound()
 
   const name = displayName(filmStock) ?? filmStock.name
   const photoCount = await prisma.photo.count({
