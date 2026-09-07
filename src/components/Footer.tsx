@@ -21,7 +21,12 @@ export default function Footer() {
 
           {/* Navigation */}
           <div>
-            <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-4">Explore</h4>
+            {/* h2, not h4. The footer is on every page, so its headings sit
+                directly under that page's h1 with nothing in between: the
+                homepage read h1 then h4, skipping two levels. Somebody moving
+                through a page by heading lands on gaps. The size is a class,
+                not the tag. */}
+            <h2 className="text-white text-xs font-bold uppercase tracking-wider mb-4">Explore</h2>
             <nav className="flex flex-col gap-2">
               <Link href="/explore" className="text-neutral-500 hover:text-white text-sm transition-colors">
                 Photos
@@ -45,7 +50,7 @@ export default function Footer() {
 
           {/* About & Contact */}
           <div>
-            <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-4">About</h4>
+            <h2 className="text-white text-xs font-bold uppercase tracking-wider mb-4">About</h2>
             <nav className="flex flex-col gap-2">
               <Link href="/guidelines" className="text-neutral-500 hover:text-white text-sm transition-colors">
                 Guidelines

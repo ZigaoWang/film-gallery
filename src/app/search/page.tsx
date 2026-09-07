@@ -170,7 +170,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         {/* Photos */}
         {(type === 'all' || type === 'photos') && photos.length > 0 && (
           <section className="mb-10">
-            {type === 'all' && <h2 className="text-xl font-bold text-white mb-6">Photos</h2>}
+            <h2 className={type === 'all' ? 'text-xl font-bold text-white mb-6' : 'sr-only'}>Photos</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
               {photos.map(photo => (
                 <Link key={photo.id} href={`/photos/${photo.id}`} className="relative aspect-[3/2] bg-neutral-900 group overflow-hidden">
@@ -184,7 +184,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         {/* Users */}
         {(type === 'all' || type === 'users') && users.length > 0 && (
           <section className="mb-10">
-            {type === 'all' && <h2 className="text-xl font-bold text-white mb-6">Users</h2>}
+            <h2 className={type === 'all' ? 'text-xl font-bold text-white mb-6' : 'sr-only'}>Users</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {users.map(user => (
                 <Link key={user.id} href={`/${user.username}`} className="flex items-center gap-4 p-4 bg-neutral-900 border border-neutral-800 hover:border-brand transition-colors">
@@ -204,7 +204,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         {/* Cameras */}
         {(type === 'all' || type === 'cameras') && cameras.length > 0 && (
           <section className="mb-10">
-            {type === 'all' && <h2 className="text-xl font-bold text-white mb-6">Cameras</h2>}
+            <h2 className={type === 'all' ? 'text-xl font-bold text-white mb-6' : 'sr-only'}>Cameras</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {cameras.map(camera => {
                 const displayImage = camera.imageStatus === 'approved' ? camera.imageUrl : null
@@ -285,7 +285,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         {/* Films */}
         {(type === 'all' || type === 'films') && films.length > 0 && (
           <section className="mb-10">
-            {type === 'all' && <h2 className="text-xl font-bold text-white mb-6">Films</h2>}
+            <h2 className={type === 'all' ? 'text-xl font-bold text-white mb-6' : 'sr-only'}>Films</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {films.map(film => {
                 const displayImage = film.imageStatus === 'approved' ? film.imageUrl : null

@@ -207,9 +207,12 @@ export default async function FilmsPage({
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
+                      {/* h2. These cards are the page's content and sit
+                          directly under its h1, with no section heading
+                          between, so h3 skipped a level. */}
+                      <h2 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
                         {displayName(film) ?? film.name}
-                      </h3>
+                      </h2>
                       <div className="flex items-center gap-2 text-neutral-500">
                         {film.iso && <span>ISO {film.iso}</span>}
                         {film.iso && <span>•</span>}
