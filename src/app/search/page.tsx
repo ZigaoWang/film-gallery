@@ -150,13 +150,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             Explore. Nothing carried which result type you were on except a red
             underline, and only the active tab had a border, so the labels
             shifted by 2px whenever the selection moved. */}
-        <nav aria-label="Result types" className="flex gap-4 border-b border-neutral-800 mb-8 overflow-x-auto">
+        {/* px-2 on the tabs, and the gap tightened to pay for it. Without any
+            horizontal padding a tab was exactly as wide as its label, so "All"
+            was a 17px target, under the 24px WCAG 2.5.8 minimum. It also gives
+            the active underline something to span. */}
+        <nav aria-label="Result types" className="flex gap-1 border-b border-neutral-800 mb-8 overflow-x-auto">
           {tabs.map(tab => (
             <Link
               key={tab.id}
               href={`/search?q=${encodeURIComponent(q)}&type=${tab.id}`}
               aria-current={type === tab.id ? 'page' : undefined}
-              className={`py-3 text-sm font-medium transition-colors whitespace-nowrap border-b-2 ${
+              className={`px-2 py-3 text-sm font-medium transition-colors whitespace-nowrap border-b-2 ${
                 type === tab.id
                   ? 'text-white border-brand'
                   : 'text-neutral-500 hover:text-white border-transparent'

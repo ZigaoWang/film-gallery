@@ -8,7 +8,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <Link href="/" className="inline-block mb-4">
+            {/* py-1 for the same reason as the nav links below: the logo is
+                24px tall, so the link around it was a 22px target. */}
+            <Link href="/" className="inline-block mb-3 py-1">
               <Image src="/logo.svg" alt="AvoidXray" width={120} height={24} />
             </Link>
             <p className="text-neutral-500 text-sm mb-2">
