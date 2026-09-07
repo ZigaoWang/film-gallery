@@ -203,6 +203,44 @@ model Camera {
   mountId            String?
   mount              LensMount? @relation(fields: [mountId], references: [id])
   year               Int? // Year of manufacture/release
+
+  /// The lens.
+  ///
+  /// A camera's lens is the first thing anyone asks about and it was the one
+  /// thing the record could not hold: every focal length and aperture in this
+  /// catalog lived inside a paragraph, so none of it could be filtered,
+  /// compared, or cited on its own. A fixed lens sets min and max to the same
+  /// number, which keeps one column answering "what focal lengths" for both
+  /// primes and zooms rather than needing a second shape for each.
+  lensName           String? // "G.Zuiko", "Hexanon", "Fujinon"
+  focalMinMm         Int?
+  focalMaxMm         Int?
+  /// Widest aperture at each end of the range. On a prime the two agree; on a
+  /// zoom the difference is the whole story, which is why both are kept.
+  apertureMaxWide    Float?
+  apertureMaxTele    Float?
+  lensElements       Int?
+  lensGroups         Int?
+  /// Closest focus, in millimetres, so it stays an integer. 600 is 0.6m.
+  closeFocusMm       Int?
+
+  /// How it focuses, meters and exposes.
+  focusType          FocusType?
+  meteringPattern    MeteringPattern?
+  exposureModes      ExposureMode[]   @default([])
+  shutterType        ShutterType?
+  /// In seconds, so the two ends sort against each other and against other
+  /// bodies. 8 is eight seconds; 1/1200 is stored as 0.000833.
+  shutterSlowestSec  Float?
+  shutterFastestSec  Float?
+  /// The DX range the body reads, where it reads one at all.
+  filmSpeedMin       Int?
+  filmSpeedMax       Int?
+
+  /// The body itself.
+  flash              FlashFitting?
+  batteryType        String? // "CR123A", "PX625", "AA"
+  weightGrams        Int?
   defaultFilmStockId String?
   defaultFilmStock   FilmStock? @relation("defaultFilm", fields: [defaultFilmStockId], references: [id])
   /// Bumped on every applied revision, so a draft made against an older
@@ -284,6 +322,75 @@ enum FrameFormat {
   PANORAMIC
   /// Exposes across the perforations, as the Sprocket Rocket does.
   SPROCKET_HOLE
+}
+
+/// How the camera is focused.
+///
+/// A property of the body, and one of the first things anyone asks about a
+/// camera they cannot try. It lived only in prose, so "fixed focus" could not
+/// be filtered for and two entries could describe the same mechanism in two
+/// different phrases.
+enum FocusType {
+  /// No focusing at all. Everything past a metre or so is acceptably sharp.
+  FIXED
+  /// Preset zones, usually drawn as symbols on the barrel.
+  ZONE
+  /// A distance scale you set by estimating. No aid in the finder.
+  SCALE
+  /// Coupled rangefinder: two images to align in the finder.
+  RANGEFINDER
+  /// Through the lens, by hand, as an SLR does.
+  SLR_MANUAL
+  AUTOFOCUS
+}
+
+/// What area of the frame the meter reads.
+///
+/// Separate from the cell technology, which is a different question and mostly
+/// a period detail. NONE is a real answer: plenty of cameras have no meter.
+enum MeteringPattern {
+  NONE
+  AVERAGE
+  CENTER_WEIGHTED
+  SPOT
+  MULTI_ZONE
+}
+
+/// The exposure the camera will let you choose. A list, because most bodies
+/// offer more than one and which ones is exactly the comparison people make.
+enum ExposureMode {
+  PROGRAM
+  APERTURE_PRIORITY
+  SHUTTER_PRIORITY
+  MANUAL
+}
+
+enum ShutterType {
+  /// In the lens. Quiet, flash syncs at any speed, usually slower at the top.
+  LEAF
+  /// In the body, in front of the film. Faster, louder, limited flash sync.
+  FOCAL_PLANE
+  /// No mechanical blades: the exposure is timed electronically.
+  ELECTRONIC
+}
+
+/// What flash the body carries or accepts.
+enum FlashFitting {
+  NONE
+  BUILT_IN
+  HOT_SHOE
+  BUILT_IN_AND_HOT_SHOE
+}
+
+/// What the emulsion is coated on.
+///
+/// Not trivia: polyester is thinner, so more of it fits on a bulk roll, and it
+/// pipes light down the roll in a way acetate does not, which is why OptiColour
+/// had to cut its 120 from 35mm material.
+enum FilmBase {
+  ACETATE
+  POLYESTER
+  PET
 }
 
 /// Whether the film records colour, or tone alone.
@@ -409,6 +516,21 @@ model FilmStock {
   /// What was done to it — remjet removal, different perforation, recut.
   respoolNotes      String?
   exposures         String? // 24, 36, 12, 16, or "24, 36" for multiple
+
+  /// Measured character, where the maker publishes it.
+  ///
+  /// These were written into descriptions as running text ("rates it RMS 4",
+  /// "125 lines/mm at high contrast"), which reads well and compares badly. As
+  /// columns they can be sorted, filtered and carry their own citation.
+  rmsGranularity     Int?
+  resolvingPowerLpmm Int?
+  baseMaterial       FilmBase?
+  /// Carries a remjet backing, so an ordinary C-41 lab cannot run it. The one
+  /// fact that decides whether a stock can be developed at all.
+  hasRemjet          Boolean?
+  /// Stops of exposure error the maker claims it tolerates, each way.
+  latitudeUnderStops Int?
+  latitudeOverStops  Int?
   /// Bumped on every applied revision, so a draft made against an older
   /// version can be spotted rather than silently overwriting.
   version           Int           @default(1)
