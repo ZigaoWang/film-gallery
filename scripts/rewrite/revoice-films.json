@@ -1,0 +1,242 @@
+[
+  {
+    "entityType": "FILM_STOCK",
+    "name": "CineStill 800T",
+    "summary": "Kodak's Vision3 500T with its remjet backing removed so an ordinary C-41 lab can run it, rated a stop faster.",
+    "description": [
+      "It starts as a motion picture negative. Kodak coats the back of Vision3 with remjet, a carbon layer that stops light bouncing off the film base and back into the emulsion. CineStill strips it off, which is what makes the film safe for standard lab chemistry.",
+      "That removal is also where the look comes from. Light now reflects off the base and re-exposes the film from behind, and because the rear layer is the red-sensitive one, bright points pick up a red halo. Street lights and neon do it hardest.",
+      "It is corrected for artificial light at around 3200K and goes strongly blue in daylight without an 85 filter. So it is a night film. After dark it does something nothing else in normal circulation does, and at noon it is a dearer, worse Portra."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Ferrania P30",
+    "summary": "A high-contrast panchromatic black and white film revived by Italy's FILM Ferrania from a 1960s cinema formula.",
+    "description": [
+      "The formula comes from the cinema stock Ferrania supplied to Italian directors in the middle of the last century, and it carries an unusually high silver content.",
+      "That shows up as deep blacks and a steep tonal curve. Highlights clip sooner than a modern general-purpose film would, and there is very little grain to speak of at box speed.",
+      "Ferrania still sells it as an alpha, a formulation it intends to keep changing on what users report back. It rewards careful metering and punishes guessing."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Fujicolor 400",
+    "summary": "The color negative film Fujifilm loads into its QuickSnap Flash 400 single-use camera.",
+    "description": [
+      "Fujifilm's naming across its consumer 400 line does not line up. The disposable is still labeled Fujicolor 400 in Fujifilm and retailer copy, while the loose roll sold beside it is now Fujifilm 400, also branded Fujicolor C400.",
+      "US listings describe the QuickSnap as pre-loaded with Superia X-TRA 400, the roll Fujifilm Japan discontinued on April 5, 2024. Fuji's amateur cameras have carried Superia X-TRA for most of their history.",
+      "What is actually inside the camera today is therefore not settled by the box. Read the name as a label on a single-use camera rather than as a stock you can buy and compare."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Fujifilm 400",
+    "summary": "Fujifilm's current general-purpose color negative film for 35mm still cameras.",
+    "description": [
+      "Fujifilm's specification page puts it on a cellulose triacetate base and rates its resolving power at 125 lines/mm at 1000:1 contrast, alongside the wide latitude and fine grain the company claims for the line.",
+      "It replaced Superia X-TRA 400, which Fujifilm Japan discontinued in April 2024.",
+      "Labs and reviewers widely hold that the version sold in the US is made for Fujifilm by Kodak and is close to UltraMax 400. Fujifilm does not confirm it, so it is a well-supported report rather than an established fact."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Fujifilm Superia Premium 400",
+    "summary": "A Japanese-market color negative film, and what is left of Fujifilm's Superia line.",
+    "description": [
+      "It joined the Superia range in 2009 as a Japan-market variant, and after Fujifilm's discontinuation notice for the rest of the line it is the only Superia-branded roll still made.",
+      "Fujifilm's Japanese datasheet, last revised in 2019, rates it RMS 4 with a resolving power of 125 lines/mm at high contrast, and sells it on fine grain, wide latitude and natural skin tones.",
+      "Whether it still carries the fourth color layer older Superia was marketed on is disputed. Some retailers list it; readers of the current datasheet report the layer is gone."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Harman Phoenix II 200",
+    "summary": "Harman's second-generation experimental C-41 color film, coated and finished at its own UK factory.",
+    "description": [
+      "Harman rebuilt every layer from the original Phoenix rather than adjusting it, and reports better contrast, finer grain and higher sharpness than the first release.",
+      "It still behaves like an experiment. Latitude is narrow by the standards of an everyday color film, so exposure has to be close to right, and the palette stays unusual rather than neutral.",
+      "Harman coats and finishes it in Mobberley, which is as much the point of the film as the look is."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Ilford HP5 Plus 400",
+    "summary": "A fast black and white negative film made by Harman and sold under the Ilford name, in production since 1989.",
+    "description": [
+      "Tonality is soft and forgiving rather than punchy. Grain is clearly visible and reads as texture rather than noise.",
+      "Ilford rates it for exposure up to EI 3200 with extended development, and that is most of why people reach for it. It holds detail in a pushed negative better than its speed suggests.",
+      "It is the wrong choice when you want fine grain, and a poor one when you want contrast straight off the negative."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Ilford Ilfocolor 400 Plus Vintage Tone",
+    "summary": "A color negative film sold by Switzerland's Ilford Imaging, which is not the company that makes Ilford black and white film.",
+    "description": [
+      "The two Ilfords are separate companies. Harman Technology in the UK makes the black and white emulsions; Ilford Imaging in Switzerland packages film it buys in, and this is one of those.",
+      "Ilford Imaging sells it on a vintage look, with reds it says come out stronger. In practice the developed film has a green base with no edge markings, coarse grain and muted color, and skies often render yellow rather than blue.",
+      "Those traits point to a rebadged ORWO emulsion, possibly Wolfen NC500. Ilford Imaging does not say who coats it."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Ilford Ilfocolor Vivid 400",
+    "summary": "The saturated half of Ilford Imaging's Ilfocolor pair, sitting above the Vintage Tone roll.",
+    "description": [
+      "It is the opposite of its sibling. Where Vintage Tone is muted and leans yellow, Vivid is contrasty and saturated, with grain that stays under control, and it takes a one to two stop push without falling apart.",
+      "Ilford Imaging sells it on wide latitude across bright daylight, low light and moving subjects.",
+      "Claims about natural skin tones come from retailer copy rather than anything Ilford publishes, and are worth reading as marketing."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kentmere Pan 400",
+    "summary": "The budget end of Harman's own black and white range, sold under the Kentmere name.",
+    "description": [
+      "Harman coats it on a 5 mil acetate base and sells it in DX-coded cassettes as well as in 100 foot bulk and 120.",
+      "It is the cheap end of Harman's range rather than a different kind of film. Grain is coarser and the tonal scale shorter than HP5 Plus, and it takes rough processing better than either its price or its speed suggests.",
+      "It is what to shoot when the cost of the roll is the thing stopping you shooting."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak ColorPlus 200",
+    "summary": "Kodak's cheapest current color negative film, sold only in 35mm.",
+    "description": [
+      "It descends from the older Kodacolor VR emulsion, and the cassette inside the box is still marked Kodacolor. Kodak publishes no datasheet for it.",
+      "It runs warm, with a yellow-golden bias, saturated daylight color and deep blue skies, which is what people mean when they call it vintage. Grain is finer than the price suggests and close to Kodak Gold.",
+      "Whether it and Gold 200 are the same emulsion is a long-running argument Kodak has not settled. It has historically been sold hardest in Asia."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak Gold 200",
+    "summary": "Kodak's long-running everyday color negative film, sold in 35mm and 120.",
+    "description": [
+      "Kodak rates its latitude at two stops under and three over, which is why it survives being loaded into cameras that guess at exposure.",
+      "The palette is warm and moderately saturated, with yellows and reds pushed a little and skin tones kept close to neutral. Grain is fine for its speed.",
+      "It is the default rather than a choice. Nothing about it is distinctive, and that is why it works in almost any daylight."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak Gold 800",
+    "summary": "Kodak's high-speed consumer color emulsion, sold loaded into single-use cameras rather than as a roll.",
+    "description": [
+      "There is no boxed Gold 800 cassette. Kodak sells this emulsion inside the FunSaver and its other single-use bodies, and the developed strip is edge-marked GT 800. Anything advertised as a Gold 800 roll is either a single-use camera or film harvested out of one.",
+      "Kodak sells it on holding the color and detail of a slower film at a speed that works in mixed and low light, with skin tones kept accurate.",
+      "It is grainier than the slower Gold films, which is the trade, and it holds color under artificial light better than most daylight-balanced stock this fast."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak Portra 800",
+    "summary": "Kodak's professional high-speed color negative, made for low light and long lenses.",
+    "description": [
+      "It uses micro-structure optimized T-GRAIN emulsions, and Kodak rates its underexposure latitude as the best in its class.",
+      "Grain is finer than the speed would predict, and skin tones stay neutral where consumer 800-speed films go warm. That is what the price buys.",
+      "Kodak warns that a film this fast is sensitive to environmental radiation and asks for visual inspection rather than x-ray at airports."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak UltraMax 400",
+    "summary": "Kodak's everyday high-speed color negative, sold for low light, flash range and moving subjects.",
+    "description": [
+      "Kodak positions it on the three things speed buys: low-light performance, extended flash range, and a shutter fast enough to stop a moving subject or a shaking hand.",
+      "It is more saturated and more contrasty than Gold, and warmer than a professional film, with grain that is clearly visible.",
+      "It is the consumer answer to a dim room, and the film a great many point-and-shoot cameras were metered around."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak Vision3 250D",
+    "summary": "Kodak's medium-speed daylight motion picture negative, stock 5207 and 7207.",
+    "description": [
+      "Kodak builds it on two things it names: Dye Layering Technology, which cuts grain in the shadows, and Sub-Micron Technology, which buys about two extra stops of highlight latitude.",
+      "It is coated on acetate with a remjet backing, so a still lab cannot run it until that layer comes off, and it is designed for ECN-2 rather than C-41.",
+      "Shot as a still film it holds highlights well past the point a consumer negative gives up, which is the whole reason people respool it."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Kodak Vision3 500T",
+    "summary": "Kodak's high-speed tungsten motion picture negative, stock 5219 and 7219.",
+    "description": [
+      "It is corrected for artificial light. Kodak rates it at EI 320 in daylight behind an 85 filter, and it goes strongly blue without one.",
+      "Like the rest of Vision3 it carries a remjet backing and is designed for ECN-2, not the C-41 a still lab runs. Removing that backing is what CineStill 800T is.",
+      "Kodak sells no still cassette of it, so every 35mm roll is somebody's respool and the frame count is theirs to choose. It is the stock most often cut down for night work, and that is what it is good at."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "LomoChrome Color '92 Sun-Kissed",
+    "summary": "Lomography's warmer companion to LomoChrome Color '92, announced in July 2024.",
+    "description": [
+      "Lomography sells it as the original Color '92 with a golden 1990s cast added, and says it can be pushed or pulled while holding shadow and highlight detail. It is a limited edition, and Lomography states that no two production runs match.",
+      "The palette is a soft yellow-orange with high contrast, and grain is much smoother than the coarse original.",
+      "Independent reviewers put it closer to neutral than the name suggests: warmer than the original rather than a warm film. Some read the emulsion as ORWO-based, which Lomography does not confirm."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Lomography Color Negative 400",
+    "summary": "Lomography's general-purpose color negative, sold in 35mm and 120.",
+    "description": [
+      "The rendering is cool and punchy, with saturation pushed well past a Kodak consumer film and contrast to match. Grain is noticeable but even, and sharpness holds up, particularly in 120.",
+      "Lomography sells it as working in sun or cloud, and it has the latitude for that.",
+      "Reds and blues can overblow, and shadows can go red in medium format. Lomography does not say who coats the emulsion."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Lucky Color 200",
+    "summary": "A new color negative from China's Lucky Film, coated at its plant in Baoding.",
+    "description": [
+      "It is a genuinely new emulsion rather than a repack. Lucky made color film from the early 2000s with Kodak's help and stopped in 2012, so this is the line restarting rather than continuing.",
+      "The palette is muted and slightly cool, with visible grain and contrast that stays moderate.",
+      "It matters more as evidence that another factory is coating color film again than it does as a look."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Lucky Color 400",
+    "summary": "Lucky Film's faster color negative, released after the Color 200.",
+    "description": [
+      "Grain is coarser than the Color 200, close to the 800-speed emulsion Kodak loads into its disposables, and still usable as an everyday film.",
+      "Contrast runs high, so there is less room for error than UltraMax 400 allows, and the palette leans noticeably yellow in daylight.",
+      "Test rolls circulated in June 2026, with release expected the following month."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "OptiColour 200",
+    "summary": "The debut film from German lab Optik Oldschool, coated by InovisCoat from an ORWO Wolfen NC200 emulsion that was never released on its own.",
+    "description": [
+      "Early rolls halate, and not by design. Optik Oldschool said the coating went wrong and the anti-halation layer was affected, and that the next production run would correct it. The red bleed around bright highlights belongs to a batch rather than to the film.",
+      "The 35mm is coated on a triacetate base with an orange mask.",
+      "Early 120 had to be cut down from 35mm material, because the same fault was worse on polyester."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Orwo Wolfen NC400",
+    "summary": "A color negative ORWO coats at the Bitterfeld-Wolfen works, where film has been made since 1910.",
+    "description": [
+      "ORWO traces the formula to an Agfa motion picture stock last used on Robin Hood: Prince of Thieves in 1991, and describes NC400 as its NC500 with finer, more subtle grain, deliberately balanced toward green with desaturated shadows.",
+      "In use it is cool, muted and low in contrast, with a green-blue cast, visible grain and halation. It shares NC500's behavior more than the finer-grain framing suggests.",
+      "Box speed tends to look underexposed. Casual Photophile found the frames thin at 400 even in bright sun and rated it nearer 200. Some retailers sell it as a tungsten film, which the coater's own datasheet contradicts."
+    ]
+  },
+  {
+    "entityType": "FILM_STOCK",
+    "name": "Yes!Star 400",
+    "summary": "A color negative sold under the Chinese Yes!Star brand.",
+    "description": [
+      "Yes!Star is a medical film company in Nanning, Guangxi. Fujifilm moved finishing of Fujicolor C200 and C400 to its facility in mid-2024, and photography outlets report this roll is that same C400 under a different label.",
+      "C400 is itself widely reported to be coated by Kodak in the US and to be close to UltraMax 400.",
+      "That is two unconfirmed steps stacked on each other, and neither Fujifilm nor Kodak has confirmed either. The chain is worth knowing and not worth relying on."
+    ]
+  }
+]
