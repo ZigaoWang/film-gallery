@@ -11,8 +11,19 @@
  */
 import { PrismaClient } from '@prisma/client'
 import { filmFormatLabel } from '../src/lib/filmFields'
+import { displayName } from '../src/lib/seo/alt'
 
 const prisma = new PrismaClient()
+
+/**
+ * Fields whose absence is an answer rather than a gap.
+ *
+ * Most cameras were sold under one name and most films have no second one, so
+ * listing every entry without an alias as missing something buried the fields
+ * that genuinely had not been researched. A brief that reports twenty gaps when
+ * three are real does not get worked through.
+ */
+const OPTIONAL = new Set(['aliases'])
 
 interface Claim { claim?: string | null; passage?: string | null; url?: string | null; editorial?: boolean | null }
 
@@ -94,7 +105,7 @@ async function main() {
     const uncited: string[] = []
     for (const [field, get] of FILM_FIELDS) {
       const value = fmt(get(f))
-      if (!value) { missing.push(field); continue }
+      if (!value) { if (!OPTIONAL.has(field)) missing.push(field); continue }
       const state = cite(field)
       if (!state) uncited.push(field)
       else if (state.includes('NO PASSAGE')) uncited.push(`${field} (cited, no passage)`)
@@ -125,14 +136,14 @@ async function main() {
       if (!row) return ''
       return passageState(row.sourceUrl, row.claims)
     }
-    out.push(`### ${c.brand ? `${c.brand} ` : ''}${c.name}`)
+    out.push(`### ${displayName(c) ?? c.name}`)
     out.push(`- slug: \`${c.slug ?? '(none)'}\``)
 
     const missing: string[] = []
     const uncited: string[] = []
     for (const [field, get] of CAMERA_FIELDS) {
       const value = fmt(get(c))
-      if (!value) { missing.push(field); continue }
+      if (!value) { if (!OPTIONAL.has(field)) missing.push(field); continue }
       const state = cite(field)
       if (!state) uncited.push(field)
       else if (state.includes('NO PASSAGE')) uncited.push(`${field} (cited, no passage)`)
