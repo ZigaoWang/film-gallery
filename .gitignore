@@ -66,3 +66,9 @@ next-env.d.ts
 # the catalog does not belong in a public repository, and it is stale the moment
 # somebody edits an entry.
 /catalog-worklist.md
+
+# Catalog copy staged for a rewrite pass. Content, not code: every value in
+# these files is an editable database field, and a description corrected
+# through the admin screen would leave the committed copy silently stale. The
+# scripts that read them are code and are tracked; what gets loaded is not.
+/scripts/rewrite/*.json
