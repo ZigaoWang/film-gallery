@@ -6,7 +6,6 @@ import { allocateSlug } from '@/lib/seo/ensureSlug'
 import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
 import { toBodyType } from '@/lib/cameraFields'
 import { normalizeAliases } from '@/lib/filmFields'
-import { summaryFromDescription } from '@/lib/catalogForm'
 import { resolveBrand } from '@/lib/brands'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
@@ -118,10 +117,6 @@ export async function POST(req: NextRequest) {
         // collects and an endpoint ignores is discarded without a word, which
         // this codebase has been caught doing before.
         aliases: normalizeAliases(aliasesInput ? aliasesInput.split(',') : []),
-        // The identifying sentence, taken from the first line of what was
-        // written. No contributor form has ever offered a summary field, so
-        // without this every entry added through the site has none.
-        summary: summaryFromDescription(description)
       }
     })
 

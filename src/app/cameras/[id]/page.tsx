@@ -24,7 +24,7 @@ import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
 import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
-import { descriptionParagraphs } from '@/lib/catalogForm'
+import { descriptionParagraphs, summaryFromDescription } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
 import { bodyTypeLabel, bodyTypeProse, frameFormatLabel, lensMount } from '@/lib/cameraFields'
@@ -59,8 +59,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   // The summary exists for this: a link preview wants the sentence that says
   // what the camera is, not a description cut off mid-clause.
-  const description = camera.summary
-    ? `${camera.summary} ${photoCount} sample ${photoCount === 1 ? 'photograph' : 'photographs'} from the AvoidXray community.`
+  const summary = summaryFromDescription(camera.description)
+  const description = summary
+    ? `${summary} ${photoCount} sample ${photoCount === 1 ? 'photograph' : 'photographs'} from the AvoidXray community.`
     : `${name} sample photos: ${photoCount} real film ${photoCount === 1 ? 'photograph' : 'photographs'} ` +
       `shot on ${article(name)} ${name} by the AvoidXray community. See what this ${
         bodyTypeLabel(camera.bodyType)?.toLowerCase() ?? 'film camera'
@@ -204,6 +205,9 @@ export default async function CameraDetailPage({ params }: Params) {
   // deleting an image silently deleted the description from the page. The
   // description is reviewed on its own, through the revision pipeline.
   const displayDescription = camera.description
+  // Derived, not stored. The lead sentence is the description's first line;
+  // keeping a second copy of it in its own column is what let the two drift.
+  const leadSentence = summaryFromDescription(displayDescription)
   const canonicalPath = `/cameras/${camera.slug ?? camera.id}`
 
   const sourceFor = new Map(Array.from(citationFor, ([field, c]) => [field, c.url]))
@@ -322,15 +326,15 @@ export default async function CameraDetailPage({ params }: Params) {
                     who has never heard of it, which is also why it is what the
                     metadata and link previews use instead of a truncated
                     description. */}
-                {camera.summary && (
-                  <p className="mb-3 text-base leading-relaxed text-neutral-200">{camera.summary}</p>
+                {leadSentence && (
+                  <p className="mb-3 text-base leading-relaxed text-neutral-200">{leadSentence}</p>
                 )}
 
                 <div className="space-y-3 text-sm leading-relaxed text-neutral-400">
                   {descriptionParagraphs(displayDescription ||
                     `${name} is ${bodyTypeProse(camera.bodyType)}${
                       camera.format ? ` shooting ${camera.format}` : ''
-                    }${camera.year ? `, introduced in ${camera.year}` : ''}.`, camera.summary)
+                    }${camera.year ? `, introduced in ${camera.year}` : ''}.`, leadSentence)
                     .map((para, i) => (
                       <p key={i}>{para}</p>
                     ))}

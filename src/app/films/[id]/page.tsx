@@ -25,7 +25,7 @@ import {
 } from '@/lib/filmFields'
 import { usefulAliases } from '@/lib/filmSearch'
 import type { FilmProcess } from '@prisma/client'
-import { descriptionParagraphs } from '@/lib/catalogForm'
+import { descriptionParagraphs, summaryFromDescription } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
 import ManufacturerValue from '@/components/ManufacturerValue'
@@ -83,8 +83,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   // sentence that says what the thing is, and previously took a truncated
   // description that cut mid-clause. Where a stock has no summary yet, the
   // constructed line still leads with the query people actually type.
-  const description = filmStock.summary
-    ? `${filmStock.summary} ${photoCount} sample ${photoCount === 1 ? 'photograph' : 'photographs'} from the AvoidXray community.`
+  const summary = summaryFromDescription(filmStock.description)
+  const description = summary
+    ? `${summary} ${photoCount} sample ${photoCount === 1 ? 'photograph' : 'photographs'} from the AvoidXray community.`
     : `${name} sample photos: ${photoCount} real film ${photoCount === 1 ? 'photograph' : 'photographs'} ` +
       `shot on ${name} by the AvoidXray community. See how this ${
         filmTypeLabel(filmStock.chromaticity, filmStock.polarity)?.toLowerCase() ?? 'film'
@@ -259,6 +260,8 @@ export default async function FilmDetailPage({ params }: Params) {
   // deleting an image silently deleted the description from the page. The
   // description is reviewed on its own, through the revision pipeline.
   const displayDescription = filmStock.description
+  // Derived, not stored. See the camera page.
+  const leadSentence = summaryFromDescription(displayDescription)
   const canonicalPath = `/films/${filmStock.slug ?? filmStock.id}`
 
   // Aliases that add something the name does not already say.
@@ -481,8 +484,8 @@ export default async function FilmDetailPage({ params }: Params) {
                     who has never heard of it, which is also why it is what the
                     metadata and link previews use instead of a truncated
                     description. */}
-                {filmStock.summary && (
-                  <p className="mb-3 text-base leading-relaxed text-neutral-200">{filmStock.summary}</p>
+                {leadSentence && (
+                  <p className="mb-3 text-base leading-relaxed text-neutral-200">{leadSentence}</p>
                 )}
 
                 <div className="space-y-3 text-sm leading-relaxed text-neutral-400">
@@ -496,7 +499,7 @@ export default async function FilmDetailPage({ params }: Params) {
                       filmStock.format.length > 0
                         ? ` in ${filmStock.format.join(' and ')} format`
                         : ''
-                    }.`, filmStock.summary)
+                    }.`, leadSentence)
                     .map((para, i) => (
                       <p key={i}>{para}</p>
                     ))}

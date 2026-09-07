@@ -275,7 +275,6 @@ export const ADMIN_RESOURCES = {
       // list is the allowlist every write path checks against, and a field
       // missing from it is discarded without a word.
       defaultFilmStockId: { kind: 'reference', label: 'Default film stock', source: 'films', help: 'For fixed-stock bodies such as disposables. Leave blank otherwise.' },
-      summary: { kind: 'longtext', label: 'Summary', minLength: 20, maxLength: 200, help: 'One or two sentences answering what this is. Between 20 and 200 characters.' },
       description: { kind: 'longtext', label: 'Description', maxLength: 4000 },
       imageStatus: { kind: 'enum', label: 'Image status', options: IMAGE_STATUS },
     },
@@ -307,7 +306,6 @@ export const ADMIN_RESOURCES = {
       // A stock can be sold in more than one gauge, so this column is a list.
       format: { kind: 'stringList', label: 'Format', help: 'Comma separated. 35mm, 120, sheet sizes.' },
       exposures: { kind: 'text', label: 'Exposures', maxLength: 40 },
-      summary: { kind: 'longtext', label: 'Summary', minLength: 20, maxLength: 200, help: 'One or two sentences answering what this is. Between 20 and 200 characters.' },
       description: { kind: 'longtext', label: 'Description', maxLength: 4000 },
       imageStatus: { kind: 'enum', label: 'Image status', options: IMAGE_STATUS },
     },

@@ -41,7 +41,6 @@ const WEIGHT: Record<Tier, number> = { core: 3, useful: 2, extra: 1 }
  */
 const FIELDS: Partial<Record<EntityType, Record<string, Tier>>> = {
   FILM_STOCK: {
-    summary: 'core',
     brandId: 'core',
     process: 'core',
     chromaticity: 'core',
@@ -49,15 +48,17 @@ const FIELDS: Partial<Record<EntityType, Record<string, Tier>>> = {
     iso: 'core',
     manufacturerStatus: 'useful',
     colorBalance: 'useful',
-    description: 'useful',
+    // The lead sentence is this field's first line, so it is not scored
+    // separately. It used to be, which counted one piece of writing twice.
+    description: 'core',
     aliases: 'extra',
     parentStockId: 'extra',
   },
   CAMERA: {
-    summary: 'core',
     brandId: 'core',
     bodyType: 'core',
-    description: 'useful',
+    // Core here too, and for the same reason as the film above.
+    description: 'core',
     year: 'useful',
     format: 'useful',
     frameFormat: 'extra',

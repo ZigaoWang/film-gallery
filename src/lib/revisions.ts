@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/db'
 import { Prisma, type EntityType, type ValueSource } from '@prisma/client'
 import { ADMIN_RESOURCES, coerceField, type ResourceName, type ResourceSpec } from '@/lib/admin/resources'
-import { summaryFromDescription, summaryWasDerived } from '@/lib/catalogForm'
 import { resolveBrand } from '@/lib/brands'
 import { reslugIfRenamed } from '@/lib/seo/rename'
 
@@ -219,39 +218,6 @@ export async function reviewRevision(
       }
     }
     survivingClaims.set(row.fieldName, survivors)
-  }
-
-  /**
-   * An approved description fills the summary, and keeps filling it.
-   *
-   * The summary is the identifying sentence, and no contributor form has ever
-   * offered a field for it, so an entry written by anyone but an administrator
-   * had none at all. Deriving it here means an approved edit populates it the
-   * same way creating the record does.
-   *
-   * This used to run only when the column was empty, on the reasoning that a
-   * summary written by hand outranks one a first line implies. That reasoning
-   * is right and the test for it was wrong: a derived summary is not written by
-   * hand, and after the description was reworded it was neither. The Konica C35
-   * EF was created with the two identical, had its opening line edited, and
-   * then printed the old sentence as its lead and the new one directly under
-   * it — the page saying the same thing twice, in two different wordings, one
-   * of them out of date.
-   *
-   * So the question is not "is there a summary" but "did anyone write it". A
-   * summary equal to what the *previous* description implied was derived, and
-   * follows the description. Anything else was authored and is left alone.
-   */
-  if (typeof data.description === 'string' && !('summary' in data)) {
-    const select = { summary: true, description: true } as const
-    const current = revision.entityType === 'FILM_STOCK'
-      ? await prisma.filmStock.findUnique({ where: { id: revision.entityId }, select })
-      : await prisma.camera.findUnique({ where: { id: revision.entityId }, select })
-
-    if (!current?.summary || summaryWasDerived(current.summary, current.description)) {
-      const derived = summaryFromDescription(data.description)
-      if (derived) data.summary = derived
-    }
   }
 
   /**
