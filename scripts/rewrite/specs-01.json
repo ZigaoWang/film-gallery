@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Orwo Wolfen NC400",
+    "entityType": "FILM_STOCK",
+    "fields": {
+      "colorBalance": {
+        "value": "DAYLIGHT",
+        "source": "https://cdn.shopify.com/s/files/1/0549/7205/5650/files/Data_sheet_Wolfen_NC400.pdf",
+        "passage": "Characteristic curves for WOLFEN NC400. Exposure: daylight. Process: C-41. Densitometry: status M."
+      }
+    },
+    "notes": "The column was null while a cluster of retailers sold the film as tungsten balanced, some titling it 'NC400 Tungsten'. The datasheet is issued by InovisCoat, who coat the emulsion, and states the balance in the standard sensitometric form: a tungsten stock's datasheet reads 'Exposure: 3200 K tungsten', as Kodak's 500T one does. FilmoTec and Wittner Cinetec, who finish the same emulsion for cine formats, publish 'Daylight (4000-5500K, w/o Filter)' and specify a Wratten 80A for tungsten, which settles it: a film needing an 80A under tungsten is daylight balanced. The retailer claim appears to be shared copy, fuelled by the film's genuinely cool rendering."
+  }
+]
