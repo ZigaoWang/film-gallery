@@ -19,6 +19,7 @@ import { textLinkClass } from '@/components/ui/TextLink'
 import CompletenessNote from '@/components/CompletenessNote'
 import { citationsByField, citationTitle } from '@/lib/citations'
 import SourceLink from '@/components/SourceLink'
+import SpecChip from '@/components/SpecChip'
 import { completenessOf, NOT_YET_STARTED } from '@/lib/completeness'
 import { ADMIN_RESOURCES } from '@/lib/admin/resources'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
@@ -305,13 +306,13 @@ export default async function CameraDetailPage({ params }: Params) {
                       whose specifications were sourced looked exactly like one
                       where somebody had typed them in from memory. */}
                   {specs.map((s) => (
-                    <span key={s.label} className="text-xs px-2 py-0.5 border border-neutral-700 text-neutral-300">
+                    <SpecChip key={s.label}>
                       {s.value}
                       <SourceLink
                         url={sourceFor.get(s.field) ?? null}
                         title={citationTitle(citationFor.get(s.field))}
                       />
-                    </span>
+                    </SpecChip>
                   ))}
                   <span className="text-xs text-neutral-500">{totalPhotos} photos</span>
                 </div>
