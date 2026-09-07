@@ -18,6 +18,8 @@ import { Prisma } from '@prisma/client'
 
 export type FieldKind =
   | 'text' | 'longtext' | 'number' | 'boolean' | 'date' | 'enum' | 'stringList'
+  /** Several members of an enum at once, as `exposureModes` needs. */
+  | 'enumList'
   /** A pointer to another record, chosen by name rather than typed as an id. */
   | 'reference'
 
@@ -41,6 +43,14 @@ export interface FieldSpec {
   minLength?: number
   min?: number
   max?: number
+  /**
+   * Keep the fractional part.
+   *
+   * `number` truncates, which is right for a year and an ISO and silently
+   * wrong for an aperture: f/3.6 would be stored as f/3, and 1/1200 of a
+   * second as zero.
+   */
+  decimal?: boolean
   help?: string
   /** For `reference`: the list to choose from. */
   source?: ReferenceSource
@@ -167,6 +177,12 @@ const VISIBILITY = ['PUBLIC', 'PRIVATE'] as const
 const IMAGE_STATUS = ['none', 'pending', 'approved', 'rejected'] as const
 const CAMERA_BODY_TYPES = ['SLR', 'RANGEFINDER', 'COMPACT', 'TLR', 'FOLDING', 'VIEW', 'INSTANT', 'DISPOSABLE'] as const
 const FRAME_FORMAT_VALUES = ['FULL_FRAME', 'HALF_FRAME', 'PANORAMIC', 'SPROCKET_HOLE'] as const
+const FOCUS_TYPES = ['FIXED', 'ZONE', 'SCALE', 'RANGEFINDER', 'SLR_MANUAL', 'AUTOFOCUS'] as const
+const METERING_PATTERNS = ['NONE', 'AVERAGE', 'CENTER_WEIGHTED', 'SPOT', 'MULTI_ZONE'] as const
+const EXPOSURE_MODES = ['PROGRAM', 'APERTURE_PRIORITY', 'SHUTTER_PRIORITY', 'MANUAL'] as const
+const SHUTTER_TYPES = ['LEAF', 'FOCAL_PLANE', 'ELECTRONIC'] as const
+const FLASH_FITTINGS = ['NONE', 'BUILT_IN', 'HOT_SHOE', 'BUILT_IN_AND_HOT_SHOE'] as const
+const FILM_BASES = ['ACETATE', 'POLYESTER', 'PET'] as const
 const CHROMATICITY = ['COLOR', 'MONOCHROME'] as const
 const POLARITY = ['NEGATIVE', 'POSITIVE', 'DIRECT_POSITIVE'] as const
 const MANUFACTURER_STATUS = ['SAME_AS_BRAND', 'KNOWN', 'ATTRIBUTED', 'UNKNOWN'] as const
@@ -271,6 +287,25 @@ export const ADMIN_RESOURCES = {
       mountId: { kind: 'reference', label: 'Mount', source: 'mounts', help: 'Chosen from the list, not typed. A body whose lens does not come off takes "Fixed lens"; a compact or disposable derives that on its own and can be left blank.' },
       aliases: { kind: 'stringList', label: 'Also known as', help: 'Comma separated. Names this body is sold under in other markets.' },
       year: { kind: 'number', label: 'Year', min: 1800, max: 2100 },
+      lensName: { kind: 'text', label: 'Lens name', maxLength: 60, help: 'The name on the barrel: G.Zuiko, Hexanon, Fujinon.' },
+      focalMinMm: { kind: 'number', label: 'Focal length, wide', min: 6, max: 2000, help: 'In millimetres. A prime takes the same number in both.' },
+      focalMaxMm: { kind: 'number', label: 'Focal length, long', min: 6, max: 2000 },
+      apertureMaxWide: { kind: 'number', label: 'Max aperture, wide', min: 0.7, max: 45, decimal: true, help: 'The f-number, so 2.8 for f/2.8.' },
+      apertureMaxTele: { kind: 'number', label: 'Max aperture, long', min: 0.7, max: 45, decimal: true },
+      lensElements: { kind: 'number', label: 'Elements', min: 1, max: 30 },
+      lensGroups: { kind: 'number', label: 'Groups', min: 1, max: 30 },
+      closeFocusMm: { kind: 'number', label: 'Closest focus', min: 10, max: 20000, help: 'In millimetres, so 600 for 0.6m.' },
+      focusType: { kind: 'enum', label: 'Focusing', options: FOCUS_TYPES },
+      meteringPattern: { kind: 'enum', label: 'Metering', options: METERING_PATTERNS },
+      exposureModes: { kind: 'enumList', label: 'Exposure modes', options: EXPOSURE_MODES, help: 'Comma separated. Everything the body offers.' },
+      shutterType: { kind: 'enum', label: 'Shutter', options: SHUTTER_TYPES },
+      shutterSlowestSec: { kind: 'number', label: 'Slowest shutter', min: 0.000001, max: 3600, decimal: true, help: 'In seconds. 8 for eight seconds.' },
+      shutterFastestSec: { kind: 'number', label: 'Fastest shutter', min: 0.000001, max: 3600, decimal: true, help: 'In seconds. 1/1200 is 0.000833.' },
+      filmSpeedMin: { kind: 'number', label: 'Film speed, min', min: 1, max: 100000 },
+      filmSpeedMax: { kind: 'number', label: 'Film speed, max', min: 1, max: 100000 },
+      flash: { kind: 'enum', label: 'Flash', options: FLASH_FITTINGS },
+      batteryType: { kind: 'text', label: 'Battery', maxLength: 40, help: 'As it is sold: CR123A, PX625, AA.' },
+      weightGrams: { kind: 'number', label: 'Weight', min: 1, max: 20000, help: 'In grams, without film or battery where that is what the maker quotes.' },
       // Offered by the suggest-edit form, so it has to be writable here: this
       // list is the allowlist every write path checks against, and a field
       // missing from it is discarded without a word.
@@ -294,6 +329,12 @@ export const ADMIN_RESOURCES = {
       brand: { kind: 'text', label: 'Brand (legacy)', maxLength: 60 },
       aliases: { kind: 'stringList', label: 'Aliases', help: 'Comma separated. Product codes and alternate names.' },
       iso: { kind: 'number', label: 'ISO', min: 1, max: 100000 },
+      rmsGranularity: { kind: 'number', label: 'RMS granularity', min: 1, max: 100 },
+      resolvingPowerLpmm: { kind: 'number', label: 'Resolving power', min: 1, max: 1000, help: 'Lines per millimetre, at the contrast the maker quotes.' },
+      baseMaterial: { kind: 'enum', label: 'Base', options: FILM_BASES },
+      hasRemjet: { kind: 'boolean', label: 'Remjet backing' },
+      latitudeUnderStops: { kind: 'number', label: 'Latitude under', min: 0, max: 10, help: 'Stops of underexposure the maker claims it tolerates.' },
+      latitudeOverStops: { kind: 'number', label: 'Latitude over', min: 0, max: 10 },
       process: { kind: 'enum', label: 'Process', options: FILM_PROCESS },
       colorBalance: { kind: 'enum', label: 'Color balance', options: COLOR_BALANCE },
       chromaticity: { kind: 'enum', label: 'Color or mono', options: CHROMATICITY, help: 'Independent of process: XP2 Super is black and white developed in C-41.' },
@@ -457,7 +498,7 @@ export function coerceField(spec: FieldSpec, raw: unknown): { value: Prisma.Inpu
       if (!Number.isFinite(n)) return { error: `${spec.label} must be a number` }
       if (spec.min !== undefined && n < spec.min) return { error: `${spec.label} must be at least ${spec.min}` }
       if (spec.max !== undefined && n > spec.max) return { error: `${spec.label} must be at most ${spec.max}` }
-      return { value: Math.trunc(n) }
+      return { value: spec.decimal ? n : Math.trunc(n) }
     }
 
     case 'date': {
@@ -474,6 +515,19 @@ export function coerceField(spec: FieldSpec, raw: unknown): { value: Prisma.Inpu
         return { error: `${spec.label} must be one of: ${spec.options?.join(', ')}` }
       }
       return { value: text }
+    }
+
+    case 'enumList': {
+      const items = Array.isArray(raw)
+        ? raw.map(String)
+        : String(raw).split(',').map(t => t.trim()).filter(Boolean)
+      const bad = items.filter(t => !spec.options?.includes(t))
+      if (bad.length > 0) {
+        return { error: `${spec.label} must be chosen from: ${spec.options?.join(', ')}` }
+      }
+      // Deduplicated: the column is a set in meaning even though Postgres
+      // stores it as an array, and "Manual, Manual" is not two modes.
+      return { value: [...new Set(items)] }
     }
 
     case 'stringList': {
