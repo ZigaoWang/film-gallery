@@ -4,6 +4,7 @@ import { displayName, gearImageAlt, makerAside, type NamedEntity } from '@/lib/s
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
 import { cameraSpecs, type CameraSpecSource } from '@/lib/cameraFields'
 import { filmSpecs, type FilmSpecSource } from '@/lib/filmFields'
+import SpecChip from '@/components/SpecChip'
 
 /**
  * A film stock or a camera, as a card that links to its page.
@@ -63,45 +64,55 @@ export default function GearCard(props: GearCardProps) {
   return (
     <Link
       href={href}
-      className="group flex items-center gap-4 border border-neutral-800 bg-neutral-900 p-4
+      className="group block border border-neutral-800 bg-neutral-900 p-4
                  transition-colors hover:border-brand
                  focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
                  focus-visible:outline-brand"
     >
-      <div className="relative flex h-16 w-20 shrink-0 items-center justify-center">
-        {image ? (
-          <Image src={image} alt={gearImageAlt(gear, kind)} fill className="object-contain" />
-        ) : (
-          <svg className="h-8 w-8 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            {ICON[kind]}
-          </svg>
-        )}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        {maker && (
-          <div className="mb-1 text-xs uppercase tracking-wide text-neutral-500">{maker}</div>
-        )}
-        <div className="truncate font-semibold text-white transition-colors group-hover:text-brand">
-          {gear.name}
+      {/* Identity on one row, specifications on the next.
+          These used to share a column with the picture and the chevron, which
+          left the chips about 270px to work in. Four of them do not fit that,
+          so the last one wrapped alone under the other three with the rest of
+          the card empty beside it. Given the full width they sit on one line,
+          and the wrap when there are five is a real second row rather than an
+          orphan. */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex h-16 w-20 shrink-0 items-center justify-center">
+          {image ? (
+            <Image src={image} alt={gearImageAlt(gear, kind)} fill className="object-contain" />
+          ) : (
+            <svg className="h-8 w-8 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              {ICON[kind]}
+            </svg>
+          )}
         </div>
-        {specs.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {specs.map(s => (
-              <span key={s} className="border border-neutral-700 px-2 py-0.5 text-xs text-neutral-300">
-                {s}
-              </span>
-            ))}
+
+        <div className="min-w-0 flex-1">
+          {maker && (
+            <div className="mb-1 text-xs uppercase tracking-wide text-neutral-500">{maker}</div>
+          )}
+          <div className="truncate font-semibold text-white transition-colors group-hover:text-brand">
+            {gear.name}
           </div>
-        )}
+        </div>
+
+        <svg
+          className="h-5 w-5 shrink-0 text-neutral-600 transition-colors group-hover:text-brand"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
       </div>
 
-      <svg
-        className="h-5 w-5 shrink-0 text-neutral-600 transition-colors group-hover:text-brand"
-        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
+      {/* gap-2, matching the detail pages. This row was gap-1.5, which is the
+          drift that comes of three copies of the same idea. */}
+      {specs.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {specs.map(s => (
+            <SpecChip key={s}>{s}</SpecChip>
+          ))}
+        </div>
+      )}
     </Link>
   )
 }
