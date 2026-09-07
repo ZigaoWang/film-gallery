@@ -60,6 +60,10 @@ const COLUMN_COUNT = 8
 /**
  * Which columns survive at each breakpoint, matching the counts the old
  * viewport read used: 4 below sm, 6 below lg, 8 above.
+ *
+ * These three counts are also the grid template on the container below. They
+ * have to agree: a breakpoint showing more columns than it has tracks wraps the
+ * surplus onto a second row, which the container then clips.
  */
 function columnVisibility(index: number): string {
   if (index < 4) return 'flex'
@@ -176,11 +180,25 @@ export default function HeroMasonry({ items, onReady }: HeroMasonryProps) {
   if (items.length === 0) return null
 
   return (
-    <div className="absolute inset-0 flex gap-[2px] overflow-hidden">
+    // Grid, not flex, and the distinction is the whole point.
+    //
+    // These columns were `flex-1`, which divides the row between however many
+    // children currently exist. The page is half a megabyte of HTML and the
+    // browser lays out what it has as it arrives, so at 1280px wide the columns
+    // were measured going 639px, then 319, then 212, then 158: two columns
+    // sharing the row, then four, then six, then eight, each step dragging
+    // everything already on screen sideways. That is a real 0.4 to 0.76 layout
+    // shift, and it is what "it starts as one column and then adds more" was.
+    //
+    // A grid template declares the tracks before any child exists, so a column
+    // arriving later drops into a slot that was already the right width and
+    // moves nothing. The counts match columnVisibility exactly: hidden columns
+    // are display:none and are never placed, so each breakpoint fills one row.
+    <div className="absolute inset-0 grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-[2px] overflow-hidden">
       {columns.map((col, colIndex) => (
         <div
           key={colIndex}
-          className={`flex-1 ${columnVisibility(colIndex)} flex-col gap-[2px]`}
+          className={`min-w-0 ${columnVisibility(colIndex)} flex-col gap-[2px]`}
         >
           {col.map((item, itemIndex) => {
             if (item.type === 'photo') {
