@@ -188,6 +188,21 @@ function photoYear(takenDate: Date | string | null | undefined): string | null {
   return Number.isNaN(d.getTime()) ? null : String(d.getUTCFullYear())
 }
 
+/**
+ * The maker's name, but only when the entry's own name does not already say it.
+ *
+ * Every name in this catalog leads with its maker, so a card that prints the
+ * maker above the name printed it twice: "CANON" over "Canon AE-1 Program".
+ * `displayName` solves the same problem from the other side, by not prepending
+ * a maker the name already carries. This is that rule for the layouts that show
+ * the two as separate lines.
+ */
+export function makerAside(entity: NamedEntity | null | undefined): string | null {
+  const maker = entity?.manufacturer?.trim() || entity?.brand?.trim()
+  if (!maker || !entity?.name) return null
+  return entity.name.toLowerCase().startsWith(maker.toLowerCase()) ? null : maker
+}
+
 /** Alt text for a film stock or camera product shot. */
 export function gearImageAlt(entity: NamedEntity, kind: 'film' | 'camera'): string {
   const name = displayName(entity) ?? entity.name

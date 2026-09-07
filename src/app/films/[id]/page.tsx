@@ -13,7 +13,7 @@ import { authOptions } from '@/lib/auth'
 import type { Metadata } from 'next'
 import { resolveFilmSlug, lookupFilm, canonicalCameraPath } from '@/lib/seo/resolve'
 import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld'
-import { displayName, gearImageAlt } from '@/lib/seo/alt'
+import { displayName, gearImageAlt, makerAside } from '@/lib/seo/alt'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
 import { colorBalanceLabel, filmFormatLabel, filmProcessLabel, filmTypeLabel } from '@/lib/filmFields'
@@ -379,8 +379,8 @@ export default async function FilmDetailPage({ params }: Params) {
 
             <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
               <div>
-                {filmStock.brand && (
-                  <div className="text-brand text-xs font-medium uppercase tracking-widest mb-1">{filmStock.brand}</div>
+                {makerAside(filmStock) && (
+                  <div className="text-brand text-xs font-medium uppercase tracking-widest mb-1">{makerAside(filmStock)}</div>
                 )}
                 <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight leading-tight">
                   {filmStock.name}

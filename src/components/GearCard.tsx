@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { displayName, gearImageAlt, type NamedEntity } from '@/lib/seo/alt'
+import { displayName, gearImageAlt, makerAside, type NamedEntity } from '@/lib/seo/alt'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
 
 /**
@@ -45,7 +45,9 @@ export default function GearCard({
 }) {
   // Only an approved image is shown, the same rule every other surface applies.
   const image = gear.imageStatus === 'approved' ? gear.imageUrl : null
-  const maker = kind === 'film' ? gear.manufacturer || gear.brand : gear.brand
+  // Only when the name does not already lead with it, or the card reads
+  //  "CANON" over "Canon AE-1 Program".
+  const maker = makerAside(gear)
   const href = kind === 'camera' ? canonicalCameraPath(gear) : canonicalFilmPath(gear)
 
   return (
