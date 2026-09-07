@@ -7,6 +7,7 @@ import { safeHttpUrl, sanitizeHandle } from '@/lib/validation'
 import { resolveTarget, type ReportTarget } from '@/lib/reports'
 import { applyAdminEdit } from '@/lib/revisions'
 import { currentUserId } from './auth'
+import { displayName } from '@/lib/seo/alt'
 
 /**
  * Reads and writes behind the admin sections.
@@ -289,7 +290,7 @@ export async function listResource(resource: ResourceName, params: ListParams): 
         rows: rows.map(n => {
           const cam = camMap.get(n.targetId)
           const film = filmMap.get(n.targetId)
-          const name = cam ? (cam.brand ? `${cam.brand} ${cam.name}` : cam.name) : film?.name ?? 'Deleted'
+          const name = cam ? (displayName(cam) ?? cam.name) : film?.name ?? 'Deleted'
           const slug = cam?.slug ?? film?.slug ?? n.targetId
           return {
             id: n.id, content: n.content, author: n.user.username,

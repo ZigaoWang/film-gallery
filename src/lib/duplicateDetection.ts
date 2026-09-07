@@ -1,3 +1,5 @@
+import { displayName } from '@/lib/seo/alt'
+
 /**
  * String normalization and fuzzy matching utilities
  * Used for duplicate detection in cameras and film stocks
@@ -116,8 +118,10 @@ export function findPotentialDuplicates<T extends { name: string; brand: string 
     .map(item => ({
       ...item,
       similarity: productSimilarity(
-        input.brand ? `${input.brand} ${input.name}` : input.name,
-        item.brand ? `${item.brand} ${item.name}` : item.name
+        // Through displayName, so a name that already leads with its maker is
+        // not compared as "Canon Canon AE-1 Program" against another one.
+        displayName(input) ?? input.name,
+        displayName(item) ?? item.name
       )
     }))
     .filter(item => item.similarity >= threshold)

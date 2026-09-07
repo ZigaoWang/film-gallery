@@ -208,7 +208,7 @@ export default async function FilmsPage({
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
-                        {film.brand ? `${film.brand} ${film.name}` : film.name}
+                        {displayName(film) ?? film.name}
                       </h3>
                       <div className="flex items-center gap-2 text-neutral-500">
                         {film.iso && <span>ISO {film.iso}</span>}

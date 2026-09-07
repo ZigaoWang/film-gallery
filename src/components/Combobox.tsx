@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useId } from 'react'
 import Image from 'next/image'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { filmMatchesQuery } from '@/lib/filmSearch'
+import { displayName } from '@/lib/seo/alt'
 
 type Option = {
   id: string
@@ -26,9 +27,16 @@ type Props = {
 }
 
 
-/** "Kodak Gold 200" from brand + name, without repeating the brand. */
+/**
+ * "Kodak Gold 200" from brand and name, without repeating the brand.
+ *
+ * That is what the comment always said and not what the code did: it joined the
+ * two unconditionally, so an option whose name already led with its maker read
+ * "Kodak Kodak Gold 200". It only stayed invisible while the brand column was
+ * empty on most rows.
+ */
 function getDisplayName(o: Option): string {
-  return o.brand ? `${o.brand} ${o.name}` : o.name
+  return displayName(o) ?? o.name
 }
 
 /** The alias responsible for a match, when the visible name does not contain the query. */

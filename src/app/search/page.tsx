@@ -14,6 +14,7 @@ import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenFilter, hiddenUserIds } from '@/lib/blocks'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { displayName } from '@/lib/seo/alt'
 export const metadata: Metadata = {
   title: 'Search',
   robots: { index: false, follow: false },
@@ -261,7 +262,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
-                          {camera.brand ? `${camera.brand} ${camera.name}` : camera.name}
+                          {displayName(camera) ?? camera.name}
                         </h3>
                         <p className="text-neutral-500">{camera._count.photos} photos</p>
                         {/* Why this came back for a query its name does not
@@ -336,7 +337,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
-                          {film.brand ? `${film.brand} ${film.name}` : film.name}
+                          {displayName(film) ?? film.name}
                         </h3>
                         <div className="flex items-center gap-2 text-neutral-500">
                           {film.iso && <span>ISO {film.iso}</span>}

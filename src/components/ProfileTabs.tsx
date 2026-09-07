@@ -593,7 +593,7 @@ function CameraCard({ item, onClick, isActive }: { item: GearItem; onClick: () =
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
-              {item.brand ? `${item.brand} ${item.name}` : item.name}
+              {displayName(item) ?? item.name}
             </h3>
           </div>
           <p className="text-neutral-500">{item.count} photo{item.count !== 1 ? 's' : ''}</p>
@@ -644,7 +644,7 @@ function FilmCard({ item, onClick, isActive }: { item: GearItem; onClick: () => 
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-bold group-hover:text-brand transition-colors truncate">
-            {item.brand ? `${item.brand} ${item.name}` : item.name}
+            {displayName(item) ?? item.name}
           </h3>
           <div className="flex items-center gap-2 text-neutral-500">
             {item.iso && <span>ISO {item.iso}</span>}

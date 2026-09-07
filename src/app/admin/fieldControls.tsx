@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ADMIN_RESOURCES, displayValue, type FieldSpec, type ReferenceSource, type ResourceName } from '@/lib/admin/resources'
+import { displayName } from '@/lib/seo/alt'
 
 /**
  * The form controls behind a resource's editable fields.
@@ -44,7 +45,7 @@ export function useReferenceOptions(resource: ResourceName) {
         const list: Option[] = Array.isArray(rows)
           ? rows.map((r: { id: string; name: string; brand?: string | null }) => ({
               id: r.id,
-              label: r.brand ? `${r.brand} ${r.name}` : r.name,
+              label: displayName(r) ?? r.name,
             }))
           : []
         list.sort((a, b) => a.label.localeCompare(b.label))

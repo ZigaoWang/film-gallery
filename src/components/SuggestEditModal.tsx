@@ -12,6 +12,7 @@ import { useDialogBehavior } from '@/components/ui/dialog'
 import CatalogFields from '@/components/CatalogFields'
 import { emptyDraft, resolvedFormat, type CatalogDraft } from '@/lib/catalogForm'
 import type { FilmStockOption } from '@/lib/filmSearch'
+import { displayName } from '@/lib/seo/alt'
 
 
 type SuggestEditModalProps = {
@@ -259,7 +260,7 @@ export default function SuggestEditModal({
             <div>
               <h2 id="suggest-edit-title" className="text-xl md:text-2xl font-bold text-white">Suggest Edit</h2>
               <p className="text-neutral-500 text-sm mt-1">
-                {brand ? `${brand} ${name}` : name}
+                {displayName({ name, brand }) ?? name}
               </p>
             </div>
             <button
