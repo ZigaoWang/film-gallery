@@ -203,13 +203,17 @@ export default function CatalogFields({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <FieldLabel htmlFor={id('name')} required>Name</FieldLabel>
+          {/* The example leads with the maker, because every entry in the
+              catalog does and because the field beside it fills itself in from
+              the name. "AE-1 Program" invited a name with the maker missing,
+              which is the one thing the hint then had to talk somebody out of. */}
           <input
             ref={nameRef}
             id={id('name')}
             type="text"
             value={draft.name}
             onChange={e => changeName(e.target.value)}
-            placeholder={isCamera ? 'e.g. AE-1 Program' : 'e.g. HP5 Plus 400'}
+            placeholder={isCamera ? 'e.g. Canon AE-1 Program' : 'e.g. Ilford HP5 Plus 400'}
             maxLength={120}
             disabled={disabled}
             className={fieldClass}
@@ -217,7 +221,9 @@ export default function CatalogFields({
           <FieldHint>
             {showRenameNote
               ? 'Renaming moves this page to a new address. The old one keeps working.'
-              : 'As it reads on the product. Including the maker is fine and usual here.'}
+              : `Lead with the maker, as it reads on the product. That fills in ${
+                  isCamera ? 'Brand' : 'Manufacturer'
+                } for you.`}
           </FieldHint>
         </div>
 
