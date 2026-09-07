@@ -19,6 +19,7 @@ const REFERENCE_ENDPOINTS: Record<ReferenceSource, string> = {
   cameras: '/api/cameras',
   films: '/api/filmstocks',
   brands: '/api/brands',
+  mounts: '/api/mounts',
 }
 
 /**

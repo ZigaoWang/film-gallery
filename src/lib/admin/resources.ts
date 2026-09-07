@@ -22,7 +22,7 @@ export type FieldKind =
   | 'reference'
 
 /** Which catalog a `reference` field picks from. */
-export type ReferenceSource = 'cameras' | 'films' | 'brands'
+export type ReferenceSource = 'cameras' | 'films' | 'brands' | 'mounts'
 
 export interface FieldSpec {
   kind: FieldKind
@@ -268,7 +268,7 @@ export const ADMIN_RESOURCES = {
       bodyType: { kind: 'enum', label: 'Body type', options: CAMERA_BODY_TYPES, help: 'The mechanism. Leave unset if none of these fit.' },
       frameFormat: { kind: 'enum', label: 'Frame format', options: FRAME_FORMAT_VALUES, help: 'Native frame geometry. Unset until checked.' },
       format: { kind: 'text', label: 'Format', maxLength: 60 },
-      mountType: { kind: 'text', label: 'Mount', maxLength: 60 },
+      mountId: { kind: 'reference', label: 'Mount', source: 'mounts', help: 'Chosen from the list, not typed. A body whose lens does not come off takes "Fixed lens"; a compact or disposable derives that on its own and can be left blank.' },
       aliases: { kind: 'stringList', label: 'Also known as', help: 'Comma separated. Names this body is sold under in other markets.' },
       year: { kind: 'number', label: 'Year', min: 1800, max: 2100 },
       // Offered by the suggest-edit form, so it has to be writable here: this

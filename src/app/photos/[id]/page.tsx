@@ -87,7 +87,7 @@ const loadPhoto = cache(async (id: string) =>
   prisma.photo.findUnique({
     where: { id },
     include: {
-      camera: true,
+      camera: { include: { mount: true } },
       filmStock: true,
       user: { select: publicUserSelect },
       _count: { select: { likes: true } },

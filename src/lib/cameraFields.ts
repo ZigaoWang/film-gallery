@@ -136,8 +136,12 @@ const FIXED_LENS_BODIES: ReadonlySet<CameraBodyType> = new Set<CameraBodyType>([
  */
 export function lensMount(camera: {
   bodyType?: CameraBodyType | null
+  /** The LensMount row, when the caller selected it. Preferred over the text. */
+  mount?: { name: string } | null
+  /** The column the relation replaced. Read only until every row has moved. */
   mountType?: string | null
 }): string | null {
+  if (camera.mount?.name) return camera.mount.name
   const recorded = camera.mountType?.trim()
   if (recorded) return recorded
   return camera.bodyType && FIXED_LENS_BODIES.has(camera.bodyType) ? 'Fixed lens' : null
@@ -146,6 +150,7 @@ export function lensMount(camera: {
 /** What a camera card shows about a camera. See `cameraSpecs`. */
 export interface CameraSpecSource {
   bodyType?: CameraBodyType | null
+  mount?: { name: string } | null
   frameFormat?: FrameFormat | null
   format?: string | null
   mountType?: string | null
