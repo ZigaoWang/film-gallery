@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { focusRing } from '@/components/ui/focus'
 import Image from 'next/image'
 import Combobox from '@/components/Combobox'
 import Button from '@/components/ui/Button'
@@ -58,6 +59,8 @@ export default function ManagePhotos() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [busy, setBusy] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  /** Whether the bulk fields are unfolded. Only consulted below sm. */
+  const [editingFields, setEditingFields] = useState(false)
 
   const [cameras, setCameras] = useState<Camera[]>([])
   const [films, setFilms] = useState<FilmStockOption[]>([])
@@ -216,7 +219,7 @@ export default function ManagePhotos() {
   const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
-    <div className="pb-32">
+    <div className="pb-24 sm:pb-32">
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <input
           type="search"
@@ -319,60 +322,86 @@ export default function ManagePhotos() {
       {/* The editing bar only exists once something is selected, so the page is
           a gallery until you make it a tool. */}
       {selected.size > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-40 bg-[#0a0a0a]/95 backdrop-blur border-t border-neutral-800
+        <div className="fixed inset-x-0 bottom-0 z-30 max-h-[75dvh] overflow-y-auto
+                        bg-[#0a0a0a]/95 backdrop-blur border-t border-neutral-800
                         pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-wrap items-end gap-3">
-              <div className="flex items-center gap-2 mr-2">
+              <div className="flex w-full items-center gap-2 sm:w-auto sm:mr-2">
                 <span className="text-sm text-white font-bold tabular-nums">{selected.size}</span>
                 <span className="text-xs text-neutral-500">selected</span>
-                <button onClick={() => setSelected(new Set())} className="text-xs text-neutral-500 hover:text-white underline ml-1">
+                <button
+                  onClick={() => setSelected(new Set())}
+                  className={`-my-2 px-2 py-2 text-xs text-neutral-500 hover:text-white underline ${focusRing}`}
+                >
                   clear
+                </button>
+
+                {/* On a phone the four fields stack, and the bar was 400px
+                    tall over a 128px reserve — it covered the photographs it
+                    was editing, with no way to scroll past it. They start
+                    folded away here and are always open from sm, where the
+                    row has the width to hold them. */}
+                <button
+                  type="button"
+                  onClick={() => setEditingFields(v => !v)}
+                  aria-expanded={editingFields}
+                  className={`-my-2 ml-auto px-2 py-2 text-xs uppercase tracking-wide text-neutral-400
+                              hover:text-white sm:hidden ${focusRing}`}
+                >
+                  {editingFields ? 'Hide fields' : 'Edit fields'}
                 </button>
               </div>
 
-              <div className="min-w-[180px]">
-                <Combobox
-                  label="Camera"
-                  options={cameras}
-                  value={newCamera}
-                  onChange={setNewCamera}
-                  placeholder="Leave unchanged"
-                />
+              {/* display:contents from sm, so the fields sit in the outer
+                  flex row exactly as they did before; a real box only below
+                  sm, where it is the thing being folded. */}
+              <div className={`${editingFields ? 'flex' : 'hidden'} w-full flex-wrap items-end gap-3 sm:contents`}>
+
+                <div className="min-w-[180px]">
+                  <Combobox
+                    label="Camera"
+                    options={cameras}
+                    value={newCamera}
+                    onChange={setNewCamera}
+                    placeholder="Leave unchanged"
+                  />
+                </div>
+
+                <div className="min-w-[180px]">
+                  <Combobox
+                    label="Film"
+                    options={films}
+                    value={newFilm}
+                    onChange={setNewFilm}
+                    placeholder="Leave unchanged"
+                  />
+                </div>
+
+                <Field label="Date taken">
+                  <input
+                    type="date"
+                    value={newDate}
+                    onChange={e => setNewDate(e.target.value)}
+                    className={fieldClass}
+                  />
+                </Field>
+
+                <Field label="Visibility">
+                  <select
+                    value={newVisibility}
+                    onChange={e => setNewVisibility(e.target.value)}
+                    className={fieldClass}
+                  >
+                    <option value="">Leave unchanged</option>
+                    <option value="PUBLIC">Public</option>
+                    <option value="PRIVATE">Private</option>
+                  </select>
+                </Field>
+
               </div>
 
-              <div className="min-w-[180px]">
-                <Combobox
-                  label="Film"
-                  options={films}
-                  value={newFilm}
-                  onChange={setNewFilm}
-                  placeholder="Leave unchanged"
-                />
-              </div>
-
-              <Field label="Date taken">
-                <input
-                  type="date"
-                  value={newDate}
-                  onChange={e => setNewDate(e.target.value)}
-                  className={fieldClass}
-                />
-              </Field>
-
-              <Field label="Visibility">
-                <select
-                  value={newVisibility}
-                  onChange={e => setNewVisibility(e.target.value)}
-                  className={fieldClass}
-                >
-                  <option value="">Leave unchanged</option>
-                  <option value="PUBLIC">Public</option>
-                  <option value="PRIVATE">Private</option>
-                </select>
-              </Field>
-
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="flex w-full items-center justify-end gap-2 sm:w-auto sm:ml-auto">
                 <Button
                   variant="destructive"
                   size="sm"
