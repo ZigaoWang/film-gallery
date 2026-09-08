@@ -9,6 +9,8 @@ import { normalizeAliases } from '@/lib/filmFields'
 import { resolveBrand } from '@/lib/brands'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
+import { randomUUID } from 'crypto'
+import { extractKeyFromUrl, generateImageKey } from '@/lib/ossUtils'
 
 export async function GET() {
   const cameras = await prisma.camera.findMany()
@@ -104,66 +106,81 @@ export async function POST(req: NextRequest) {
     // migration was unfindable by its maker's name.
     const brandRecord = brand?.trim() ? await resolveBrand(brand) : null
 
-    // Create camera with categorization fields
-    const camera = await prisma.camera.create({
-      data: {
-        name,
-        brand,
-        brandId: brandRecord?.id,
-        slug: await allocateSlug('camera', name, brand),
-        addedById: userId,
-        bodyType,
-        // Through the enum coercion, so a member the schema does not have is
-        // dropped rather than written.
-        frameFormat: toFrameFormat(frameFormat ?? null),
-        // Verified against the table rather than trusted: an id from a stale
-        // client would otherwise be a foreign key error at insert time.
-        format,
-        year,
-        defaultFilmStockId,
-        // Offered by the add dialog, so it has to be read here. A field a form
-        // collects and an endpoint ignores is discarded without a word, which
-        // this codebase has been caught doing before.
-        aliases: normalizeAliases(aliasesInput ? aliasesInput.split(',') : []),
-      }
-    })
-
-    // If image data was provided, upload it
+    /**
+     * The picture is processed and stored before the row exists, and the row
+     * is then written once with everything on it.
+     *
+     * It used to run the other way: create the camera, then process the
+     * image, then update the row twice over. An image this machine could not
+     * decode -- or object storage being briefly unreachable -- answered
+     * "Failed to create camera" with the camera already created, public, and
+     * carrying neither the description nor the picture that were submitted
+     * with it. The person then added it again and hit the unique name.
+     *
+     * The key does not need the row's id: generateImageKey stamps a
+     * timestamp, so a fresh token is enough to be unique.
+     */
+    let imageUrl: string | null = null
     if (hasImageData && imageFile) {
       const { uploadToOSS } = await import('@/lib/oss')
       const { processItemImage } = await import('@/lib/imageProcessing')
 
-      // Process image with same pipeline as suggest edit
       const buffer = Buffer.from(await imageFile.arrayBuffer())
       const processedBuffer = await processItemImage(buffer)
-
-      // Upload to OSS
-      const key = `cameras/${camera.id}.webp`
-      const imageUrl = await uploadToOSS(processedBuffer, key)
-
-      // Update camera with approved image (no moderation for new items)
-      await prisma.camera.update({
-        where: { id: camera.id },
-        data: {
-          imageUrl,
-          description,
-          imageStatus: 'approved',
-          imageUploadedBy: userId,
-          imageUploadedAt: new Date()
-        }
-      })
-    } else if (description) {
-      // Save description even without image
-      await prisma.camera.update({
-        where: { id: camera.id },
-        data: {
-          description,
-          imageStatus: 'approved'
-        }
-      })
+      imageUrl = await uploadToOSS(processedBuffer, generateImageKey('camera', randomUUID()))
     }
 
-    return NextResponse.json(camera)
+    try {
+      const camera = await prisma.camera.create({
+        data: {
+          name,
+          brand,
+          brandId: brandRecord?.id,
+          slug: await allocateSlug('camera', name, brand),
+          addedById: userId,
+          bodyType,
+          // Through the enum coercion, so a member the schema does not have is
+          // dropped rather than written.
+          frameFormat: toFrameFormat(frameFormat ?? null),
+          // Verified against the table rather than trusted: an id from a stale
+          // client would otherwise be a foreign key error at insert time.
+          format,
+          year,
+          defaultFilmStockId,
+          // Offered by the add dialog, so it has to be read here. A field a form
+          // collects and an endpoint ignores is discarded without a word, which
+          // this codebase has been caught doing before.
+          aliases: normalizeAliases(aliasesInput ? aliasesInput.split(',') : []),
+          description,
+          // A new entry is not moderated, so its own picture is approved on
+          // arrival. Unchanged from before, including for a submission that
+          // carries a description and no image.
+          ...(imageUrl
+            ? {
+                imageUrl,
+                imageStatus: 'approved',
+                imageUploadedBy: userId,
+                imageUploadedAt: new Date(),
+              }
+            : description
+              ? { imageStatus: 'approved' }
+              : {}),
+        }
+      })
+
+      return NextResponse.json(camera)
+    } catch (error) {
+      // The picture is already stored and the row that would account for it
+      // is not. Swallowed per key: this runs while the request is failing.
+      if (imageUrl) {
+        const key = extractKeyFromUrl(imageUrl)
+        if (key) {
+          const { deleteFromOSS } = await import('@/lib/oss')
+          await deleteFromOSS(key).catch(() => {})
+        }
+      }
+      throw error
+    }
   } catch (error) {
     console.error('Create camera error:', error)
     return NextResponse.json(

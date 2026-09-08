@@ -18,6 +18,8 @@ import { readJsonObject, invalidBody, asString, asInt } from '@/lib/requestBody'
 import { resolveBrand } from '@/lib/brands'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
+import { randomUUID } from 'crypto'
+import { extractKeyFromUrl, generateImageKey } from '@/lib/ossUtils'
 
 export async function GET() {
   const filmStocks = await prisma.filmStock.findMany()
@@ -165,8 +167,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Could not resolve a brand for this stock' }, { status: 400 })
     }
 
-    // Create film stock with categorization fields
-    const filmStock = await prisma.filmStock.create({
+    /**
+     * The picture is stored before the row exists, and the row is written
+     * once with everything on it. See the camera route: created-then-updated
+     * meant an undecodable image answered "Failed to create film stock" with
+     * the stock already created, public, and carrying neither the description
+     * nor the picture submitted with it.
+     */
+    let imageUrl: string | null = null
+    if (hasImageData && imageFile) {
+      const { uploadToOSS } = await import('@/lib/oss')
+      const { processItemImage } = await import('@/lib/imageProcessing')
+
+      const buffer = Buffer.from(await imageFile.arrayBuffer())
+      const processedBuffer = await processItemImage(buffer)
+      imageUrl = await uploadToOSS(processedBuffer, generateImageKey('filmstock', randomUUID()))
+    }
+
+    try {
+      const filmStock = await prisma.filmStock.create({
       data: {
         name,
         brand,
@@ -187,45 +206,35 @@ export async function POST(req: NextRequest) {
         process: resolvedProcess,
         colorBalance,
         aliases: normalizeAliases(aliasesInput ? aliasesInput.split(',') : []),
+        description,
+        // A new entry is not moderated, so its own picture is approved on
+        // arrival. Unchanged, including for a description with no image.
+        ...(imageUrl
+          ? {
+              imageUrl,
+              imageStatus: 'approved',
+              imageUploadedBy: userId,
+              imageUploadedAt: new Date(),
+            }
+          : description
+            ? { imageStatus: 'approved' }
+            : {}),
       }
-    })
-
-    // If image data was provided, upload it
-    if (hasImageData && imageFile) {
-      const { uploadToOSS } = await import('@/lib/oss')
-      const { processItemImage } = await import('@/lib/imageProcessing')
-
-      // Process image with same pipeline as suggest edit
-      const buffer = Buffer.from(await imageFile.arrayBuffer())
-      const processedBuffer = await processItemImage(buffer)
-
-      // Upload to OSS
-      const key = `filmstocks/${filmStock.id}.webp`
-      const imageUrl = await uploadToOSS(processedBuffer, key)
-
-      // Update film stock with approved image (no moderation for new items)
-      await prisma.filmStock.update({
-        where: { id: filmStock.id },
-        data: {
-          imageUrl,
-          description,
-          imageStatus: 'approved',
-          imageUploadedBy: userId,
-          imageUploadedAt: new Date()
-        }
       })
-    } else if (description) {
-      // Save description even without image
-      await prisma.filmStock.update({
-        where: { id: filmStock.id },
-        data: {
-          description,
-          imageStatus: 'approved'
+
+      return NextResponse.json(filmStock)
+    } catch (error) {
+      // Stored picture, no row to account for it. Swallowed per key: this
+      // runs while the request is already failing.
+      if (imageUrl) {
+        const key = extractKeyFromUrl(imageUrl)
+        if (key) {
+          const { deleteFromOSS } = await import('@/lib/oss')
+          await deleteFromOSS(key).catch(() => {})
         }
-      })
+      }
+      throw error
     }
-
-    return NextResponse.json(filmStock)
   } catch (error) {
     console.error('Create film stock error:', error)
     return NextResponse.json(
