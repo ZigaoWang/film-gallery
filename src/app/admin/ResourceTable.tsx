@@ -385,10 +385,13 @@ export default function ResourceTable<F extends string>({ resource, filters, def
       )}
 
       {/* Sticky, because a selection can span pages: the actions have to stay
-          reachable after scrolling down a hundred rows to add one more. */}
+          reachable after scrolling down a hundred rows to add one more.
+          Offset by the height of the site header, which is sticky at z-40 —
+          at top-0 this slid underneath it and took Approve, Edit and Delete
+          with it. */}
       {selected.size > 0 && (
-        <div className="sticky top-0 z-20 flex flex-wrap items-center gap-2 mb-4 px-3 py-2
-                        bg-neutral-900 border border-neutral-700">
+        <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 flex flex-wrap items-center gap-2
+                        mb-4 px-3 py-2 bg-neutral-900 border border-neutral-700">
           <span className="text-xs text-white font-medium tabular-nums">
             {selected.size} selected
           </span>
