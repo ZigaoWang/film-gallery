@@ -180,8 +180,15 @@ model Camera {
   imageUploadedBy    String?
   imageUploadedAt    DateTime?
   // Categorization
-  /// Superseded by `bodyType`. Retained until its readers have moved across;
-  /// do not write to it in new code.
+  /// Dead as a column: nothing reads it and nothing writes it. `bodyType`
+  /// replaced it.
+  ///
+  /// The *name* is not dead, which is the part worth knowing before dropping
+  /// this. `cameraType` is still the field the create and update routes accept
+  /// on the wire, and `toBodyType()` maps whatever arrives -- a member, or the
+  /// older display wording a client built against the previous list would send
+  /// -- onto `bodyType`. So the column can go whenever; the request field has
+  /// to keep being accepted.
   cameraType         String? // SLR, Rangefinder, Point & Shoot, TLR, Medium Format, Large Format, Instant, Disposable
   /// The mechanism. Null means nobody has classified it yet.
   bodyType           CameraBodyType?
@@ -416,12 +423,25 @@ model FilmStock {
   id                String        @id @default(cuid())
   slug              String?       @unique
   name              String        @unique
-  /// Superseded by `manufacturer`, which is required and normalized. Retained
-  /// only so existing rows and the Camera relation are undisturbed.
+  /// The name the stock is sold under, as text, for display.
+  ///
+  /// Not superseded, whatever this comment used to say: `displayName`, the
+  /// film page, the home page, the photo page, profile pages, catalogue search
+  /// and the SEO alt text all read it, and both the create route and the admin
+  /// form write it. `brandId` is the queryable relation and the source of
+  /// truth for joins; this is the string, the same arrangement `Camera.brand`
+  /// has.
   brand             String?
-  /// Superseded by `brandId` + `manufacturedByBrandId`, which separate who a
-  /// film is sold as from who coats it. Retained until its readers have moved
-  /// across; do not write to it in new code.
+  /// Who coats it, as text. Written, despite what this comment used to say:
+  /// the public suggest-edit form collects it and normalizes it through
+  /// `normalizeManufacturer`, the create route sets it, and admin search
+  /// matches on it.
+  ///
+  /// `manufacturedByBrandId` + `manufacturerStatus` are the pair that carry
+  /// the real claim -- who coats it, and whether that is confirmed or merely
+  /// reported -- and are what the film page renders. This column is the plain
+  /// string beside them. Retiring it means moving those readers across first;
+  /// until then it is live.
   manufacturer      String?
 
   /// The name on the box. Required: every stock is sold as something.
