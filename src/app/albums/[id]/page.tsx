@@ -11,6 +11,7 @@ import type { Metadata } from 'next'
 import { SITE_URL } from '@/lib/seo/site'
 import EmptyState, { PhotoIcon } from '@/components/ui/EmptyState'
 import { visibleToViewer } from '@/lib/photoVisibility'
+import { feedScopeQuery } from '@/lib/photoFeed'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -199,7 +200,7 @@ export default async function AlbumPage({ params }: { params: Promise<{ id: stri
           ) : (
             // The album is the list being browsed, so prev/next on a photo
             // stay inside it instead of walking the whole site.
-            <MasonryGrid photos={photos} scopeQuery={`&albumId=${album.id}`} />
+            <MasonryGrid photos={photos} scopeQuery={feedScopeQuery({ albumId: album.id })} />
           )}
         </div>
       </main>

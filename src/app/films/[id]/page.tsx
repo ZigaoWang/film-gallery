@@ -15,7 +15,7 @@ import { resolveFilmSlug, lookupFilm, canonicalCameraPath } from '@/lib/seo/reso
 import { breadcrumbJsonLd, collectionJsonLd, gearJsonLd } from '@/lib/seo/jsonld'
 import { displayName, gearImageAlt, makerAside } from '@/lib/seo/alt'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
-import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
+import { FEED_FIRST_PAGE, feedOrderBy, feedScopeQuery } from '@/lib/photoFeed'
 import {
   colorBalanceLabel,
   exposureCounts,
@@ -566,7 +566,7 @@ export default async function FilmDetailPage({ params }: Params) {
             initialPhotos={initialPhotos}
             initialOffset={hasMore ? FEED_FIRST_PAGE : null}
             tab="recent"
-            scopeQuery={`&filmStockId=${filmStock.id}`}
+            scopeQuery={feedScopeQuery({ filmStockId: filmStock.id })}
           />
         </div>
       </main>

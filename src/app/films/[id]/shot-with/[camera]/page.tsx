@@ -13,7 +13,7 @@ import { lookupFilm, lookupCamera, canonicalFilmPath } from '@/lib/seo/resolve'
 import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
 import { displayName, article } from '@/lib/seo/alt'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
-import { FEED_FIRST_PAGE } from '@/lib/photoFeed'
+import { FEED_FIRST_PAGE, feedScopeQuery } from '@/lib/photoFeed'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
 import { formatMonth } from '@/lib/formatDate'
@@ -310,7 +310,7 @@ export default async function ComboPage({ params }: Params) {
             initialPhotos={gridPhotos}
             initialOffset={hasMore ? FEED_FIRST_PAGE : null}
             tab="recent"
-            scopeQuery={`&filmStockId=${film.id}&cameraId=${camera.id}`}
+            scopeQuery={feedScopeQuery({ filmStockId: film.id, cameraId: camera.id })}
           />
         </div>
 

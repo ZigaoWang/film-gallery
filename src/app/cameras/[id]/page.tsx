@@ -18,7 +18,7 @@ import { usefulAliases } from '@/lib/aliases'
 import { textLinkClass } from '@/components/ui/TextLink'
 import SpecChip from '@/components/SpecChip'
 import { SITE_URL, comboUrl } from '@/lib/seo/site'
-import { FEED_FIRST_PAGE, feedOrderBy } from '@/lib/photoFeed'
+import { FEED_FIRST_PAGE, feedOrderBy, feedScopeQuery } from '@/lib/photoFeed'
 import { descriptionParagraphs, summaryFromDescription } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
@@ -379,7 +379,7 @@ export default async function CameraDetailPage({ params }: Params) {
             initialPhotos={initialPhotos}
             initialOffset={hasMore ? FEED_FIRST_PAGE : null}
             tab="recent"
-            scopeQuery={`&cameraId=${camera.id}`}
+            scopeQuery={feedScopeQuery({ cameraId: camera.id })}
           />
         </div>
       </main>
