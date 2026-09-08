@@ -14,9 +14,10 @@ import { focusRing } from '@/components/ui/focus'
  * top, and a strip of section links under the form. For a page whose whole job
  * is four boxes and a button, that is more furniture than form.
  *
- * What is left: the wordmark, the way back, the heading, one line saying what
- * the page is for, the form, and the photographs. The collage kept its
- * gradients only where they do work, which is the seam between the two halves.
+ * What is left: the wordmark, the heading, one line saying what the page is
+ * for, the form, and the photographs. No copy over the collage and no
+ * gradient across it — the photographs are the argument, so nothing is
+ * painted on top of them.
  *
  * The form comes first in the DOM. The collage is decorative and marked as
  * such, so a screen reader lands on the heading rather than walking a dozen
@@ -56,66 +57,32 @@ export default function AuthShell({
           them, none of it lining up with anything.
         */}
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col lg:mx-0 lg:max-w-none">
-          {/*
-            The wordmark on the left, where it is on every other page, and the
-            way back beside it.
-
-            A logo alone is not a control anybody is taught to press: someone who
-            tapped Join from a photo and changed their mind had the browser's
-            back button and nothing else, which is not there at all if they
-            arrived from a link. The wordmark used to sit on the right, opposite
-            the back link, which put the site's identity in the one corner of the
-            page nothing else aligns to.
-          */}
-          <header className="flex items-center gap-5">
-            <Link
-              href="/"
-              className={`inline-block ${focusRing}`}
-              aria-label="AvoidXray home"
-            >
+          {/* The wordmark, on the left, where it is on every other page. It is
+              also the way out: a second labelled back link beside it was one
+              more thing to read on a screen that asks for an email address. */}
+          <header>
+            <Link href="/" className={`inline-block ${focusRing}`} aria-label="AvoidXray home">
               <Image src="/logo.svg" alt="AvoidXray" width={112} height={22} priority />
-            </Link>
-
-            <Link
-              href="/explore"
-              className={`-my-2 inline-flex items-center gap-1.5 py-2 text-sm text-neutral-500
-                         transition-colors hover:text-white ${focusRing}`}
-            >
-              <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              Browse photos
             </Link>
           </header>
 
           {/*
-            The photographs, below lg.
+            The photographs, below lg. The same packed collage as the wide
+            layout, just fed fewer frames.
 
-            One row of whole frames rather than a fixed-height window onto a
-            packed collage. That window was `26dvh`, and on a tablet — tall, and
-            still one column — it cut three portraits off mid-subject and left a
-            sliver of the next row showing beneath them. A row of tiles at a
-            fixed ratio is never cut, because its height comes from its width.
+            Short because it is six photographs, not because it is a window
+            cropping a taller collage — so its height is whatever the packing
+            comes to and nothing is cut. Three tiles at a fixed ratio read as
+            three stock images; a masonry reads as a contact sheet, which is
+            what the site is.
 
             Full width on a phone, where edge-to-edge photographs are the
             point; aligned to the column from sm up, where a strip wider than
             the form it introduces just looks loose.
           */}
           {hasPhotos && (
-            <div className="-mx-6 mt-8 grid grid-cols-3 gap-2 sm:mx-0 lg:hidden" aria-hidden>
-              {photos.slice(0, 3).map(photo => (
-                <div key={photo.id} className="relative aspect-[4/5] overflow-hidden bg-neutral-900">
-                  <Image
-                    src={photo.thumbnailPath}
-                    alt=""
-                    fill
-                    sizes="34vw"
-                    className="object-cover"
-                    placeholder={photo.blurHash ? 'blur' : 'empty'}
-                    blurDataURL={blurHashToDataURL(photo.blurHash)}
-                  />
-                </div>
-              ))}
+            <div className="-mx-6 mt-8 sm:mx-0 lg:hidden" aria-hidden>
+              <Collage photos={photos.slice(0, 6)} columns={3} sizes="34vw" />
             </div>
           )}
 
@@ -143,12 +110,7 @@ export default function AuthShell({
           className="relative hidden border-l border-neutral-800 lg:sticky lg:top-0 lg:block lg:h-dvh lg:overflow-hidden"
           aria-hidden
         >
-          <Collage photos={photos} columns={3} sizes="18vw" />
-
-          {/* The one gradient that does work: it softens the seam where the
-              collage meets the form's black column. The others existed to
-              hold text that is no longer laid over the photographs. */}
-          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a0a0a] to-transparent" />
+          <Collage photos={photos} columns={3} sizes="18vw" fill />
         </div>
       )}
     </div>
@@ -166,10 +128,17 @@ function Collage({
   photos,
   columns,
   sizes,
+  fill = false,
 }: {
   photos: AuthShowcase['photos']
   columns: number
   sizes: string
+  /**
+   * Pin to the parent and let the columns overflow its bottom edge, for the
+   * full-height panel. Off, the collage sits in normal flow and is as tall as
+   * the packing comes to, so nothing is cropped.
+   */
+  fill?: boolean
 }) {
   const cols: AuthShowcase['photos'][] = Array.from({ length: columns }, () => [])
   const heights = new Array(columns).fill(0)
@@ -181,7 +150,9 @@ function Collage({
   }
 
   return (
-    <div className="absolute inset-0 flex gap-2 p-2">
+    // No padding: this is a full-bleed panel, and an inset left a thin black
+    // margin down the edge the photographs are supposed to run off.
+    <div className={`flex gap-2 ${fill ? 'absolute inset-0' : ''}`}>
       {cols.map((col, i) => (
         <div key={i} className="flex flex-1 flex-col gap-2">
           {col.map(photo => (
