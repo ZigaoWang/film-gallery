@@ -85,17 +85,20 @@ export function TitleSkeleton({
   size = '3xl',
   gap = 'mb-8',
 }: {
-  /** Matches the page's `text-3xl` or `text-4xl` heading. */
-  size?: '3xl' | '4xl'
+  /** Matches the page's `text-2xl`, `text-3xl` or `text-4xl` heading. */
+  size?: '2xl' | '3xl' | '4xl'
   /** The page's own margin below the title block. */
   gap?: string
 }) {
+  // The line heights of text-2xl, text-3xl and text-4xl.
+  const heading = { '2xl': 'h-8 w-44', '3xl': 'h-9 w-56', '4xl': 'h-10 w-64' }[size]
+
   return (
     <div className={gap}>
-      {/* h-9 and h-10 are the line heights of text-3xl and text-4xl. */}
-      <Bar className={`mb-2 ${size === '4xl' ? 'h-10 w-64' : 'h-9 w-56'}`} />
-      {/* h-6, because the subtitle is body text rather than a 16px rule. */}
-      <Bar className="h-6 w-72 max-w-full" />
+      <Bar className={`mb-2 ${heading}`} />
+      {/* The subtitle is body text rather than a 16px rule: h-5 under a
+          text-sm subtitle, h-6 under the larger pages' text-base one. */}
+      <Bar className={`${size === '2xl' ? 'h-5' : 'h-6'} w-72 max-w-full`} />
     </div>
   )
 }
@@ -169,6 +172,23 @@ export function TileGridSkeleton({ count = 12 }: { count?: number }) {
     <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
         <Bar key={i} className="aspect-[3/2]" delay={(i % 5) * 160} />
+      ))}
+    </div>
+  )
+}
+
+/**
+ * The dense square thumbnails /manage lays its own photographs out in.
+ *
+ * Its own shape rather than TileGridSkeleton's: that one is search's 3:2 tiles
+ * three or four to a row, and this grid runs six squares wide on a desktop, so
+ * either placeholder in the other's page is a visible re-layout on arrival.
+ */
+export function ThumbGridSkeleton({ count = 24 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <Bar key={i} className="aspect-square" delay={(i % 5) * 160} />
       ))}
     </div>
   )
