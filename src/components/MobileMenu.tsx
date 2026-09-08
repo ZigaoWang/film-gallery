@@ -80,7 +80,7 @@ export default function MobileMenu({ isLoggedIn, username, name, avatar }: Mobil
           {/* Tapping away closes it, which is the gesture people already try.
               Previously only the button itself would. */}
           <button
-            className="fixed inset-0 z-40 bg-black/60 cursor-default"
+            className="fixed inset-0 z-40 bg-black/80 cursor-default"
             aria-label="Close menu"
             tabIndex={-1}
             onClick={close}

@@ -206,6 +206,9 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
     }
   }
 
+  // The backdrop is /95 rather than the /80 every dialog on the site uses, as
+  // the lightbox is and for the same reason: what this frames is a photograph
+  // being judged, so the surround is part of looking at it.
   return (
     <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div

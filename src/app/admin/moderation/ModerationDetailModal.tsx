@@ -123,7 +123,7 @@ export default function ModerationDetailModal({
   }, [submission.originalData, submission.proposedData])
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-start justify-center overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto">
       <div
         ref={panelRef}
         tabIndex={-1}

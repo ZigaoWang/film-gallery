@@ -192,6 +192,10 @@ export default function Lightbox({ photoId, src, alt, width, height, prevId, nex
         aria-label="View full size"
       />
 
+      {/* The backdrop below is /95 rather than the /80 every dialog on the
+          site uses, deliberately: this one exists to show a photograph, and
+          the surround is part of looking at it rather than a scrim over the
+          page behind. */}
       {open && (
         <div
           ref={dialogRef}
