@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
 import { displayName } from '@/lib/seo/alt'
+import { activeOption, idleOption } from '@/components/ui/focus'
 
 type SearchResult = {
   photos: { id: string; thumbnailPath: string; caption: string | null }[]
@@ -145,7 +146,7 @@ export default function SearchBar() {
     role: 'option',
     'aria-selected': active === index,
     tabIndex: -1,
-    className: `${className} ${active === index ? 'bg-neutral-800' : ''}`,
+    className: `${className} ${active === index ? activeOption : idleOption}`,
     onClick: closeAll,
   })
 
@@ -224,7 +225,7 @@ export default function SearchBar() {
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search…"
-          className="w-48 lg:w-64 px-3 h-8 bg-neutral-900 text-white text-sm border border-neutral-800 focus:border-neutral-600 focus:outline-none placeholder-neutral-600 animate-expand-in"
+          className="w-48 lg:w-64 px-3 h-8 bg-neutral-900 text-white text-sm border border-neutral-800 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand placeholder-neutral-600 animate-expand-in"
         />
       </form>
 

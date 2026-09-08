@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useId } from 'react'
 import Image from 'next/image'
 import FieldLabel from '@/components/ui/FieldLabel'
+import { activeOption, idleOption } from '@/components/ui/focus'
 import { filmMatchesQuery } from '@/lib/filmSearch'
 import { displayName } from '@/lib/seo/alt'
 
@@ -318,7 +319,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
                   key="add-new"
                   onClick={() => chooseRow(row)}
                   className={`w-full px-3 py-2 text-left text-sm text-brand border-b border-neutral-800 transition-colors ${
-                    highlighted ? 'bg-neutral-800' : ''
+                    highlighted ? activeOption : idleOption
                   }`}
                 >
                   + Add New {label}
@@ -334,7 +335,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
                 key={o.id}
                 onClick={() => handleSelect(o)}
                 className={`w-full px-3 py-2 text-left text-sm transition-colors flex items-center gap-2 ${
-                  highlighted ? 'bg-neutral-800 text-white' : 'text-neutral-300'
+                  highlighted ? `${activeOption} text-white` : `${idleOption} text-neutral-300`
                 }`}
               >
                 {o.imageUrl && (

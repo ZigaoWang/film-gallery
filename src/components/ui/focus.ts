@@ -27,3 +27,19 @@ export const focusRing =
  */
 export const focusRingInset =
   'focus-visible:outline focus-visible:outline-1 focus-visible:-outline-offset-2 focus-visible:outline-brand'
+
+/**
+ * The row the arrow keys are on, in a listbox that keeps DOM focus on its
+ * input.
+ *
+ * `aria-activedescendant` means no element is actually focused, so no focus
+ * utility fires and this class is the only cursor the widget has. It was
+ * `bg-neutral-800` on a `bg-neutral-900` panel, so arrow-keying the header
+ * search or a catalog picker moved something nobody could see.
+ *
+ * A brand edge, which is how the site already marks the current tab and the
+ * current nav item. Both states carry the border so the label does not shift
+ * two pixels as the highlight moves.
+ */
+export const activeOption = 'bg-neutral-800 border-l-2 border-brand'
+export const idleOption = 'border-l-2 border-transparent'

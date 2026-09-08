@@ -96,7 +96,7 @@ export const inputClass =
   // were not, so editing a camera from a phone lurched sideways on every
   // field and admin was the one place left doing it.
   'w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-base sm:text-sm text-white ' +
-  'placeholder:text-neutral-700 focus:outline-none focus:border-neutral-600'
+  'placeholder:text-neutral-700 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand'
 
 export function FieldInput({
   id, column, field, value, options, disabled, onChange,

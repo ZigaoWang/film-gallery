@@ -344,7 +344,7 @@ export default function RevisionQueue() {
                             : 'Why is this wrong? The next person reads this.'
                         }
                         className="mt-2 w-full border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm
-                                   text-white placeholder:text-neutral-700 focus:border-neutral-600 focus:outline-none"
+                                   text-white placeholder:text-neutral-700 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                       />
                     )}
                   </div>

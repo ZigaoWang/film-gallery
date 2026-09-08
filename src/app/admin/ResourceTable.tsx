@@ -341,7 +341,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
           placeholder={`Search ${spec.plural.toLowerCase()}…`}
           aria-label={`Search ${spec.plural}`}
           className="flex-1 min-w-[200px] bg-neutral-900 border border-neutral-800 px-3 py-2 text-base sm:text-sm text-white
-                     placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600"
+                     placeholder:text-neutral-600 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
         />
         <label className="flex items-center gap-2 text-xs text-neutral-500">
           <span className="uppercase tracking-wide">Per page</span>
@@ -350,7 +350,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
             onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
             aria-label="Rows per page"
             className="bg-neutral-900 border border-neutral-800 px-2 py-1.5 text-xs text-white
-                       focus:outline-none focus:border-neutral-600"
+                       focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           >
             {PAGE_SIZES.map(n => <option key={n} value={n}>{n}</option>)}
           </select>
@@ -701,7 +701,7 @@ function ConfirmBulkDelete({
           onChange={e => setTyped(e.target.value)}
           inputMode="numeric"
           className="mt-1 w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white
-                     focus:outline-none focus:border-neutral-600"
+                     focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
         />
       </label>
     </ConfirmDialog>
@@ -911,7 +911,7 @@ function ConfirmDelete({
             value={typed}
             onChange={e => setTyped(e.target.value)}
             className="mt-1 w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white
-                       focus:outline-none focus:border-neutral-600"
+                       focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </label>
       )}

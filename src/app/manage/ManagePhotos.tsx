@@ -225,7 +225,7 @@ export default function ManagePhotos() {
           placeholder="Search your captions…"
           aria-label="Search your photos"
           className="flex-1 min-w-[200px] bg-neutral-900 border border-neutral-800 px-3 py-2 text-base sm:text-sm text-white
-                     placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600"
+                     placeholder:text-neutral-600 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
         />
         <span className="text-xs text-neutral-500 tabular-nums">
           {loading ? 'Loading…' : `${total.toLocaleString()} photo${total === 1 ? '' : 's'}`}
