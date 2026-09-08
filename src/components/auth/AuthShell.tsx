@@ -2,20 +2,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { blurHashToDataURL } from '@/lib/blurhash'
 import type { AuthShowcase } from '@/lib/authShowcase'
+import { focusRing } from '@/components/ui/focus'
 
 /**
  * The frame around every sign-in, join and password form.
  *
- * All four of these pages were a logo in the corner and a form in the middle
- * of an empty black page — no header, no footer, no way anywhere else, and
- * nothing showing what the site actually contains. That is the first thing a
- * new visitor sees, and it said nothing.
+ * The photographs are the argument; everything else is in the way of it. This
+ * screen had accumulated three separate pitches — a subtitle under the
+ * heading, a sentence laid over the collage, and a row of counted totals — and
+ * three separate places to navigate from: a back link and the wordmark at the
+ * top, and a strip of section links under the form. For a page whose whole job
+ * is four boxes and a button, that is more furniture than form.
  *
- * The photographs are the argument. On a wide screen they take the right half
- * at full brightness beside the form; on a phone they are a band across the
- * top, with the form below on plain background — a form laid over photographs
- * is a form nobody can read, and a phone has no room to put the two side by
- * side.
+ * What is left: the wordmark, the way back, the heading, one line saying what
+ * the page is for, the form, and the photographs. The collage kept its
+ * gradients only where they do work, which is the seam between the two halves.
  *
  * The form comes first in the DOM. The collage is decorative and marked as
  * such, so a screen reader lands on the heading rather than walking a dozen
@@ -35,133 +36,121 @@ export default function AuthShell({
   /** The line under the form — "No account? Create one". */
   footer?: React.ReactNode
 }) {
-  const { photos, totalPhotos, totalFilms, totalCameras } = showcase
+  const { photos } = showcase
   const hasPhotos = photos.length > 0
 
   return (
-    <div className="relative min-h-dvh bg-[#0a0a0a] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-      {/* The form side. Full height only from lg, where it is a column beside
-          the showcase; on a phone it follows the band and is as tall as it
-          needs to be. */}
-      <div className="relative flex flex-col px-6 pb-10 pt-8 sm:px-10 lg:min-h-dvh lg:px-14 lg:py-8">
+    <div className="relative min-h-dvh bg-[#0a0a0a] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
+      {/* The form side. On a phone it follows the band of photographs and is as
+          tall as it needs to be; from lg it is a column that scrolls beside a
+          pinned showcase. */}
+      <div className="relative flex min-h-dvh flex-col px-6 pb-12 pt-8 sm:px-10 lg:px-14 lg:py-10">
         {/*
-          A way out, spelled out.
+          Below lg the wordmark, the photographs and the form share one measure
+          and sit centred in the viewport.
 
-          The logo was the only route off these pages, and a logo is not a
-          control anybody is taught to press — someone who tapped Join from a
-          photo and changed their mind had the browser's back button and
-          nothing else, which is not there at all if they arrived from a link.
-
-          So: a labelled back link, with an arrow, at the top left where a back
-          control belongs, and the wordmark beside it still pointing home.
+          There is a wide band — a tablet, or a small laptop window — that is
+          too narrow for two columns and far too wide for a 384px form pinned
+          to the left edge. It left two thirds of the screen empty beside the
+          fields, with a photo strip stretched across the full width above
+          them, none of it lining up with anything.
         */}
-        <header className="flex items-center gap-4">
-          <Link
-            href="/explore"
-            className="-ml-2 inline-flex h-11 items-center gap-1.5 px-2 text-sm text-neutral-400
-                       transition-colors hover:text-white focus-visible:outline focus-visible:outline-1
-                       focus-visible:outline-offset-2 focus-visible:outline-brand"
-          >
-            <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Browse photos
-          </Link>
+        <div className="mx-auto flex w-full max-w-md flex-1 flex-col lg:mx-0 lg:max-w-none">
+          {/*
+            The wordmark on the left, where it is on every other page, and the
+            way back beside it.
 
-          <Link
-            href="/"
-            className="ml-auto inline-block focus-visible:outline focus-visible:outline-1
-                       focus-visible:outline-offset-4 focus-visible:outline-brand"
-            aria-label="AvoidXray home"
-          >
-            <Image src="/logo.svg" alt="AvoidXray" width={132} height={26} priority />
-          </Link>
-        </header>
+            A logo alone is not a control anybody is taught to press: someone who
+            tapped Join from a photo and changed their mind had the browser's
+            back button and nothing else, which is not there at all if they
+            arrived from a link. The wordmark used to sit on the right, opposite
+            the back link, which put the site's identity in the one corner of the
+            page nothing else aligns to.
+          */}
+          <header className="flex items-center gap-5">
+            <Link
+              href="/"
+              className={`inline-block ${focusRing}`}
+              aria-label="AvoidXray home"
+            >
+              <Image src="/logo.svg" alt="AvoidXray" width={112} height={22} priority />
+            </Link>
 
-        {/*
-          The photographs, on a phone.
+            <Link
+              href="/explore"
+              className={`-my-2 inline-flex items-center gap-1.5 py-2 text-sm text-neutral-500
+                         transition-colors hover:text-white ${focusRing}`}
+            >
+              <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              Browse photos
+            </Link>
+          </header>
 
-          Below the header rather than above it: this sat at the very top, so
-          the only way back was under a third of a screen of imagery and you
-          had to scroll past the picture to find the navigation. Negative
-          margins take it full width again inside a padded column.
+          {/*
+            The photographs, below lg.
 
-          Six rather than the twelve the wide layout shows — a band this size
-          does not need more, and a phone should not fetch images it will not
-          draw.
-        */}
-        {hasPhotos && (
-          <div
-            className="relative -mx-6 mt-6 h-[26dvh] min-h-[150px] overflow-hidden sm:-mx-10 lg:hidden"
-            aria-hidden
-          >
-            <Collage photos={photos.slice(0, 6)} columns={3} sizes="34vw" />
-            <div className="absolute inset-0 bg-[#0a0a0a]/25" />
-            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
-          </div>
-        )}
+            One row of whole frames rather than a fixed-height window onto a
+            packed collage. That window was `26dvh`, and on a tablet — tall, and
+            still one column — it cut three portraits off mid-subject and left a
+            sliver of the next row showing beneath them. A row of tiles at a
+            fixed ratio is never cut, because its height comes from its width.
 
-        <main className="flex flex-1 items-center py-10">
-          <div className="w-full max-w-sm">
-            <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">{title}</h1>
-            <p className="mt-2 mb-8 text-neutral-400">{subtitle}</p>
-            {children}
-            {footer && <div className="mt-6 text-sm text-neutral-500">{footer}</div>}
-          </div>
-        </main>
+            Full width on a phone, where edge-to-edge photographs are the
+            point; aligned to the column from sm up, where a strip wider than
+            the form it introduces just looks loose.
+          */}
+          {hasPhotos && (
+            <div className="-mx-6 mt-8 grid grid-cols-3 gap-2 sm:mx-0 lg:hidden" aria-hidden>
+              {photos.slice(0, 3).map(photo => (
+                <div key={photo.id} className="relative aspect-[4/5] overflow-hidden bg-neutral-900">
+                  <Image
+                    src={photo.thumbnailPath}
+                    alt=""
+                    fill
+                    sizes="34vw"
+                    className="object-cover"
+                    placeholder={photo.blurHash ? 'blur' : 'empty'}
+                    blurDataURL={blurHashToDataURL(photo.blurHash)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Somewhere to go that is not the form. These pages were a dead end:
-            the only link on them was the logo. */}
-        <footer className="flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-neutral-600">
-          <Link href="/films" className="transition-colors hover:text-neutral-300">
-            Film stocks
-          </Link>
-          <Link href="/cameras" className="transition-colors hover:text-neutral-300">
-            Cameras
-          </Link>
-          <Link href="/legal" className="transition-colors hover:text-neutral-300">
-            Terms &amp; privacy
-          </Link>
-        </footer>
+          <main id="main-content" tabIndex={-1} className="flex flex-1 items-center py-12 outline-none">
+            <div className="w-full lg:max-w-sm">
+              <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">{title}</h1>
+              <p className="mt-3 mb-8 text-neutral-400">{subtitle}</p>
+              {children}
+              {footer && <div className="mt-6 text-sm text-neutral-500">{footer}</div>}
+            </div>
+          </main>
+        </div>
       </div>
 
-      {/* The showcase, on wide screens only. */}
+      {/*
+        The showcase, from lg.
+
+        Pinned to the viewport and exactly as tall as it, so the collage
+        overflows the bottom and is cut by the edge of the screen rather than
+        running out partway down a long form. Sign-up is the tallest of these
+        forms, and beside it the photographs used to stop with black underneath.
+      */}
       {hasPhotos && (
-        <div className="relative hidden overflow-hidden lg:block" aria-hidden>
+        <div
+          className="relative hidden border-l border-neutral-800 lg:sticky lg:top-0 lg:block lg:h-dvh lg:overflow-hidden"
+          aria-hidden
+        >
           <Collage photos={photos} columns={3} sizes="18vw" />
 
-          {/* Fades the collage into the form side so the two halves meet on a
-              gradient rather than a hard seam, and darkens the foot of the
-              panel so the figures below stay readable over any photograph. */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
-
-          <div className="absolute inset-x-0 bottom-0 p-10">
-            <p className="mb-4 max-w-sm text-lg font-medium text-white">
-              Every frame here was shot on film and scanned by the person who took it.
-            </p>
-            <dl className="flex items-center gap-8">
-              <Stat value={totalPhotos} label="Photos" />
-              <Stat value={totalFilms} label="Film stocks" />
-              <Stat value={totalCameras} label="Cameras" />
-            </dl>
-          </div>
+          {/* The one gradient that does work: it softens the seam where the
+              collage meets the form's black column. The others existed to
+              hold text that is no longer laid over the photographs. */}
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a0a0a] to-transparent" />
         </div>
       )}
-    </div>
-  )
-}
-
-function Stat({ value, label }: { value: number; label: string }) {
-  return (
-    <div>
-      <dt className="sr-only">{label}</dt>
-      <dd>
-        <span className="block text-2xl font-black tabular-nums text-white">
-          {value.toLocaleString('en-US')}
-        </span>
-        <span className="text-[10px] uppercase tracking-wider text-neutral-500">{label}</span>
-      </dd>
     </div>
   )
 }
