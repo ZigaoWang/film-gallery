@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { Prisma } from '@prisma/client'
+import { previewPhotosByGear, groupPreviews, VISIBLE_TO_ANYONE, notHidden } from '@/lib/previewPhotos'
 import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/Header'
@@ -86,26 +87,17 @@ export default async function CamerasPage({
     format: tally(formatCounts, formatCounts.map(r => r.format)),
   }
 
-  // Get 4 random photos for each camera using raw SQL
-  const cameraIds = cameras.map(c => c.id)
-  const randomPhotos = cameraIds.length > 0 ? await prisma.$queryRaw<{ id: string; thumbnailPath: string; cameraId: string; blurHash: string | null }[]>`
-    SELECT id, "thumbnailPath", "cameraId", "blurHash" FROM (
-      SELECT id, "thumbnailPath", "cameraId", "blurHash", ROW_NUMBER() OVER (PARTITION BY "cameraId" ORDER BY RANDOM()) as rn
-      FROM "Photo"
-      WHERE "cameraId" IN (${Prisma.join(cameraIds)}) AND published = true
-        AND visibility = 'public'
-        AND (${hidden.length === 0} OR "userId" <> ALL(${hidden}))
-    ) p WHERE rn <= 4
-  ` : []
-
-  // Group photos by camera
-  const photosByCamera = new Map<string, typeof randomPhotos>()
-  for (const photo of randomPhotos) {
-    if (!photosByCamera.has(photo.cameraId)) {
-      photosByCamera.set(photo.cameraId, [])
-    }
-    photosByCamera.get(photo.cameraId)!.push(photo)
-  }
+  // Four photos for each body, shuffled so the strip is an invitation to
+  // browse rather than a record of the most recent upload.
+  const photosByCamera = groupPreviews(
+    await previewPhotosByGear({
+      key: 'cameraId',
+      parents: cameras.map((c) => c.id),
+      where: Prisma.sql`${VISIBLE_TO_ANYONE} ${notHidden(hidden)}`,
+      order: 'random',
+    }),
+    'cameraId'
+  )
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">

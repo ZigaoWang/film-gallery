@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { Prisma } from '@prisma/client'
+import { previewPhotosByGear, groupPreviews, VISIBLE_TO_ANYONE, notHidden } from '@/lib/previewPhotos'
 import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/Header'
@@ -81,26 +82,17 @@ export default async function FilmsPage({
     ),
   }
 
-  // Get 4 random photos for each film stock using raw SQL
-  const filmStockIds = filmStocks.map(f => f.id)
-  const randomPhotos = filmStockIds.length > 0 ? await prisma.$queryRaw<{ id: string; thumbnailPath: string; filmStockId: string; blurHash: string | null }[]>`
-    SELECT id, "thumbnailPath", "filmStockId", "blurHash" FROM (
-      SELECT id, "thumbnailPath", "filmStockId", "blurHash", ROW_NUMBER() OVER (PARTITION BY "filmStockId" ORDER BY RANDOM()) as rn
-      FROM "Photo"
-      WHERE "filmStockId" IN (${Prisma.join(filmStockIds)}) AND published = true
-        AND visibility = 'public'
-        AND (${hidden.length === 0} OR "userId" <> ALL(${hidden}))
-    ) p WHERE rn <= 4
-  ` : []
-
-  // Group photos by film stock
-  const photosByFilm = new Map<string, typeof randomPhotos>()
-  for (const photo of randomPhotos) {
-    if (!photosByFilm.has(photo.filmStockId)) {
-      photosByFilm.set(photo.filmStockId, [])
-    }
-    photosByFilm.get(photo.filmStockId)!.push(photo)
-  }
+  // Four photos for each stock, shuffled so the strip is an invitation to
+  // browse rather than a record of the most recent upload.
+  const photosByFilm = groupPreviews(
+    await previewPhotosByGear({
+      key: 'filmStockId',
+      parents: filmStocks.map((f) => f.id),
+      where: Prisma.sql`${VISIBLE_TO_ANYONE} ${notHidden(hidden)}`,
+      order: 'random',
+    }),
+    'filmStockId'
+  )
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">

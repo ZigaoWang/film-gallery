@@ -1,4 +1,10 @@
 import { prisma } from '@/lib/db'
+import { Prisma } from '@prisma/client'
+import {
+  previewPhotosByGear,
+  groupPreviews,
+  type PreviewPhoto,
+} from '@/lib/previewPhotos'
 
 /**
  * Aggregates for a photographer's profile.
@@ -61,12 +67,15 @@ export function utcDayRange(day: string): { gte: Date; lt: Date } | null {
   return { gte: start, lt: end }
 }
 
-export interface GearPreview {
-  id: string
-  thumbnailPath: string
-  blurHash: string | null
-  cameraId: string | null
-  filmStockId: string | null
+/** The preview strips on a profile, one for each piece of gear it lists. */
+export interface GearPreviews {
+  byCamera: Map<string, PreviewPhoto[]>
+  byFilm: Map<string, PreviewPhoto[]>
+}
+
+/** For a blocked profile, which lists no gear at all. */
+export function noGearPreviews(): GearPreviews {
+  return { byCamera: new Map(), byFilm: new Map() }
 }
 
 /**
@@ -76,43 +85,27 @@ export interface GearPreview {
  * walked the list to collect four per piece of gear, which meant fetching
  * hundreds of records to display a handful.
  */
-export async function getGearPreviews(userId: string, viewerId?: string | null): Promise<GearPreview[]> {
-  const ownVisible = viewerId === userId
-  return prisma.$queryRaw<GearPreview[]>`
-    SELECT id, "thumbnailPath", "blurHash", "cameraId", "filmStockId" FROM (
-      SELECT id, "thumbnailPath", "blurHash", "cameraId", "filmStockId",
-             ROW_NUMBER() OVER (PARTITION BY "cameraId" ORDER BY "createdAt" DESC) AS rn
-      FROM "Photo"
-      WHERE published = true AND (${ownVisible}::boolean OR visibility = 'public')
-        AND "userId" = ${userId} AND "cameraId" IS NOT NULL
-    ) c WHERE rn <= 4
-    UNION
-    SELECT id, "thumbnailPath", "blurHash", "cameraId", "filmStockId" FROM (
-      SELECT id, "thumbnailPath", "blurHash", "cameraId", "filmStockId",
-             ROW_NUMBER() OVER (PARTITION BY "filmStockId" ORDER BY "createdAt" DESC) AS rn
-      FROM "Photo"
-      WHERE published = true AND (${ownVisible}::boolean OR visibility = 'public')
-        AND "userId" = ${userId} AND "filmStockId" IS NOT NULL
-    ) f WHERE rn <= 4
+export async function getGearPreviews(
+  userId: string,
+  viewerId?: string | null
+): Promise<GearPreviews> {
+  // A photographer sees their own private and unpublished frames in their own
+  // gear strips. Nobody else does.
+  const own = viewerId === userId
+  const scope = Prisma.sql`
+    published = true AND (${own}::boolean OR visibility = 'public')
+    AND "userId" = ${userId}
   `
-}
 
-/** Buckets previews by camera or film, capped at four each. */
-export function groupPreviews(
-  previews: GearPreview[],
-  key: 'cameraId' | 'filmStockId'
-): Map<string, GearPreview[]> {
-  const grouped = new Map<string, GearPreview[]>()
-  for (const preview of previews) {
-    const id = preview[key]
-    if (!id) continue
-    const bucket = grouped.get(id) ?? []
-    if (bucket.length < 4) {
-      bucket.push(preview)
-      grouped.set(id, bucket)
-    }
+  const [byCamera, byFilm] = await Promise.all([
+    previewPhotosByGear({ key: 'cameraId', parents: 'all', where: scope, order: 'recent' }),
+    previewPhotosByGear({ key: 'filmStockId', parents: 'all', where: scope, order: 'recent' }),
+  ])
+
+  return {
+    byCamera: groupPreviews(byCamera, 'cameraId'),
+    byFilm: groupPreviews(byFilm, 'filmStockId'),
   }
-  return grouped
 }
 
 export interface ProfilePhoto {

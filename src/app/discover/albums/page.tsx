@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db'
-import { Prisma } from '@prisma/client'
+import { previewPhotosByAlbum, groupPreviews, VISIBLE_TO_ANYONE } from '@/lib/previewPhotos'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -67,29 +67,12 @@ export default async function DiscoverAlbumsPage({
 
   const lastPage = Math.max(1, Math.ceil(totalAlbums / ALBUMS_PER_PAGE))
 
-  // Get 4 random photos for each album using raw SQL
-  const albumIds = albums.map(a => a.id)
-  const randomPhotos = albumIds.length > 0 ? await prisma.$queryRaw<{ id: string; thumbnailPath: string; collectionId: string; blurHash: string | null }[]>`
-    SELECT p.id, p."thumbnailPath", cp."collectionId", p."blurHash" FROM (
-      SELECT cp.*, ROW_NUMBER() OVER (PARTITION BY cp."collectionId" ORDER BY RANDOM()) as rn
-      FROM "CollectionPhoto" cp
-      WHERE cp."collectionId" IN (${Prisma.join(albumIds)})
-    ) cp
-    JOIN "Photo" p ON cp."photoId" = p.id
-    -- A public album can still contain a private photo; the preview strangers
-    -- see must not include it. Unpublished drafts are excluded for the same
-    -- reason.
-    WHERE cp.rn <= 4 AND p.published = true AND p.visibility = 'public'
-  ` : []
-
-  // Group photos by album
-  const photosByAlbum = new Map<string, typeof randomPhotos>()
-  for (const photo of randomPhotos) {
-    if (!photosByAlbum.has(photo.collectionId)) {
-      photosByAlbum.set(photo.collectionId, [])
-    }
-    photosByAlbum.get(photo.collectionId)!.push(photo)
-  }
+  // A public album can still contain a private photo; the preview strangers
+  // see must not include it, and drafts are excluded for the same reason.
+  const photosByAlbum = groupPreviews(
+    await previewPhotosByAlbum({ albumIds: albums.map((a) => a.id), where: VISIBLE_TO_ANYONE }),
+    'collectionId'
+  )
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db'
 import { randomSeed } from '@/lib/seededShuffle'
 import { FEED_FIRST_PAGE } from '@/lib/photoFeed'
-import { getGearPreviews, getPhotoDays, getProfileFirstPage, groupPreviews } from '@/lib/profileFeed'
+import { getGearPreviews, getPhotoDays, getProfileFirstPage, noGearPreviews } from '@/lib/profileFeed'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Header from '@/components/Header'
@@ -155,7 +155,7 @@ export default async function UserPage({
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } }
     }),
-    isBlocked ? Promise.resolve([]) : getGearPreviews(user.id, currentUserId),
+    isBlocked ? Promise.resolve(noGearPreviews()) : getGearPreviews(user.id, currentUserId),
     isBlocked ? Promise.resolve([]) : getPhotoDays(user.id, currentUserId),
   ])
 
@@ -177,8 +177,7 @@ export default async function UserPage({
       : Promise.resolve([]),
   ])
 
-  const photosByCameraId = groupPreviews(gearPreviews, 'cameraId')
-  const photosByFilmId = groupPreviews(gearPreviews, 'filmStockId')
+  const { byCamera: photosByCameraId, byFilm: photosByFilmId } = gearPreviews
 
   const cameraMap = Object.fromEntries(cameras.map(c => [c.id, c]))
   const filmMap = Object.fromEntries(films.map(f => [f.id, f]))
