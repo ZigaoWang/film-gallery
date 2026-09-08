@@ -112,7 +112,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <Header />
 
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-10">
           <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Explore</h1>
           <p className="text-neutral-500 mb-8">Discover film photography</p>

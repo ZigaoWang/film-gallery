@@ -21,7 +21,7 @@ export default function NotFound() {
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <Header />
 
-      <main className="flex flex-1 items-center justify-center px-6 py-24">
+      <main id="main-content" tabIndex={-1} className="flex flex-1 items-center justify-center px-6 py-24">
         <div className="text-center">
           <p className="mb-4 text-8xl font-black text-brand">404</p>
           <h1 className="mb-2 text-2xl font-bold text-white">Film Fogged</h1>

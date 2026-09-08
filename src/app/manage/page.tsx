@@ -27,7 +27,7 @@ export default async function ManagePage() {
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <Header />
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
         <header className="mb-6">
           <h1 className="text-2xl font-black text-white tracking-tight">Your work</h1>
           <p className="text-neutral-500 text-sm mt-1">

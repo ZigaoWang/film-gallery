@@ -168,7 +168,7 @@ export default function EditAlbumPage() {
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <ClientHeader />
 
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         <div className="max-w-6xl mx-auto px-6 py-10">
           <h1 className="text-3xl font-black text-white mb-8 tracking-tight">Edit Album</h1>
 

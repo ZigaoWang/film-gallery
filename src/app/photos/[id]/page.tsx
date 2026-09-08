@@ -277,7 +277,7 @@ export default async function PhotoPage({
       />
       <Header />
 
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         {/*
           The heading for the page, which had none: the only heading on a photo
           page was the h2 over "More like this", so a screen reader moving by

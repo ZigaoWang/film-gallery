@@ -63,32 +63,51 @@ const PhotoTile = memo(function PhotoTile({
   onSelect: (index: number) => void
   onRemove: (index: number) => void
 }) {
+  // Selecting a tile switches the panel beside the grid to that photograph's
+  // own caption, camera, film and visibility. It was a div with an onClick, so
+  // that panel could only be reached with a pointer: tabbing through the grid
+  // went from one tile's Remove button to the next tile's Remove button and
+  // never focused a tile. A real button gets Enter and Space for free, and
+  // aria-pressed says which one is showing, which the red ring alone did not.
+  //
+  // The remove control is a sibling rather than a child, because a button
+  // inside a button is not something a browser will render as either.
   return (
     <div
-      onClick={() => onSelect(index)}
-      className={`aspect-square overflow-hidden bg-neutral-900 relative cursor-pointer transition-all ${
+      className={`aspect-square overflow-hidden bg-neutral-900 relative transition-all ${
         selected ? 'ring-2 ring-brand scale-[1.02]' : 'hover:opacity-80'
       }`}
     >
+      <button
+        type="button"
+        onClick={() => onSelect(index)}
+        aria-pressed={selected}
+        aria-label={`Photo ${index + 1}${selected ? ', showing its details' : ''}`}
+        className="absolute inset-0 z-0 cursor-pointer
+                   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px]
+                   focus-visible:outline-brand"
+      />
       {/* eslint-disable-next-line @next/next/no-img-element -- a blob URL from
           the local file, which next/image cannot optimize. */}
-      <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+      <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover pointer-events-none" />
       <button
+        type="button"
         onClick={(e) => { e.stopPropagation(); onRemove(index) }}
-        className="absolute top-1.5 left-1.5 text-white hover:text-red-500 z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
-        title="Remove"
+        className="absolute top-1.5 left-1.5 grid h-9 w-9 place-items-center text-white hover:text-red-500 z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]
+                   focus-visible:outline focus-visible:outline-1 focus-visible:outline-brand"
+        aria-label={`Remove photo ${index + 1}`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       {status === 'uploading' && (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+        <div className="absolute inset-0 z-10 bg-black/70 flex items-center justify-center pointer-events-none">
           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
         </div>
       )}
       {status === 'done' && (
-        <div className="absolute top-1 right-1 w-5 h-5 bg-[#1B5E20] border border-[#2E7D32] rounded-full flex items-center justify-center shadow">
+        <div className="absolute top-1 right-1 z-10 w-5 h-5 bg-[#1B5E20] border border-[#2E7D32] rounded-full flex items-center justify-center shadow pointer-events-none">
           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
@@ -96,22 +115,29 @@ const PhotoTile = memo(function PhotoTile({
       )}
       {status === 'error' && (
         <>
-          <div
-            className="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow"
-            title={error ?? 'Upload failed.'}
-          >
+          <div className="absolute top-1 right-1 z-10 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow pointer-events-none">
             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <div className="absolute inset-x-0 bottom-0 bg-red-950/90 px-1.5 py-1 text-[10px] leading-tight text-red-200">
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-red-950/90 px-1.5 py-1 text-[10px] leading-tight text-red-200 pointer-events-none">
             {error ?? 'Upload failed.'}
           </div>
         </>
       )}
       {hasCustomMeta && (
-        <div className="absolute bottom-1 left-1 w-2 h-2 bg-blue-500 rounded-full" title="Has custom metadata" />
+        <div className="absolute bottom-1 left-1 z-10 w-2 h-2 bg-blue-500 rounded-full pointer-events-none" aria-hidden />
       )}
+
+      {/* Colour and an icon are the whole of the status otherwise, and the
+          explanation lived on a title attribute, which a screen reader is not
+          obliged to read. */}
+      <span className="sr-only">
+        {status === 'uploading' && 'Uploading'}
+        {status === 'done' && 'Uploaded'}
+        {status === 'error' && `Upload failed. ${error ?? ''}`}
+        {hasCustomMeta && ' Has its own details.'}
+      </span>
     </div>
   )
 })
@@ -608,7 +634,7 @@ function UploadPageContent() {
   return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <ClientHeader />
-      <main className="flex-1 max-w-5xl mx-auto w-full py-12 px-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-5xl mx-auto w-full py-12 px-6">
         {/* Admin Upload As User Banner */}
         {targetUser && (
           <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-between">
@@ -643,13 +669,24 @@ function UploadPageContent() {
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Left: Upload & Preview */}
           <div className="lg:col-span-3 space-y-4">
+            {/* sr-only on the input, not `hidden`.
+                Tailwind's `hidden` is display:none, which takes the input out
+                of the tab order and out of the accessibility tree, and a
+                <label> cannot be focused in its place. Nothing else here
+                opens a file dialog and the drop zone needs a pointer, so
+                uploading a photograph — the thing this site is for — could
+                not be done from a keyboard at all. sr-only keeps it in the
+                tab order and invisible, and focus-within puts the ring on the
+                zone so the focus can be seen. */}
             <div
               onDrop={handleDrop}
               onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
               onDragLeave={e => { e.preventDefault(); setIsDragging(false) }}
-              className={`border-2 border-dashed p-10 text-center transition-all ${isDragging ? 'border-brand bg-brand/5' : 'border-neutral-700 hover:border-neutral-600'}`}
+              className={`border-2 border-dashed p-10 text-center transition-all
+                          focus-within:border-brand focus-within:ring-1 focus-within:ring-brand
+                          ${isDragging ? 'border-brand bg-brand/5' : 'border-neutral-700 hover:border-neutral-600'}`}
             >
-              <input type="file" multiple accept="image/*,.heic,.heif" onChange={e => { uploadFiles(Array.from(e.target.files || []).filter(isImageFile)); e.target.value = '' }} className="hidden" id="file-input" />
+              <input type="file" multiple accept="image/*,.heic,.heif" onChange={e => { uploadFiles(Array.from(e.target.files || []).filter(isImageFile)); e.target.value = '' }} className="sr-only" id="file-input" />
               <label htmlFor="file-input" className="cursor-pointer block">
                 <div className="text-neutral-400 mb-2">
                   <svg className="w-10 h-10 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">

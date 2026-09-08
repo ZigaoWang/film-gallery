@@ -64,7 +64,7 @@ export default async function MyAlbumsPage() {
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <Header />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full py-8 px-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl mx-auto w-full py-8 px-6">
         {/* The same header and tabs as /manage, so photos and albums read as
             two views of one area rather than two unrelated pages. */}
         <header className="mb-6">

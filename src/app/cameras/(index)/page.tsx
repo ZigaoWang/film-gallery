@@ -117,7 +117,7 @@ export default async function CamerasPage({
       />
       <Header />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full py-16 px-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl mx-auto w-full py-16 px-6">
         <div className="flex items-center justify-between mb-12">
           <div>
             <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Cameras</h1>

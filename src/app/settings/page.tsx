@@ -91,7 +91,7 @@ export default function SettingsPage() {
   if (loadFailed) return (
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <ClientHeader />
-      <main className="flex-1 flex items-center justify-center px-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 flex items-center justify-center px-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-2">Your settings could not be loaded</h1>
           <p className="text-neutral-500 mb-6">Nothing has been changed. Reloading the page usually works.</p>
@@ -215,9 +215,13 @@ export default function SettingsPage() {
                     (name || username || '?').charAt(0).toUpperCase()
                   )}
                 </div>
-                <label className="cursor-pointer bg-neutral-800 text-white px-4 py-2 text-sm hover:bg-neutral-700 transition-colors font-medium">
+                {/* sr-only rather than `hidden`, so the input keeps its place
+                    in the tab order. See the upload page: display:none leaves
+                    no keyboard route to the file dialog at all. */}
+                <label className="cursor-pointer bg-neutral-800 text-white px-4 py-2 text-sm hover:bg-neutral-700 transition-colors font-medium
+                                  focus-within:outline focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-brand">
                   Change Photo
-                  <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                  <input type="file" accept="image/*" onChange={handleAvatarChange} className="sr-only" />
                 </label>
               </div>
             </div>

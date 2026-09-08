@@ -147,13 +147,18 @@ export default async function Home() {
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <Header />
 
-      <HeroSection
-        items={mixedItems}
-        totalPhotos={totalPhotos}
-        totalFilms={totalFilms}
-        totalCameras={totalCameras}
-        isLoggedIn={!!session}
-      />
+      {/* The front page was the one page with no main landmark at all, so it
+          had nothing for "Skip to content" to reach and nothing for a screen
+          reader to jump to. */}
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+        <HeroSection
+          items={mixedItems}
+          totalPhotos={totalPhotos}
+          totalFilms={totalFilms}
+          totalCameras={totalCameras}
+          isLoggedIn={!!session}
+        />
+      </main>
 
       <Footer />
     </div>

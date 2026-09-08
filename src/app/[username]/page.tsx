@@ -251,7 +251,7 @@ export default async function UserPage({
       />
       <Header />
 
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         {/* Profile Header */}
         <div className="border-b border-neutral-900">
           <div className="max-w-7xl mx-auto px-6 py-12">

@@ -95,7 +95,7 @@ export default async function DiscoverAlbumsPage({
     <div className="min-h-dvh bg-[#0a0a0a] flex flex-col">
       <Header />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full py-16 px-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl mx-auto w-full py-16 px-6">
         <div className="mb-12">
           <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Discover Albums</h1>
           <p className="text-neutral-500">Photo collections put together by the community</p>

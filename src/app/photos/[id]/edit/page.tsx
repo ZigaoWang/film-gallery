@@ -221,7 +221,7 @@ export default function EditPhotoPage({ params }: { params: Promise<{ id: string
         </Link>
       </header>
 
-      <main className="max-w-xl mx-auto py-12 px-6">
+      <main id="main-content" tabIndex={-1} className="max-w-xl mx-auto py-12 px-6">
         <Link href={`/photos/${photoId}`} className="text-neutral-500 hover:text-white text-sm mb-6 inline-block">
           &larr; Back to Photo
         </Link>

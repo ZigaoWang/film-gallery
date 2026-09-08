@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           <AdminNav />
-          <main className="flex-1 min-w-0">{children}</main>
+          <main id="main-content" tabIndex={-1} className="flex-1 min-w-0">{children}</main>
         </div>
       </div>
       <Footer />

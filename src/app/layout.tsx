@@ -123,8 +123,13 @@ export default function RootLayout({
           tab through the whole header — logo, five nav links, search, sign in —
           before reaching the content, on every single navigation.
 
-          It targets a wrapper here rather than each page's own <main>, so it
-          works everywhere without every page having to remember an id.
+          It targets each page's own <main>, which every page now carries the
+          id on. It used to target a wrapper around {children} here, on the
+          theory that one id in one place could not be forgotten — but every
+          page renders its own <Header /> inside that wrapper, so the target
+          sat *above* the header and moving focus to it skipped nothing at all.
+          The next Tab landed on the logo, and then on the nine header controls
+          the link exists to bypass.
         */}
         <a
           href="#main-content"
@@ -134,11 +139,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <Providers>
-          <div id="main-content" tabIndex={-1} className="outline-none">
-            {children}
-          </div>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
