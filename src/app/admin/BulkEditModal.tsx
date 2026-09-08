@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ADMIN_RESOURCES, UNIQUE_FIELDS, type FieldSpec, type ResourceName } from '@/lib/admin/resources'
-import Button from '@/components/ui/Button'
+import Button, { iconButtonClass } from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useDialogBehavior } from '@/components/ui/dialog'
 import { FieldInput, groupFields, useReferenceOptions } from './fieldControls'
@@ -107,9 +107,9 @@ export default function BulkEditModal({
               Only the fields you tick are changed. The rest are left as they are.
             </p>
           </div>
-          <button onClick={onClose} aria-label="Close" className="text-neutral-500 hover:text-white p-2 -mr-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <button type="button" onClick={onClose} aria-label="Close" className={`${iconButtonClass} -mr-3`}>
+            <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>

@@ -139,14 +139,21 @@ function ToastRow({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string) 
       className={`animate-toast-in pointer-events-auto flex w-full max-w-sm items-start gap-3 px-4 py-3
                   text-sm font-medium shadow-lg shadow-black/50 ${TONE[toast.type]}`}
     >
-      <span className="min-w-0 flex-1 break-words">{toast.message}</span>
+      <span className="min-w-0 flex-1 break-words py-0.5">{toast.message}</span>
       <button
         type="button"
         onClick={() => onDismiss(toast.id)}
         aria-label="Dismiss"
-        className="-mr-1 mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center opacity-70
+        // Not the shared icon button: this one sits on a coloured fill, so it
+        // takes its colour from the toast and draws its ring in the same ink.
+        // Brand red on a red toast would be invisible.
+        //
+        // 40px, up from an explicit h-4 w-4. A toast dismisses itself on a
+        // timer, so this is the one control on the site people reach for
+        // against the clock, and it was the smallest.
+        className="-my-2 -mr-2.5 grid h-10 w-10 flex-shrink-0 place-items-center opacity-70
                    transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline
-                   focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-current"
+                   focus-visible:outline-1 focus-visible:-outline-offset-2 focus-visible:outline-current"
       >
         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useDialogBehavior } from './dialog'
 import { focusRingInset } from './focus'
+import { iconButtonClass } from './Button'
 
 /**
  * An overlay dialog, with the behavior a dialog has to have.
@@ -69,12 +70,10 @@ export default function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-neutral-500 transition-colors hover:text-white
-                       focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                       focus-visible:outline-brand"
+            className={`${iconButtonClass} -mr-3`}
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>

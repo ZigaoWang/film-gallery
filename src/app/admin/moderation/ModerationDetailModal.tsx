@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import { fieldClass, fieldClassMultiline } from '@/components/ui/Field'
-import Button from '@/components/ui/Button'
+import Button, { iconButtonClass } from '@/components/ui/Button'
 import { useDialogBehavior } from '@/components/ui/dialog'
 
 type Submission = {
@@ -148,12 +148,10 @@ export default function ModerationDetailModal({
             onClick={onClose}
             disabled={processing}
             aria-label="Close"
-            className="text-neutral-500 hover:text-white disabled:opacity-50
-                       focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                       focus-visible:outline-brand"
+            className={`${iconButtonClass} -mr-3`}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>

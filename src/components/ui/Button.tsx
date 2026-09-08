@@ -83,6 +83,25 @@ export default function Button({
   return <button className={classes(variant, size, fullWidth, className)} {...props} />
 }
 
+/**
+ * A square button whose entire content is an icon: a dialog's close, a
+ * toast's dismiss, a filter's clear.
+ *
+ * There were nine of these and no two were the same size — a bare 16px glyph
+ * with no padding, a 20px one, a 24px one, `p-1` around 16px, `p-2` around
+ * 20px. Most were under the 24px WCAG 2.5.8 asks for, and the smallest was
+ * the shared modal close that every list dialog inherits.
+ *
+ * 44px, which is the target the lightbox and the mobile menu already use and
+ * the size a finger actually needs. Callers that sit against a padded edge
+ * pull it back with a negative margin so the glyph, not the box, lines up.
+ */
+export const iconButtonClass = [
+  'grid h-11 w-11 place-items-center text-neutral-500 transition-colors',
+  'hover:text-white disabled:opacity-50 disabled:cursor-not-allowed',
+  focusRing,
+].join(' ')
+
 /** Same shape, for navigation rather than an action. */
 export function ButtonLink({
   variant = 'primary',

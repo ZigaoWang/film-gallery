@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from './ui/Toast'
 import FieldLabel, { FieldCaption } from '@/components/ui/FieldLabel'
 import { FieldHint } from '@/components/ui/Field'
-import Button from '@/components/ui/Button'
+import Button, { iconButtonClass } from '@/components/ui/Button'
 import { useDialogBehavior } from '@/components/ui/dialog'
 import CatalogFields from '@/components/CatalogFields'
 import { emptyDraft, resolvedFormat, type CatalogDraft } from '@/lib/catalogForm'
@@ -272,12 +272,10 @@ export default function SuggestEditModal({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="ml-4 flex-shrink-0 text-neutral-500 hover:text-white
-                         focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
-                         focus-visible:outline-brand"
+              className={`ml-2 -mr-3 flex-shrink-0 ${iconButtonClass}`}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
