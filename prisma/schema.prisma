@@ -920,7 +920,6 @@ model Collection {
   id          String            @id @default(cuid())
   name        String
   description String?
-  coverImage  String?
   featured    Boolean           @default(false)
   public      Boolean           @default(false)
   userId      String?
@@ -994,7 +993,6 @@ model ModerationSubmission {
   // Admin review
   reviewedBy  String? // Admin user ID
   reviewedAt  DateTime?
-  reviewNotes String? // Admin can add notes
 
   // Metadata
   createdAt DateTime @default(now())
