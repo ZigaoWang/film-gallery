@@ -418,19 +418,20 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
                         className={`${fieldClassMultiline} resize-y`}
                       />
                       <div className="flex items-center gap-2 mt-2">
-                        <button
+                        {/* Both on the shared scale, so the pair stays level:
+                            these were h-7, four pixels under the smallest
+                            size, and the Cancel beside it was font-medium
+                            where every other dismissal is bold. */}
+                        <Button
+                          size="sm"
                           onClick={() => saveEdit(n.id)}
                           disabled={savingEdit || editContent.trim().length < MIN_LEN}
-                          className="bg-brand hover:bg-brand-dark text-white text-xs px-4 h-7 uppercase tracking-wide font-bold transition-colors disabled:opacity-40"
                         >
                           {savingEdit ? 'Saving…' : 'Save'}
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="text-neutral-500 hover:text-white text-xs uppercase tracking-wide font-medium px-2 h-7 transition-colors"
-                        >
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
                           Cancel
-                        </button>
+                        </Button>
                         <span className={`ml-auto text-xs ${editContent.trim().length < MIN_LEN ? 'text-amber-500' : 'text-neutral-600'}`}>
                           {editContent.trim().length}/{MAX_LEN}
                         </span>

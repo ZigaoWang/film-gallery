@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ADMIN_RESOURCES, type FieldSpec, type ResourceName } from '@/lib/admin/resources'
+import Button from '@/components/ui/Button'
 import { useDialogBehavior } from '@/components/ui/dialog'
 import { FieldInput, groupFields, toInput, useReferenceOptions } from './fieldControls'
 
@@ -116,21 +117,12 @@ export default function EditRecordModal({
           ))}
 
           <div className="flex justify-end gap-2 pt-2 border-t border-neutral-800 mt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={busy}
-              className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-40"
-            >
+            <Button type="button" variant="secondary" size="sm" onClick={onClose} disabled={busy}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={busy}
-              className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark disabled:opacity-40"
-            >
+            </Button>
+            <Button type="submit" size="sm" disabled={busy}>
               {busy ? 'Saving…' : row ? 'Save changes' : 'Create'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

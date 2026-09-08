@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Combobox from '@/components/Combobox'
+import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
@@ -371,22 +372,17 @@ export default function ManagePhotos() {
               </Field>
 
               <div className="flex items-center gap-2 ml-auto">
-                <button
+                <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={() => setConfirmingDelete(true)}
                   disabled={busy}
-                  className="h-9 px-4 text-xs uppercase tracking-wide font-bold text-neutral-400 hover:text-brand
-                             border border-neutral-800 hover:border-brand transition-colors disabled:opacity-40"
                 >
                   Delete
-                </button>
-                <button
-                  onClick={apply}
-                  disabled={busy || changeCount === 0}
-                  className="h-9 px-5 text-xs uppercase tracking-wide font-bold bg-brand text-white
-                             hover:bg-brand-dark transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
+                </Button>
+                <Button size="sm" onClick={apply} disabled={busy || changeCount === 0}>
                   {busy ? 'Applying…' : changeCount === 0 ? 'Choose a change' : `Apply to ${selected.size}`}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

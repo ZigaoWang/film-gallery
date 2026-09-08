@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import Link from 'next/link'
+import Button, { ButtonLink } from '@/components/ui/Button'
 
 /**
  * What a reader sees when a page throws.
@@ -25,20 +25,8 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           The problem is on our side, not yours. Trying again often works. Nothing you did has been lost.
         </p>
         <div className="flex items-center justify-center gap-3">
-          <button
-            onClick={reset}
-            className="inline-flex items-center justify-center h-10 px-5 text-sm uppercase tracking-wide font-bold
-                       bg-brand text-white hover:bg-brand-dark transition-colors"
-          >
-            Try again
-          </button>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center h-10 px-5 text-sm uppercase tracking-wide font-bold
-                       bg-neutral-800 text-white hover:bg-neutral-700 transition-colors"
-          >
-            Go home
-          </Link>
+          <Button onClick={reset}>Try again</Button>
+          <ButtonLink href="/" variant="secondary">Go home</ButtonLink>
         </div>
         {/* The digest is what ties this to a line in the server log. */}
         {error.digest && (

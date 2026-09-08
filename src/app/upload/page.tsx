@@ -712,9 +712,9 @@ function UploadPageContent() {
                     <span className="text-neutral-600 ml-2">/ {previews.length} total</span>
                   </span>
                   {isIndividual && (
-                    <button onClick={() => setSelectedIdx(null)} className="px-3 py-1 bg-brand text-white text-xs font-medium hover:bg-brand-dark">
-                      ← All Photos
-                    </button>
+                    <Button size="sm" onClick={() => setSelectedIdx(null)}>
+                      ← All photos
+                    </Button>
                   )}
                 </div>
 

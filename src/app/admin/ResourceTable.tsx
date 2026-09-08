@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ADMIN_RESOURCES, VALUE_LABELS, displayValue, type BulkAction, type ResourceName, type ResourceSpec } from '@/lib/admin/resources'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
+import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import EditRecordModal from './EditRecordModal'
 import BulkEditModal from './BulkEditModal'
@@ -326,12 +327,9 @@ export default function ResourceTable<F extends string>({ resource, filters, def
           <p className="text-neutral-500 text-sm mt-1">{spec.description}</p>
         </div>
         {spec.creatable && (
-          <button
-            onClick={() => setCreating(true)}
-            className="shrink-0 px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark"
-          >
+          <Button size="sm" className="shrink-0" onClick={() => setCreating(true)}>
             New {spec.label.toLowerCase()}
-          </button>
+          </Button>
         )}
       </header>
 

@@ -12,7 +12,7 @@ import Link from 'next/link'
  * default here and the sentence-case one-offs move onto it.
  */
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'outline'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'destructive'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANTS: Record<Variant, string> = {
@@ -25,6 +25,17 @@ const VARIANTS: Record<Variant, string> = {
   /** Present but not urgent, e.g. an empty-state prompt. */
   outline:
     'border border-neutral-800 text-neutral-300 hover:border-neutral-600 hover:text-white',
+  /**
+   * Deleting something, and saying so on the way to the confirmation.
+   *
+   * Neutral until it is pointed at, then red. Not a red fill: brand red is
+   * what `primary` already is, so a filled destructive button would be
+   * indistinguishable from the action a screen wants you to take. Reaching
+   * for red on hover is the signal the delete controls had each built for
+   * themselves, which is why every one of them was hand-rolled.
+   */
+  destructive:
+    'border border-neutral-800 text-neutral-400 hover:border-brand hover:text-brand',
 }
 
 const SIZES: Record<Size, string> = {

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
 import { textLinkClass } from '@/components/ui/TextLink'
+import Button from '@/components/ui/Button'
 import EmptyState from '@/components/ui/EmptyState'
 
 /**
@@ -357,14 +358,13 @@ export default function RevisionQueue() {
                   ? `${acceptCount} of ${revision.fields.length} accepted`
                   : `${revision.fields.length - decidedCount} still to decide`}
               </p>
-              <button
+              <Button
+                size="sm"
                 onClick={() => submit(revision)}
                 disabled={busy === revision.id || !allDecided}
-                className="h-9 bg-brand px-4 text-xs font-bold uppercase tracking-wide text-white
-                           hover:bg-brand-dark disabled:opacity-40"
               >
                 {busy === revision.id ? 'Saving…' : 'Apply decision'}
-              </button>
+              </Button>
             </footer>
           </article>
         )
