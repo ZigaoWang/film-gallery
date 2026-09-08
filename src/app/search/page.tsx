@@ -11,6 +11,13 @@ import type { Metadata } from 'next'
 import { SITE_URL } from '@/lib/seo/site'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/resolve'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
+import {
+  previewPhotosByGear,
+  groupPreviews,
+  VISIBLE_TO_ANYONE,
+  notHidden,
+  PREVIEW_PHOTOS,
+} from '@/lib/previewPhotos'
 import { hiddenFilter, hiddenUserIds } from '@/lib/blocks'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -111,7 +118,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       // queries, so a body findable in one was missing from the other.
       where: { id: { in: cameraIds } },
       include: {
-        photos: { where: photoScope, take: 4, orderBy: { createdAt: 'desc' } },
         _count: { select: { photos: { where: photoScope } } }
       },
       orderBy: { name: 'asc' },
@@ -126,13 +132,33 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         // actually makes it in the same words the film page uses.
         brandRef: { select: { name: true } },
         manufacturedBy: { select: { name: true } },
-        photos: { where: photoScope, take: 4, orderBy: { createdAt: 'desc' } },
         _count: { select: { photos: { where: photoScope } } }
       },
       orderBy: { name: 'asc' },
       take: 50
     }) : []
     ])
+
+  // The preview strips, picked in SQL now that the results are known. Asking
+  // Prisma for four photos per result fetched *every* photo of all hundred
+  // matched cameras and film stocks and kept four of each, so searching a
+  // common word was the most expensive page on the site.
+  const [cameraPreviews, filmPreviews] = await Promise.all([
+    previewPhotosByGear({
+      key: 'cameraId',
+      parents: cameras.map((c) => c.id),
+      where: Prisma.sql`${VISIBLE_TO_ANYONE} ${notHidden(hiddenIds)}`,
+      order: 'recent',
+    }),
+    previewPhotosByGear({
+      key: 'filmStockId',
+      parents: films.map((f) => f.id),
+      where: Prisma.sql`${VISIBLE_TO_ANYONE} ${notHidden(hiddenIds)}`,
+      order: 'recent',
+    }),
+  ])
+  const photosByCamera = groupPreviews(cameraPreviews, 'cameraId')
+  const photosByFilm = groupPreviews(filmPreviews, 'filmStockId')
 
   const tabs = [
     { id: 'all', label: 'All' },
@@ -216,6 +242,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {cameras.map(camera => {
                 const displayImage = camera.imageStatus === 'approved' ? camera.imageUrl : null
+                const previews = photosByCamera.get(camera.id) ?? []
                 return (
                   <Link
                     key={camera.id}
@@ -224,12 +251,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   >
                     {/* Photo Grid */}
                     <div className="grid grid-cols-4 gap-px bg-neutral-800">
-                      {camera.photos.slice(0, 4).map((photo) => (
+                      {previews.map((photo) => (
                         <div key={photo.id} className="aspect-square relative bg-neutral-900">
                           <Image src={photo.thumbnailPath} alt="" fill className="object-cover" sizes="100px" />
                         </div>
                       ))}
-                      {Array.from({ length: Math.max(0, 4 - camera.photos.length) }).map((_, i) => (
+                      {Array.from({ length: Math.max(0, PREVIEW_PHOTOS - previews.length) }).map((_, i) => (
                         <div key={i} className="aspect-square bg-neutral-900" />
                       ))}
                     </div>
@@ -297,6 +324,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {films.map(film => {
                 const displayImage = film.imageStatus === 'approved' ? film.imageUrl : null
+                const previews = photosByFilm.get(film.id) ?? []
                 return (
                   <Link
                     key={film.id}
@@ -305,12 +333,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   >
                     {/* Photo Grid */}
                     <div className="grid grid-cols-4 gap-px bg-neutral-800">
-                      {film.photos.slice(0, 4).map((photo) => (
+                      {previews.map((photo) => (
                         <div key={photo.id} className="aspect-square relative bg-neutral-900">
                           <Image src={photo.thumbnailPath} alt="" fill className="object-cover" sizes="100px" />
                         </div>
                       ))}
-                      {Array.from({ length: Math.max(0, 4 - film.photos.length) }).map((_, i) => (
+                      {Array.from({ length: Math.max(0, PREVIEW_PHOTOS - previews.length) }).map((_, i) => (
                         <div key={i} className="aspect-square bg-neutral-900" />
                       ))}
                     </div>
