@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { FEEDBACK_STATUSES, feedbackKindLabel, isFeedbackStatus } from '@/lib/feedback'
 import FeedbackItem, { type AdminFeedback } from './FeedbackItem'
+import EmptyState from '@/components/ui/EmptyState'
 import type { FeedbackStatus } from '@prisma/client'
 import { formatDate } from '@/lib/formatDate'
 
@@ -114,9 +115,7 @@ export default async function AdminFeedbackPage({
       </nav>
 
       {rows.length === 0 ? (
-        <p className="text-neutral-500 text-sm border border-neutral-900 px-4 py-8 text-center">
-          {active === 'OPEN' ? 'No open feedback.' : 'Nothing here.'}
-        </p>
+        <EmptyState size="compact" message={active === 'OPEN' ? 'No open feedback.' : 'Nothing here.'} />
       ) : (
         <div className="space-y-4">
           {rows.map((item) => (
