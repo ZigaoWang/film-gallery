@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, useEffect, useRef, memo, Suspense } from 'react'
+import { useState, useCallback, useEffect, useId, useRef, memo, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Combobox from '@/components/Combobox'
@@ -143,6 +143,10 @@ const PhotoTile = memo(function PhotoTile({
 })
 
 function UploadPageContent() {
+  // Prefix for this form's control ids, so a label points at its own field
+  // even when the page renders the form twice.
+  const fid = useId()
+
   const { status } = useSession()
   const router = useRouter()
   const { toast } = useToast()
@@ -794,8 +798,9 @@ function UploadPageContent() {
               </div>
 
               <div>
-                <FieldLabel>Caption</FieldLabel>
+                <FieldLabel htmlFor={`${fid}-caption`}>Caption</FieldLabel>
                 <input
+                  id={`${fid}-caption`}
                   type="text"
                   value={currentMeta.caption}
                   onChange={e => setCurrentMeta({ ...currentMeta, caption: e.target.value })}
@@ -809,7 +814,7 @@ function UploadPageContent() {
                     be a placeholder, which a date input never renders, so the
                     one person who needed to know there was no default to fall
                     back on was the one person who could not see it. */}
-                <FieldLabel
+                <FieldLabel htmlFor={`${fid}-taken-date`}
                   hint={
                     isIndividual
                       ? bulkMeta.takenDate
@@ -821,6 +826,7 @@ function UploadPageContent() {
                   Date taken
                 </FieldLabel>
                 <input
+                  id={`${fid}-taken-date`}
                   type="date"
                   value={currentMeta.takenDate}
                   onChange={e => setCurrentMeta({ ...currentMeta, takenDate: e.target.value })}
@@ -887,10 +893,11 @@ function UploadPageContent() {
                   {addToAlbum && (
                     <div className="pt-2 space-y-3 border-t border-neutral-800">
                       <div>
-                        <FieldLabel>
+                        <FieldLabel htmlFor={`${fid}-album-select`}>
                           {selectedAlbumId ? 'Add to Existing Album' : 'Create New Album'}
                         </FieldLabel>
                         <select
+                          id={`${fid}-album-select`}
                           value={selectedAlbumId}
                           onChange={e => {
                             setSelectedAlbumId(e.target.value)
@@ -912,8 +919,9 @@ function UploadPageContent() {
                       {!selectedAlbumId && (
                         <>
                           <div>
-                            <FieldLabel>Album name</FieldLabel>
+                            <FieldLabel htmlFor={`${fid}-album-name`}>Album name</FieldLabel>
                             <input
+                              id={`${fid}-album-name`}
                               type="text"
                               value={albumName}
                               onChange={e => setAlbumName(e.target.value)}

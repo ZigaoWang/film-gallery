@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useId } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -82,6 +82,7 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
   const [savingEdit, setSavingEdit] = useState(false)
   const [voting, setVoting] = useState<Set<string>>(new Set())
   const composerRef = useRef<HTMLTextAreaElement>(null)
+  const composerId = useId()
   const panelRef = useDialogBehavior({
     open: showComposer,
     onClose: () => setShowComposer(false),
@@ -525,10 +526,11 @@ export default function CommunityNotes({ targetType, targetId, targetLabel }: Pr
               </div>
 
               <form onSubmit={submit}>
-                <FieldLabel>
+                <FieldLabel htmlFor={composerId}>
                   Your take
                 </FieldLabel>
                 <textarea
+                  id={composerId}
                   ref={composerRef}
                   value={content}
                   onChange={e => setContent(e.target.value.slice(0, MAX_LEN))}

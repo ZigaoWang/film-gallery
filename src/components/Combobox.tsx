@@ -93,6 +93,11 @@ export default function Combobox({ options, value, onChange, placeholder, label,
     ...filtered.map((option) => ({ kind: 'option', option }) as Row),
   ]
   const rowId = (index: number) => `${listId}-row-${index}`
+  // Derived from listId so the pair cannot drift. Without an id here the
+  // label was a <label> pointing at nothing, so "Camera" and "Film stock"
+  // on the upload form were visible text next to an unnamed combobox: a
+  // screen reader announced the role and the value and never the question.
+  const inputId = `${listId}-input`
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -238,7 +243,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
 
   return (
     <div ref={containerRef} className="relative">
-      <FieldLabel>
+      <FieldLabel htmlFor={inputId}>
         {label}
       </FieldLabel>
 
@@ -253,6 +258,7 @@ export default function Combobox({ options, value, onChange, placeholder, label,
 
       <input
         ref={inputRef}
+        id={inputId}
         type="text"
         role="combobox"
         aria-expanded={open && !disabled}

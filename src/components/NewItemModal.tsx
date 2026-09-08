@@ -3,7 +3,7 @@
 import { useState, useEffect, useId, useRef } from 'react'
 import Image from 'next/image'
 import type { NewItemPayload } from '@/lib/newItemForm'
-import FieldLabel from '@/components/ui/FieldLabel'
+import FieldLabel, { FieldCaption } from '@/components/ui/FieldLabel'
 import { FieldHint } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { useDialogBehavior } from '@/components/ui/dialog'
@@ -171,7 +171,7 @@ export default function NewItemModal({
 
             {previewUrl && (
               <div>
-                <FieldLabel>Preview</FieldLabel>
+                <FieldCaption>Preview</FieldCaption>
                 <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
                   <Image src={previewUrl} alt="" fill className="object-contain" />
                 </div>

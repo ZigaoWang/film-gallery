@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Combobox from '@/components/Combobox'
-import FieldLabel from '@/components/ui/FieldLabel'
+import FieldLabel, { FieldCaption } from '@/components/ui/FieldLabel'
 import { FieldHint, fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import { FORMATS } from '@/lib/constants'
 import {
@@ -51,7 +51,7 @@ const PROCESS_IMPLIES: Record<string, { colorBalance?: string }> = {
 function DerivedField({ label, value, from }: { label: string; value: string; from: string }) {
   return (
     <div>
-      <FieldLabel>{label}</FieldLabel>
+      <FieldCaption>{label}</FieldCaption>
       <div
         className="flex h-10 items-center border border-neutral-700 bg-neutral-900/60 px-3 text-sm text-neutral-300"
         aria-readonly="true"

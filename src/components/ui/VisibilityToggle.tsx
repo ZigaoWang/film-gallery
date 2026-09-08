@@ -1,4 +1,4 @@
-import FieldLabel from './FieldLabel'
+import { FieldCaption } from './FieldLabel'
 
 /**
  * Who can see a photo. The same control on the upload page, the edit page and
@@ -63,7 +63,9 @@ export default function VisibilityToggle({
 
   return (
     <div>
-      {label && <FieldLabel>{label}</FieldLabel>}
+      {/* Names the group below, which carries its own aria-label, so this is
+          text rather than a label pointing at no single control. */}
+      {label && <FieldCaption>{label}</FieldCaption>}
 
       <div className="flex border border-neutral-700" role="group" aria-label={label ?? 'Visibility'}>
         {options.map((option) => {

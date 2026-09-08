@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useToast } from './ui/Toast'
-import FieldLabel from '@/components/ui/FieldLabel'
+import FieldLabel, { FieldCaption } from '@/components/ui/FieldLabel'
 import { FieldHint } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { useDialogBehavior } from '@/components/ui/dialog'
@@ -319,7 +319,7 @@ export default function SuggestEditModal({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {currentImage && (
               <div>
-                <FieldLabel>Current image</FieldLabel>
+                <FieldCaption>Current image</FieldCaption>
                 <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
                   <Image src={currentImage} alt={name} fill className="object-contain" />
                 </div>
@@ -327,7 +327,7 @@ export default function SuggestEditModal({
             )}
             {previewUrl && (
               <div>
-                <FieldLabel>Replacement</FieldLabel>
+                <FieldCaption>Replacement</FieldCaption>
                 <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
                   <Image src={previewUrl} alt="" fill className="object-contain" />
                 </div>

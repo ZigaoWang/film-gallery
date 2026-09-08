@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -20,6 +20,10 @@ type Photo = {
 }
 
 export default function CreateAlbumPage() {
+  // Prefix for this form's control ids, so a label points at its own field
+  // even when the page renders the form twice.
+  const fid = useId()
+
   const { status } = useSession()
   const router = useRouter()
   const { toast } = useToast()
@@ -116,8 +120,9 @@ export default function CreateAlbumPage() {
             <div className="lg:col-span-1 space-y-5">
               <div className="bg-neutral-900/50 border border-neutral-800 p-5 space-y-5 sticky top-6">
                 <div>
-                  <FieldLabel required>Album name</FieldLabel>
+                  <FieldLabel htmlFor={`${fid}-album-name`} required>Album name</FieldLabel>
                   <input
+                    id={`${fid}-album-name`}
                     type="text"
                     value={albumName}
                     onChange={e => setAlbumName(e.target.value)}
@@ -127,8 +132,9 @@ export default function CreateAlbumPage() {
                 </div>
 
                 <div>
-                  <FieldLabel>Description</FieldLabel>
+                  <FieldLabel htmlFor={`${fid}-album-description`}>Description</FieldLabel>
                   <textarea
+                    id={`${fid}-album-description`}
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                     placeholder="Optional description…"

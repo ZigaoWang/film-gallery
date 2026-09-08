@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useId, useRef, useCallback } from 'react'
 import FieldLabel from '@/components/ui/FieldLabel'
 import { fieldClass } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
@@ -75,6 +75,10 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
   // Always open: the parent mounts this component only while the dialog is
   // showing, and unmounts it to close.
   const panelRef = useDialogBehavior({ open: true, onClose })
+  // Prefix for this form's control ids, so a label points at its own field
+  // even when the page renders the form twice.
+  const fid = useId()
+
 
   const [style, setStyle] = useState<ExportStyle>('clean')
   const supports = SUPPORTS[style]
@@ -439,10 +443,11 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
 
               {supports.byline && showDate && (
                 <div>
-                  <FieldLabel>
+                  <FieldLabel htmlFor={`${fid}-date`}>
                     {takenDate ? 'Date (from photo taken date)' : 'Date'}
                   </FieldLabel>
                   <input
+                    id={`${fid}-date`}
                     type="date"
                     value={customDate}
                     onChange={(e) => setCustomDate(e.target.value)}
@@ -454,8 +459,9 @@ export default function WatermarkGenerator({ photoId, camera, filmStock, takenDa
               {supports.caption && showCaption && (
                 <>
                   <div>
-                    <FieldLabel>Caption</FieldLabel>
+                    <FieldLabel htmlFor={`${fid}-caption`}>Caption</FieldLabel>
                     <input
+                      id={`${fid}-caption`}
                       type="text"
                       value={customCaption}
                       onChange={(e) => setCustomCaption(e.target.value)}

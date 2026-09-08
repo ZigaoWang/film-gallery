@@ -42,3 +42,28 @@ export default function FieldLabel({
     </label>
   )
 }
+
+/**
+ * The same line of text above something that is not a form control.
+ *
+ * A `<label>` is a promise that there is one control it names, and several of
+ * these sat over things that cannot take focus: a picture preview, a derived
+ * read-only value, a radio group that carries its own `aria-label`. A label
+ * pointing at nothing is worse than no label, because a screen reader offers
+ * it as a way into a control that is not there.
+ *
+ * Identical styling, so nothing moves; it is the element that changes.
+ */
+export function FieldCaption({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <p className={`block text-xs font-medium text-neutral-400 mb-2 ${className}`.trim()}>
+      {children}
+    </p>
+  )
+}

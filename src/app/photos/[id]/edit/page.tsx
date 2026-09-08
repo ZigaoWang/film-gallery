@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -27,6 +27,10 @@ type Camera = {
 type Photo = { id: string; userId: string; caption: string | null; cameraId: string | null; filmStockId: string | null; takenDate: string | null; visibility: Visibility }
 
 export default function EditPhotoPage({ params }: { params: Promise<{ id: string }> }) {
+  // Prefix for this form's control ids, so a label points at its own field
+  // even when the page renders the form twice.
+  const fid = useId()
+
   const { data: session, status } = useSession()
   const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null
   const router = useRouter()
@@ -229,8 +233,9 @@ export default function EditPhotoPage({ params }: { params: Promise<{ id: string
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <FieldLabel>Caption</FieldLabel>
+            <FieldLabel htmlFor={`${fid}-caption`}>Caption</FieldLabel>
             <input
+              id={`${fid}-caption`}
               type="text"
               value={caption}
               onChange={e => setCaption(e.target.value)}
@@ -239,8 +244,9 @@ export default function EditPhotoPage({ params }: { params: Promise<{ id: string
           </div>
 
           <div>
-            <FieldLabel>Date taken</FieldLabel>
+            <FieldLabel htmlFor={`${fid}-taken-date`}>Date taken</FieldLabel>
             <input
+              id={`${fid}-taken-date`}
               type="date"
               value={takenDate}
               onChange={e => setTakenDate(e.target.value)}

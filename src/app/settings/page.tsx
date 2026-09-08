@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -13,6 +13,9 @@ import Button from '@/components/ui/Button'
 import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password'
 
 export default function SettingsPage() {
+  // One prefix for the page's field ids, so every label points at its own
+  // control and nothing collides if this ever renders twice.
+  const fid = useId()
   const { status, update } = useSession()
   const router = useRouter()
   const { toast } = useToast()
@@ -206,7 +209,7 @@ export default function SettingsPage() {
           <h2 className="text-sm font-bold text-neutral-300 uppercase tracking-wider mb-6 pb-2 border-b border-neutral-800">Profile</h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <FieldLabel>Avatar</FieldLabel>
+              <p className="block text-xs font-medium text-neutral-400 mb-2">Avatar</p>
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 bg-neutral-800 flex items-center justify-center text-white text-2xl font-bold overflow-hidden shrink-0">
                   {avatar ? (
@@ -227,33 +230,33 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <FieldLabel>Username</FieldLabel>
-              <input type="text" value={username} disabled className={fieldClass} />
+              <FieldLabel htmlFor={`${fid}-username`}>Username</FieldLabel>
+              <input id={`${fid}-username`} type="text" value={username} disabled className={fieldClass} />
               <p className="text-neutral-600 text-xs mt-1">Username cannot be changed</p>
             </div>
 
             <div>
-              <FieldLabel>Email</FieldLabel>
-              <input type="email" value={email} disabled className={fieldClass} />
+              <FieldLabel htmlFor={`${fid}-email`}>Email</FieldLabel>
+              <input id={`${fid}-email`} type="email" value={email} disabled className={fieldClass} />
             </div>
 
             <div>
-              <FieldLabel>Display name</FieldLabel>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className={fieldClass} placeholder="Your name" />
+              <FieldLabel htmlFor={`${fid}-name`}>Display name</FieldLabel>
+              <input id={`${fid}-name`} type="text" value={name} onChange={e => setName(e.target.value)} className={fieldClass} placeholder="Your name" />
             </div>
 
             <div>
-              <FieldLabel>Bio</FieldLabel>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Tell us about yourself…" className={`${fieldClassMultiline} resize-none`} />
+              <FieldLabel htmlFor={`${fid}-bio`}>Bio</FieldLabel>
+              <textarea id={`${fid}-bio`} value={bio} onChange={e => setBio(e.target.value)} rows={3} placeholder="Tell us about yourself…" className={`${fieldClassMultiline} resize-none`} />
             </div>
 
             <div>
-              <FieldLabel>Website</FieldLabel>
-              <input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://yourwebsite.com" className={fieldClass} />
+              <FieldLabel htmlFor={`${fid}-website`}>Website</FieldLabel>
+              <input id={`${fid}-website`} type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://yourwebsite.com" className={fieldClass} />
             </div>
 
             <div>
-              <FieldLabel>Instagram</FieldLabel>
+              <FieldLabel htmlFor={`${fid}-instagram`}>Instagram</FieldLabel>
               <div className="flex">
                 {/* Matches the control it is joined to: same border color and
                     the same vertical padding. It used border-neutral-800
@@ -261,12 +264,12 @@ export default function SettingsPage() {
                     two halves of one control were a different height and a
                     different color where they met. */}
                 <span className="flex items-center bg-neutral-800 px-3 py-2.5 text-sm text-neutral-500 border border-r-0 border-neutral-700">@</span>
-                <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="username" className={`${fieldClass} flex-1`} />
+                <input id={`${fid}-instagram`} type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="username" className={`${fieldClass} flex-1`} />
               </div>
             </div>
 
             <div>
-              <FieldLabel>Twitter / X</FieldLabel>
+              <FieldLabel htmlFor={`${fid}-twitter`}>Twitter / X</FieldLabel>
               <div className="flex">
                 {/* Matches the control it is joined to: same border color and
                     the same vertical padding. It used border-neutral-800
@@ -274,7 +277,7 @@ export default function SettingsPage() {
                     two halves of one control were a different height and a
                     different color where they met. */}
                 <span className="flex items-center bg-neutral-800 px-3 py-2.5 text-sm text-neutral-500 border border-r-0 border-neutral-700">@</span>
-                <input type="text" value={twitter} onChange={e => setTwitter(e.target.value)} placeholder="username" className={`${fieldClass} flex-1`} />
+                <input id={`${fid}-twitter`} type="text" value={twitter} onChange={e => setTwitter(e.target.value)} placeholder="username" className={`${fieldClass} flex-1`} />
               </div>
             </div>
 
@@ -291,17 +294,17 @@ export default function SettingsPage() {
           <h2 className="text-sm font-bold text-neutral-300 uppercase tracking-wider mb-6 pb-2 border-b border-neutral-800">Change Password</h2>
           <form onSubmit={handlePasswordChange} className="space-y-5">
             <div>
-              <FieldLabel>Current password</FieldLabel>
-              <PasswordInput autoComplete="current-password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+              <FieldLabel htmlFor={`${fid}-current-password`}>Current password</FieldLabel>
+              <PasswordInput id={`${fid}-current-password`} autoComplete="current-password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
             </div>
             <div>
-              <FieldLabel>New password</FieldLabel>
-              <PasswordInput autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={MIN_PASSWORD_LENGTH} aria-describedby="new-password-hint" />
+              <FieldLabel htmlFor={`${fid}-new-password`}>New password</FieldLabel>
+              <PasswordInput id={`${fid}-new-password`} autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={MIN_PASSWORD_LENGTH} aria-describedby="new-password-hint" />
               <p id="new-password-hint" className="text-neutral-600 text-xs mt-1">At least {MIN_PASSWORD_LENGTH} characters.</p>
             </div>
             <div>
-              <FieldLabel>Confirm new password</FieldLabel>
-              <PasswordInput autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+              <FieldLabel htmlFor={`${fid}-confirm-password`}>Confirm new password</FieldLabel>
+              <PasswordInput id={`${fid}-confirm-password`} autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
             </div>
             <div className="pt-2">
               {/* The shared component, like every other submit on the site.
