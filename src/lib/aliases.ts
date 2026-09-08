@@ -16,19 +16,3 @@ export function usefulAliases(name: string, aliases: string[]): string[] {
   const haystack = name.toLowerCase().replace(/[^a-z0-9]/g, '')
   return aliases.filter(a => !haystack.includes(a.toLowerCase().replace(/[^a-z0-9]/g, '')))
 }
-
-/** For pickers that already hold the full list and filter in the browser. */
-export function matchesQuery(
-  record: { name: string; aliases?: string[] } & Record<string, unknown>,
-  query: string,
-  extraFields: string[] = []
-): boolean {
-  const q = query.trim().toLowerCase()
-  if (!q) return true
-  if (record.name.toLowerCase().includes(q)) return true
-  for (const field of extraFields) {
-    const value = record[field]
-    if (typeof value === 'string' && value.toLowerCase().includes(q)) return true
-  }
-  return (record.aliases ?? []).some(a => a.toLowerCase().includes(q))
-}

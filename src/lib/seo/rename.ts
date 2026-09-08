@@ -54,7 +54,7 @@ export async function reslugIfRenamed(
  * Exported so a caller can tell the difference between a rename that changes
  * the URL and one that does not — the admin table says so before saving.
  */
-export function nextSlug(
+function nextSlug(
   current: string | null,
   name: string,
   brand: string | null

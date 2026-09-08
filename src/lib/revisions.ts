@@ -356,19 +356,3 @@ export async function applyAdminEdit(
   })
 }
 
-/**
- * Earlier decisions on the same field, so a reviewer can see that something was
- * refused before and why.
- *
- * The escape hatch that makes rejection-as-event workable: rather than blocking
- * a re-proposal, show the reviewer the history and let them judge. A value
- * refused for lacking a citation and re-proposed with one is the system working.
- */
-export async function priorDecisions(entityType: EntityType, entityId: string) {
-  return prisma.revision.findMany({
-    where: { entityType, entityId, status: { in: ['REJECTED', 'PARTIAL'] } },
-    select: { id: true, rejectedFields: true, reviewedAt: true, source: true },
-    orderBy: { reviewedAt: 'desc' },
-    take: 10,
-  })
-}

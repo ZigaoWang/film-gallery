@@ -28,7 +28,7 @@ export async function hiddenUserIds(viewerId: string | null | undefined): Promis
 }
 
 /** Whether these two accounts have blocked each other in either direction. */
-export async function isBlockedBetween(a: string, b: string): Promise<boolean> {
+async function isBlockedBetween(a: string, b: string): Promise<boolean> {
   const found = await prisma.block.findFirst({
     where: { OR: [{ blockerId: a, blockedId: b }, { blockerId: b, blockedId: a }] },
     select: { id: true },

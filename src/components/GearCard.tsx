@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { displayName, gearImageAlt, makerAside, type NamedEntity } from '@/lib/seo/alt'
+import { gearImageAlt, makerAside, type NamedEntity } from '@/lib/seo/alt'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/slug'
 import { cameraSpecs, type CameraSpecSource } from '@/lib/cameraFields'
 import { filmSpecs, type FilmSpecSource } from '@/lib/filmFields'
@@ -115,9 +115,4 @@ export default function GearCard(props: GearCardProps) {
       )}
     </Link>
   )
-}
-
-/** The name as the card shows it, for a caller that needs the same string. */
-export function gearLabel(gear: NamedEntity): string {
-  return displayName(gear) ?? gear.name
 }

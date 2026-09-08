@@ -24,7 +24,7 @@ export function normalizeString(str: string): string {
  * Calculate Levenshtein distance between two strings
  * Returns the minimum number of edits needed to transform one string into another
  */
-export function levenshteinDistance(str1: string, str2: string): number {
+function levenshteinDistance(str1: string, str2: string): number {
   const len1 = str1.length
   const len2 = str2.length
 
@@ -56,7 +56,7 @@ export function levenshteinDistance(str1: string, str2: string): number {
  * Calculate similarity score between two strings (0-1 range)
  * 1 = identical, 0 = completely different
  */
-export function calculateSimilarity(str1: string, str2: string): number {
+function calculateSimilarity(str1: string, str2: string): number {
   const normalized1 = normalizeString(str1)
   const normalized2 = normalizeString(str2)
 

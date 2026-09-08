@@ -49,16 +49,6 @@ export function validateImageType(mimeType: string): boolean {
 }
 
 /**
- * Validate field length
- * @param str - String to validate
- * @param maxLength - Maximum allowed length
- * @returns True if string is within length limit
- */
-export function validateFieldLength(str: string, maxLength: number): boolean {
-  return str.length <= maxLength
-}
-
-/**
  * A query-string integer, clamped into a range it is safe to hand to Prisma.
  *
  * `parseInt` on absent or non-numeric input yields NaN, which reached `skip`

@@ -29,7 +29,7 @@ export async function legalVersion(): Promise<string> {
 
 let cached: string | null = null
 
-export async function legalMarkdown(): Promise<string> {
+async function legalMarkdown(): Promise<string> {
   if (!cached) {
     cached = await readFile(join(process.cwd(), 'legal.md'), 'utf8')
   }
