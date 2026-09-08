@@ -67,26 +67,31 @@ export default function AuthShell({
           </header>
 
           {/*
-            The photographs, below lg. The same packed collage as the wide
-            layout, just fed fewer frames.
+            The photographs, below lg: a short window onto the same packed
+            collage, fading out at the bottom.
 
-            Short because it is six photographs, not because it is a window
-            cropping a taller collage — so its height is whatever the packing
-            comes to and nothing is cut. Three tiles at a fixed ratio read as
-            three stock images; a masonry reads as a contact sheet, which is
-            what the site is.
+            The height is fixed and the columns are fed twelve frames, which
+            overflows it even on a 375px screen holding nothing but panoramas —
+            checked, because an under-filled band is the notch again. Letting the packing decide
+            the height instead left the three columns ending at three different
+            heights, which on six photographs is not a contact sheet, it is a
+            black notch in the corner.
 
-            Full width on a phone, where edge-to-edge photographs are the
-            point; aligned to the column from sm up, where a strip wider than
-            the form it introduces just looks loose.
+            The fade is what makes the cut deliberate. A hard edge across the
+            middle of a photograph reads as a bug; a fade into the page reads
+            as more of them below.
+
+            Aligned to the form's own measure, so its edges line up with the
+            fields under it.
           */}
           {hasPhotos && (
-            <div className="-mx-6 mt-8 sm:mx-0 lg:hidden" aria-hidden>
-              <Collage photos={photos.slice(0, 6)} columns={3} sizes="34vw" />
+            <div className="relative mt-8 h-44 overflow-hidden sm:h-52 lg:hidden" aria-hidden>
+              <Collage photos={photos.slice(0, 12)} columns={3} sizes="34vw" fill />
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
             </div>
           )}
 
-          <main id="main-content" tabIndex={-1} className="flex flex-1 items-center py-12 outline-none">
+          <main id="main-content" tabIndex={-1} className="flex flex-1 items-center pt-8 pb-12 outline-none lg:py-12">
             <div className="w-full lg:max-w-sm">
               <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">{title}</h1>
               <p className="mt-3 mb-8 text-neutral-400">{subtitle}</p>
