@@ -6,13 +6,17 @@ import { authOptions } from '@/lib/auth'
 import HeroSection from '@/components/HeroSection'
 import type { MasonryItem } from '@/components/HeroMasonry'
 import type { Metadata } from 'next'
-import { SITE_URL } from '@/lib/seo/site'
+import { OG_DEFAULT_IMAGE, SITE_URL } from '@/lib/seo/site'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'AvoidXray – Film Photography Community',
+  // Absolute, or the root layout's "%s – AvoidXray" template appends the brand
+  // to a title that already ends in it: "AvoidXray – Film Photography
+  // Community – AvoidXray". The template is right for every other page and
+  // wrong for the one whose title is the site's own name.
+  title: { absolute: 'AvoidXray – Film Photography Community' },
   description:
     'Browse real film photography organized by film stock and camera. See how Kodak, Fujifilm, Ilford and Cinestill stocks actually render before you buy a roll. Every frame is an unedited scan uploaded by the photographer who shot it.',
   keywords: [
@@ -30,7 +34,8 @@ export const metadata: Metadata = {
       'Real film photography organized by film stock and camera. See how a stock actually renders before you buy a roll.',
     url: SITE_URL,
     type: 'website',
-  },
+      images: [OG_DEFAULT_IMAGE],
+    },
 }
 
 /**

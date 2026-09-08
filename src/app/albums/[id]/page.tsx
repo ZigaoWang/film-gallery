@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import MasonryGrid from '@/components/MasonryGrid'
 import type { Metadata } from 'next'
-import { SITE_URL } from '@/lib/seo/site'
+import { OG_DEFAULT_IMAGE, SITE_URL } from '@/lib/seo/site'
 import EmptyState, { PhotoIcon } from '@/components/ui/EmptyState'
 import { visibleToViewer } from '@/lib/photoVisibility'
 import { feedScopeQuery } from '@/lib/photoFeed'
@@ -40,6 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description,
       type: 'website',
       url: `${SITE_URL}/albums/${id}`,
+      images: [OG_DEFAULT_IMAGE],
     },
     twitter: {
       card: 'summary',

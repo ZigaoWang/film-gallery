@@ -19,6 +19,7 @@ import BrowseFilters from '@/components/BrowseFilters'
 import EmptyState, { CameraIcon } from '@/components/ui/EmptyState'
 import { FORMATS } from '@/lib/constants'
 import { toBodyType, BODY_TYPES, BODY_TYPE_LABELS } from '@/lib/cameraFields'
+import { OG_DEFAULT_IMAGE } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Cameras',
@@ -27,7 +28,8 @@ export const metadata: Metadata = {
     title: 'Cameras – AvoidXray',
     description: 'Photos organized by camera, uploaded by the AvoidXray community.',
     url: 'https://avoidxray.com/cameras',
-  },
+      images: [OG_DEFAULT_IMAGE],
+    },
   alternates: {
     canonical: 'https://avoidxray.com/cameras',
   },

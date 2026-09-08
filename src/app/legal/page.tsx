@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { legalHtml } from '@/lib/legal'
-import { SITE_URL } from '@/lib/seo/site'
+import { OG_DEFAULT_IMAGE, SITE_URL } from '@/lib/seo/site'
 
 const DESCRIPTION =
   'The agreement between you and AvoidXray, and what we do with your data. What we expect from people posting here is in the guidelines.'
@@ -19,7 +19,8 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/legal`,
     type: 'article',
-  },
+      images: [OG_DEFAULT_IMAGE],
+    },
   twitter: {
     card: 'summary',
     title: 'Terms and Privacy – AvoidXray',

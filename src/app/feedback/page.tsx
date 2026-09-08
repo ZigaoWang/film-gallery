@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FeedbackForm from '@/components/FeedbackForm'
-import { SITE_URL } from '@/lib/seo/site'
+import { OG_DEFAULT_IMAGE, SITE_URL } from '@/lib/seo/site'
 import { textLinkClass } from '@/components/ui/TextLink'
 
 export const metadata: Metadata = {
@@ -15,7 +15,8 @@ export const metadata: Metadata = {
     title: 'Feedback – AvoidXray',
     description: 'Report a problem or suggest an improvement. No account required.',
     url: `${SITE_URL}/feedback`,
-  },
+      images: [OG_DEFAULT_IMAGE],
+    },
 }
 
 /**

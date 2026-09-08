@@ -18,6 +18,7 @@ import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { hiddenUserIds, hiddenFilter } from '@/lib/blocks'
+import { OG_DEFAULT_IMAGE } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Film Stocks',
@@ -26,7 +27,8 @@ export const metadata: Metadata = {
     title: 'Film Stocks – AvoidXray',
     description: 'Photos organized by film stock, uploaded by the AvoidXray community.',
     url: 'https://avoidxray.com/films',
-  },
+      images: [OG_DEFAULT_IMAGE],
+    },
   alternates: {
     canonical: 'https://avoidxray.com/films',
   },

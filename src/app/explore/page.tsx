@@ -11,6 +11,7 @@ import type { Metadata } from 'next'
 import { bylineUserSelect } from '@/lib/publicUser'
 import { feedOrderBy, feedWhere, isFeedTab, type FeedTab } from '@/lib/photoFeed'
 import { hiddenUserIds } from '@/lib/blocks'
+import { OG_DEFAULT_IMAGE } from '@/lib/seo/site'
 
 export const metadata: Metadata = {
   title: 'Explore',
@@ -19,7 +20,8 @@ export const metadata: Metadata = {
     title: 'Explore – AvoidXray',
     description: 'Film photography uploaded by the AvoidXray community.',
     url: 'https://avoidxray.com/explore',
-  },
+      images: [OG_DEFAULT_IMAGE],
+    },
   alternates: {
     canonical: 'https://avoidxray.com/explore',
   },

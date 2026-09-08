@@ -12,7 +12,7 @@ import { authOptions } from '@/lib/auth'
 import { lookupFilm, lookupCamera, canonicalFilmPath } from '@/lib/seo/resolve'
 import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
 import { displayName, article } from '@/lib/seo/alt'
-import { SITE_URL, comboUrl } from '@/lib/seo/site'
+import { OG_DEFAULT_IMAGE, SITE_URL, comboUrl } from '@/lib/seo/site'
 import { FEED_FIRST_PAGE, feedScopeQuery } from '@/lib/photoFeed'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
@@ -90,7 +90,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       `${cameraName} ${filmName} sample photos`,
       `${filmName} sample photos`,
     ],
-    openGraph: { title, description, type: 'website', url: canonical },
+    openGraph: { title, description, type: 'website', url: canonical,
+      images: [OG_DEFAULT_IMAGE],
+    },
     twitter: { card: 'summary_large_image', title, description },
     alternates: { canonical },
   }
