@@ -16,7 +16,18 @@ export default function RegisterForm() {
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
+  /**
+   * Null while the form is still up. Once the account exists, whether the
+   * verification email actually went out.
+   *
+   * The two cases used to be one. Registration answers 200 with an
+   * `emailWarning` when the send fails — the account is real, the link is
+   * not — and this form checked only `res.ok`, so it told people to go and
+   * look for a message that was never sent, and to wait 24 hours for it to
+   * expire.
+   */
+  const [created, setCreated] = useState<{ emailSent: boolean } | null>(null)
+  const [resending, setResending] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,8 +58,10 @@ export default function RegisterForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, acceptedTerms })
       })
-      if (res.ok) setSuccess(true)
-      else setError(await apiErrorMessage(res, 'Could not create your account'))
+      if (res.ok) {
+        const data = await res.json().catch(() => null)
+        setCreated({ emailSent: !data?.emailWarning })
+      } else setError(await apiErrorMessage(res, 'Could not create your account'))
     } catch {
       // Unhandled, a dropped connection rejected out of here with loading
       // still true, leaving the button reading "Creating…" for good.
@@ -58,11 +71,31 @@ export default function RegisterForm() {
     }
   }
 
-  // The "check your email" state replaces the form in place, so the shell —
-  // logo, photographs, footer — stays put around it rather than the page
+  const handleResend = async () => {
+    setResending(true)
+    setError('')
+    try {
+      const res = await fetch('/api/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email }),
+      })
+      if (res.ok) setCreated({ emailSent: true })
+      // Usually the per-address hourly limit, which is worth saying rather
+      // than leaving the button looking like it did nothing.
+      else setError(await apiErrorMessage(res, 'Could not send that email. Please try again shortly.'))
+    } catch {
+      setError('Could not reach the server. Check your connection and try again.')
+    } finally {
+      setResending(false)
+    }
+  }
+
+  // Both post-registration states replace the form in place, so the shell —
+  // logo, photographs, footer — stays put around them rather than the page
   // swapping for a bare centred message.
-  if (success) {
-    return (
+  if (created) {
+    return created.emailSent ? (
       <div role="status">
         <p className="mb-2 text-lg font-medium text-white">Check your email</p>
         <p className="mb-6 text-neutral-400">
@@ -75,6 +108,32 @@ export default function RegisterForm() {
             Go to sign in
           </Link>{' '}
           and we can send it again.
+        </p>
+      </div>
+    ) : (
+      <div role="status">
+        <p className="mb-2 text-lg font-medium text-white">Your account is ready</p>
+        <p className="mb-6 text-neutral-400">
+          We could not send the verification link to{' '}
+          <span className="text-white">{form.email}</span> just now. Your account is safe, so you can
+          ask for the link again.
+        </p>
+
+        {error && (
+          <div role="alert" className="mb-4 bg-brand text-white text-sm px-4 py-3">
+            {error}
+          </div>
+        )}
+        <Button onClick={handleResend} disabled={resending} fullWidth>
+          {resending ? 'Sending…' : 'Send the link again'}
+        </Button>
+
+        <p className="mt-4 text-sm text-neutral-500">
+          Still nothing?{' '}
+          <Link href="/login" className={textLinkClass}>
+            Go to sign in
+          </Link>{' '}
+          and try from there.
         </p>
       </div>
     )
