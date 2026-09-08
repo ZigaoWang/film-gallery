@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { uploadToOSS, deleteFromOSS } from '@/lib/oss'
+import { uploadToOSS, discardStoredImage } from '@/lib/oss'
 import { sendAdminModerationNotification } from '@/lib/email'
 import { processItemImage } from '@/lib/imageProcessing'
 import { sanitizeString, validateFileSize, validateImageType, VALIDATION_LIMITS } from '@/lib/validation'
 import { refuseOversizedBody } from '@/lib/requestBody'
-import { extractKeyFromUrl, generateImageKey } from '@/lib/ossUtils'
+import { generateImageKey } from '@/lib/ossUtils'
 import { enforceLimit } from '@/lib/rateLimit'
 import { LIMITS } from '@/lib/rateLimitPolicy'
 import { type SlugKind } from '@/lib/seo/rename'
@@ -314,22 +314,15 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
         // revision payload and is written separately. Its moderation state
         // belongs to the asset rather than to any column a revision can reach.
         if (proposedImageUrl) {
-          if (resource.imageUrl) {
-            const oldKey = extractKeyFromUrl(resource.imageUrl)
-            if (oldKey) {
-              try {
-                await deleteFromOSS(oldKey)
-              } catch (error) {
-                console.error('Failed to delete old image:', error)
-              }
-            }
-          }
+          const replaced = resource.imageUrl
           await config.updateResource(resourceId, {
             imageUrl: proposedImageUrl,
             imageUploadedBy: userId,
             imageUploadedAt: new Date(),
             imageStatus: 'approved',
           })
+          // Only now that the record names the new file.
+          await discardStoredImage(replaced)
         }
 
         const updatedResource = await config.findResource(resourceId)
@@ -407,10 +400,7 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
       // already failing, and a delete that cannot find its object has nothing
       // to report. The point is not to add storage nobody can account for on
       // top of the error being returned.
-      if (proposedImageUrl) {
-        const key = extractKeyFromUrl(proposedImageUrl)
-        if (key) await deleteFromOSS(key).catch(() => {})
-      }
+      await discardStoredImage(proposedImageUrl)
 
       return NextResponse.json(
         { success: false, error: 'Failed to save changes. Please try again.' } as ApiResponse,
@@ -460,26 +450,17 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
         )
       }
 
-      // Delete from OSS
-      if (resource.imageUrl) {
-        const key = extractKeyFromUrl(resource.imageUrl)
-        if (key) {
-          try {
-            await deleteFromOSS(key)
-            console.log(`[${config.resourceDisplayName}] Deleted image:`, key)
-          } catch (error) {
-            console.error(`[${config.resourceDisplayName}] Failed to delete image from OSS:`, error)
-          }
-        }
-      }
+      const removed = resource.imageUrl
 
-      // Update resource
       const updatedResource = await config.updateResource(resourceId, {
         imageUrl: null,
         imageStatus: 'none',
         imageUploadedBy: null,
         imageUploadedAt: null
       })
+
+      // Only now that the record has stopped naming the file.
+      await discardStoredImage(removed)
 
       return NextResponse.json({
         success: true,

@@ -3,8 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { Prisma } from '@prisma/client'
-import { deleteFromOSS } from '@/lib/oss'
-import { extractKeyFromUrl } from '@/lib/ossUtils'
+import { discardStoredImage } from '@/lib/oss'
 import { readJsonObject, invalidBody, asString, asObject } from '@/lib/requestBody'
 import { coerceEditableFields } from '@/lib/admin/resources'
 import { reslugIfRenamed } from '@/lib/seo/rename'
@@ -78,19 +77,16 @@ export async function POST(
         imageStatus: 'approved'
       } as Prisma.FilmStockUpdateInput
 
+      // Held until after the update, so the row names the replacement before
+      // the file it replaced goes away.
+      let replaced: string | null = null
+
       if (submission.proposedImage) {
-        // Delete old image
-        const filmStock = await prisma.filmStock.findUnique({ where: { id: submission.resourceId } })
-        if (filmStock?.imageUrl) {
-          const oldKey = extractKeyFromUrl(filmStock.imageUrl)
-          if (oldKey) {
-            try {
-              await deleteFromOSS(oldKey)
-            } catch (error) {
-              console.error('Failed to delete old image:', error)
-            }
-          }
-        }
+        const existing = await prisma.filmStock.findUnique({
+          where: { id: submission.resourceId },
+          select: { imageUrl: true },
+        })
+        replaced = existing?.imageUrl ?? null
 
         updateData.imageUrl = submission.proposedImage
         updateData.imageUploadedBy = submission.submittedBy
@@ -117,22 +113,13 @@ export async function POST(
         }
       })
 
+      await discardStoredImage(replaced)
+
       return NextResponse.json({
         message: 'Film stock edit approved and changes applied'
       })
     } else {
-      // Reject: delete proposed image, keep original data
-      if (submission.proposedImage) {
-        const key = extractKeyFromUrl(submission.proposedImage)
-        if (key) {
-          try {
-            await deleteFromOSS(key)
-          } catch (error) {
-            console.error('Failed to delete proposed image:', error)
-          }
-        }
-      }
-
+      // The original data is untouched; only the proposal goes away.
       // Mark submission as rejected (don't touch filmstock record)
       await prisma.moderationSubmission.update({
         where: { id: submissionId },
@@ -142,6 +129,8 @@ export async function POST(
           reviewedAt: new Date()
         }
       })
+
+      await discardStoredImage(submission.proposedImage)
 
       return NextResponse.json({
         message: 'Film stock edit rejected. Original data preserved.'
