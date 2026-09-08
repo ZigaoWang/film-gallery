@@ -148,6 +148,16 @@ export function sanitizeHandle(value: unknown): string | null {
 /**
  * Validation constants
  */
+/**
+ * What every file picker on the site offers.
+ *
+ * The extensions are listed alongside the wildcard on purpose: Safari reports
+ * a HEIC straight off an iPhone with an empty MIME type often enough that
+ * `image/*` alone greys the file out. The server converts HEIC on every
+ * upload path, so a picker that hides it is refusing a file the site accepts.
+ */
+export const IMAGE_FILE_ACCEPT = 'image/*,.heic,.heif'
+
 export const VALIDATION_LIMITS = {
   /**
    * Free-text people write about a photo. Unbounded before, in both the API

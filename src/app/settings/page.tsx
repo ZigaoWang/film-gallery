@@ -11,6 +11,7 @@ import FieldLabel from '@/components/ui/FieldLabel'
 import { PasswordInput, fieldClass, fieldClassMultiline } from '@/components/ui/Field'
 import Button from '@/components/ui/Button'
 import { MIN_PASSWORD_LENGTH, passwordProblem } from '@/lib/password'
+import { IMAGE_FILE_ACCEPT } from '@/lib/validation'
 
 export default function SettingsPage() {
   // One prefix for the page's field ids, so every label points at its own
@@ -224,7 +225,7 @@ export default function SettingsPage() {
                 <label className="cursor-pointer bg-neutral-800 text-white px-4 py-2 text-sm hover:bg-neutral-700 transition-colors font-medium
                                   focus-within:outline focus-within:outline-1 focus-within:outline-offset-2 focus-within:outline-brand">
                   Change Photo
-                  <input type="file" accept="image/*" onChange={handleAvatarChange} className="sr-only" />
+                  <input type="file" accept={IMAGE_FILE_ACCEPT} onChange={handleAvatarChange} className="sr-only" />
                 </label>
               </div>
             </div>

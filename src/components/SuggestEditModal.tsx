@@ -13,6 +13,7 @@ import CatalogFields from '@/components/CatalogFields'
 import { emptyDraft, resolvedFormat, type CatalogDraft } from '@/lib/catalogForm'
 import type { FilmStockOption } from '@/lib/filmSearch'
 import { displayName } from '@/lib/seo/alt'
+import { IMAGE_FILE_ACCEPT } from '@/lib/validation'
 
 
 type SuggestEditModalProps = {
@@ -303,7 +304,7 @@ export default function SuggestEditModal({
             <input
               id={`${fieldId}-image`}
               type="file"
-              accept="image/*"
+              accept={IMAGE_FILE_ACCEPT}
               onChange={handleFileSelect}
               disabled={uploading}
               className="block w-full text-sm text-neutral-400

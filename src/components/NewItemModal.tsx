@@ -10,6 +10,7 @@ import { useDialogBehavior } from '@/components/ui/dialog'
 import CatalogFields from '@/components/CatalogFields'
 import { emptyDraft, resolvedFormat, type CatalogDraft } from '@/lib/catalogForm'
 import type { FilmStockOption } from '@/lib/filmSearch'
+import { IMAGE_FILE_ACCEPT } from '@/lib/validation'
 
 type Props = {
   type: 'camera' | 'film'
@@ -156,7 +157,7 @@ export default function NewItemModal({
               <input
                 id={`${fieldId}-image`}
                 type="file"
-                accept="image/*"
+                accept={IMAGE_FILE_ACCEPT}
                 onChange={handleFileSelect}
                 disabled={loading}
                 className="block w-full text-sm text-neutral-400

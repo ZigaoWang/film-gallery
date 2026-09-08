@@ -9,6 +9,8 @@ import { LIMITS } from '@/lib/rateLimitPolicy'
 import { randomUUID } from 'crypto'
 import sharp from 'sharp'
 import { SHARP_INPUT } from '@/lib/sharpConfig'
+import { convertHeicIfNeeded } from '@/lib/image'
+import { safeExtension } from '@/lib/ossUtils'
 
 /**
  * Longest edge of a stored avatar.
@@ -70,9 +72,14 @@ export async function POST(req: NextRequest) {
   // bytes under any name could be parked on the bucket. Decoding through sharp
   // is what actually establishes the file is an image, and the output key is
   // ours, so the caller no longer picks how the object is served.
+  //
+  // HEIC first, because sharp cannot read it. Photographs on this site go
+  // through the same conversion, so a picture straight off an iPhone uploaded
+  // fine as a photograph and was refused as the same person's avatar.
   let processed: Buffer
   try {
-    processed = await sharp(buffer, SHARP_INPUT)
+    const { buffer: readable } = await convertHeicIfNeeded(buffer, safeExtension(file.name))
+    processed = await sharp(readable, SHARP_INPUT)
       .rotate()
       .resize(AVATAR_MAX_EDGE, AVATAR_MAX_EDGE, { fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 85 })
