@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Combobox from '@/components/Combobox'
 import Button from '@/components/ui/Button'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { fieldClass } from '@/components/ui/Field'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
 import type { FilmStockOption } from '@/lib/filmSearch'
@@ -355,7 +356,7 @@ export default function ManagePhotos() {
                   type="date"
                   value={newDate}
                   onChange={e => setNewDate(e.target.value)}
-                  className="bg-neutral-900 border border-neutral-800 px-2 h-9 text-base sm:text-sm text-white focus:outline-none focus:border-neutral-600"
+                  className={fieldClass}
                 />
               </Field>
 
@@ -363,7 +364,7 @@ export default function ManagePhotos() {
                 <select
                   value={newVisibility}
                   onChange={e => setNewVisibility(e.target.value)}
-                  className="bg-neutral-900 border border-neutral-800 px-2 h-9 text-base sm:text-sm text-white focus:outline-none focus:border-neutral-600"
+                  className={fieldClass}
                 >
                   <option value="">Leave unchanged</option>
                   <option value="PUBLIC">Public</option>
