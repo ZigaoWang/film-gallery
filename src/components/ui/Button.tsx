@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { focusRing } from './focus'
 
 /**
  * Buttons and button-shaped links.
@@ -48,6 +49,11 @@ function classes(variant: Variant, size: Size, fullWidth: boolean, extra: string
   return [
     'inline-flex items-center justify-center gap-2 uppercase tracking-wide font-bold',
     'transition-colors disabled:opacity-40 disabled:cursor-not-allowed',
+    // Every button and button-link on the site, including the Cancel and
+    // Delete pair in a confirmation, was relying on whatever ring the browser
+    // happened to draw. That is one look in Chrome, another in Safari, and on
+    // a brand-red fill it is a dark outline on a dark red field.
+    focusRing,
     VARIANTS[variant],
     SIZES[size],
     fullWidth ? 'w-full' : '',
