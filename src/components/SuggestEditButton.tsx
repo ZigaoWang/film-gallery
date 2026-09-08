@@ -14,7 +14,6 @@ type SuggestEditButtonProps = {
   currentDescription: string | null
   cameraType?: string | null
   frameFormat?: string | null
-  mountId?: string | null
   format?: string | null
   year?: number | null
   defaultFilmStockId?: string | null
@@ -29,7 +28,7 @@ type SuggestEditButtonProps = {
 
 export default function SuggestEditButton({
   type, id, name, brand, currentImage, currentDescription,
-  cameraType, frameFormat, mountId, format, year, defaultFilmStockId, iso, exposures, noDescription,
+  cameraType, frameFormat, format, year, defaultFilmStockId, iso, exposures, noDescription,
   process, colorBalance, manufacturer, aliases
 }: SuggestEditButtonProps) {
   const [showModal, setShowModal] = useState(false)
@@ -55,7 +54,7 @@ export default function SuggestEditButton({
         <SuggestEditModal
           type={type} id={id} name={name} brand={brand}
           currentImage={currentImage} currentDescription={currentDescription}
-          cameraType={cameraType} frameFormat={frameFormat} mountId={mountId}
+          cameraType={cameraType} frameFormat={frameFormat}
           format={format} year={year}
           defaultFilmStockId={defaultFilmStockId}
           iso={iso} exposures={exposures}

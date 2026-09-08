@@ -74,16 +74,16 @@ export const lookupFilm = cache(async (param: string) => {
 })
 
 export const lookupCamera = cache(async (param: string) => {
-  const live = await prisma.camera.findUnique({ where: { slug: param }, include: { mount: true } })
+  const live = await prisma.camera.findUnique({ where: { slug: param } })
   if (live) return live
 
   if (looksLikeCuid(param)) {
-    const byId = await prisma.camera.findUnique({ where: { id: param }, include: { mount: true } })
+    const byId = await prisma.camera.findUnique({ where: { id: param } })
     if (byId) return byId
   }
 
   const targetId = await retiredTargetId('camera', param)
-  return targetId ? prisma.camera.findUnique({ where: { id: targetId }, include: { mount: true } }) : null
+  return targetId ? prisma.camera.findUnique({ where: { id: targetId } }) : null
 })
 
 /**

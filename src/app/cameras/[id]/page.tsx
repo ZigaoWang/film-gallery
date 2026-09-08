@@ -22,7 +22,7 @@ import { FEED_FIRST_PAGE, feedOrderBy, feedScopeQuery } from '@/lib/photoFeed'
 import { descriptionParagraphs, summaryFromDescription } from '@/lib/catalogForm'
 import { PUBLIC_PHOTO } from '@/lib/photoVisibility'
 import { hiddenPhotoFilter } from '@/lib/blocks'
-import { bodyTypeLabel, bodyTypeProse, frameFormatLabel, mountAside } from '@/lib/cameraFields'
+import { bodyTypeLabel, bodyTypeProse, frameFormatLabel } from '@/lib/cameraFields'
 import type { CameraBodyType } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
@@ -171,7 +171,6 @@ export default async function CameraDetailPage({ params }: Params) {
   // Aliases that add something the name does not already say.
   const alternateNames = usefulAliases(name, camera.aliases)
 
-  const mount = mountAside(camera)
   const displayImage = camera.imageStatus === 'approved' ? camera.imageUrl : null
   // Not gated on imageStatus. That column tracks the moderation state of the
   // product photograph and nothing else, so tying the prose to it meant
@@ -191,10 +190,6 @@ export default async function CameraDetailPage({ params }: Params) {
     camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
       && { label: 'Frame', value: frameFormatLabel(camera.frameFormat)! },
     camera.format && { label: 'Format', value: camera.format },
-    // "Fixed lens" for the bodies that cannot take another one, rather than no
-    // chip at all. A reader looking at a compact wants to know the lens is part
-    // of it, and silence there is indistinguishable from an unresearched field.
-    mount && { label: 'Mount', value: mount },
     camera.year && { label: 'Year', value: String(camera.year) },
   ].filter(Boolean) as Array<{ label: string; value: string }>
 
@@ -327,7 +322,6 @@ export default async function CameraDetailPage({ params }: Params) {
                   currentDescription={displayDescription}
                   cameraType={camera.bodyType}
                   frameFormat={camera.frameFormat}
-                  mountId={camera.mountId}
                   format={camera.format}
                   year={camera.year}
                   defaultFilmStockId={camera.defaultFilmStockId}

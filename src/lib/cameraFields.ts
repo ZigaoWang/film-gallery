@@ -106,75 +106,11 @@ export function toFrameFormat(input: string | null | undefined): FrameFormat | n
   return (FRAME_FORMATS as string[]).includes(input) ? (input as FrameFormat) : null
 }
 
-/**
- * Body types whose lens is part of the body, so there is no mount to record.
- *
- * Definitional rather than a generalization: a point & shoot, a disposable and
- * an instant camera do not take another lens, and a row saying otherwise would
- * be wrong rather than unresearched. The types left out are the ones where it
- * varies and only the individual camera can answer - a Leica M and an Olympus
- * 35 SP are both rangefinders, and only one of them takes lenses.
- */
-const FIXED_LENS_BODIES: ReadonlySet<CameraBodyType> = new Set<CameraBodyType>([
-  'COMPACT',
-  'DISPOSABLE',
-  'INSTANT',
-])
-
-/**
- * What a camera takes for a lens, or null if nobody has established it.
- *
- * Fourteen of the nineteen cameras in the catalog have an empty `mountType`,
- * and every reader of that column treated the emptiness as one thing: the
- * public pages dropped the chip, the gap report counted a hole. For a
- * disposable there is no hole. Answering "Fixed lens" from the body type
- * leaves two real gaps instead of fourteen, and two is a list somebody works
- * through.
- *
- * Null is reserved for the genuine gap, so callers can keep using falsiness
- * and get the right behaviour without asking a second question.
- */
-export function lensMount(camera: {
-  bodyType?: CameraBodyType | null
-  /** The LensMount row, when the caller selected it. Preferred over the text. */
-  mount?: { name: string } | null
-  /** The column the relation replaced. Read only until every row has moved. */
-  mountType?: string | null
-}): string | null {
-  if (camera.mount?.name) return camera.mount.name
-  const recorded = camera.mountType?.trim()
-  if (recorded) return recorded
-  return camera.bodyType && FIXED_LENS_BODIES.has(camera.bodyType) ? 'Fixed lens' : null
-}
-
-/**
- * The mount, unless the camera's own name already says it.
- *
- * The XPan's lens mount is used by the XPan and nothing else, so it is
- * recorded as "Hasselblad XPan" and printed a chip's width under a heading
- * reading "Hasselblad XPan". A reader learns nothing from the second one.
- *
- * Same rule and same shape as `makerAside`, which drops the maker on the
- * bodies whose names lead with it. The value stays on the record either way:
- * this decides what is worth printing, not what is true.
- */
-export function mountAside(camera: CameraSpecSource & { name?: string | null }): string | null {
-  const mount = lensMount(camera)
-  if (!mount) return null
-  // Unlike makerAside, a missing name means print it: the mount stands on its
-  // own, and having nothing to compare against is not a reason to hide it.
-  const name = camera.name?.trim()
-  if (!name) return mount
-  return name.toLowerCase().includes(mount.toLowerCase()) ? null : mount
-}
-
 /** What a camera card shows about a camera. See `cameraSpecs`. */
 export interface CameraSpecSource {
   bodyType?: CameraBodyType | null
-  mount?: { name: string } | null
   frameFormat?: FrameFormat | null
   format?: string | null
-  mountType?: string | null
   year?: number | null
 }
 
@@ -193,14 +129,13 @@ export interface CameraSpecSource {
  * omits it: nearly every 35mm body is full frame, so printing it on all of them
  * is noise, and half-frame or panoramic is the thing a reader needs told.
  */
-export function cameraSpecs(camera: CameraSpecSource & { name?: string | null }): string[] {
+export function cameraSpecs(camera: CameraSpecSource): string[] {
   return [
     bodyTypeLabel(camera.bodyType),
     camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
       ? frameFormatLabel(camera.frameFormat)
       : null,
     camera.format?.trim() || null,
-    mountAside(camera),
     camera.year ? String(camera.year) : null,
   ].filter((s): s is string => Boolean(s))
 }

@@ -57,7 +57,6 @@ export async function POST(req: NextRequest) {
     let format: string | undefined
     let year: number | undefined
     let frameFormat: string | undefined
-    let mountId: string | undefined
     let defaultFilmStockId: string | undefined
     let aliasesInput: string | undefined
 
@@ -72,7 +71,6 @@ export async function POST(req: NextRequest) {
       format = (formData.get('format') as string) || undefined
       year = asInt(formData.get('year'))
       frameFormat = (formData.get('frameFormat') as string) || undefined
-      mountId = (formData.get('mountId') as string) || undefined
       defaultFilmStockId = (formData.get('defaultFilmStockId') as string) || undefined
       aliasesInput = (formData.get('aliases') as string) || undefined
       hasImageData = !!imageFile
@@ -85,7 +83,6 @@ export async function POST(req: NextRequest) {
       format = asString(body.format)
       year = asInt(body.year)
       frameFormat = asString(body.frameFormat)
-      mountId = asString(body.mountId)
       defaultFilmStockId = asString(body.defaultFilmStockId) || undefined
       aliasesInput = Array.isArray(body.aliases)
         ? body.aliases.filter((a): a is string => typeof a === 'string').join(',')
@@ -121,9 +118,6 @@ export async function POST(req: NextRequest) {
         frameFormat: toFrameFormat(frameFormat ?? null),
         // Verified against the table rather than trusted: an id from a stale
         // client would otherwise be a foreign key error at insert time.
-        mountId: mountId && (await prisma.lensMount.findUnique({
-          where: { id: mountId }, select: { id: true },
-        })) ? mountId : undefined,
         format,
         year,
         defaultFilmStockId,

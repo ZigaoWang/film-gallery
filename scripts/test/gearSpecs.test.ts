@@ -38,7 +38,6 @@ const SNAPIC = {
   bodyType: 'COMPACT' as const,
   frameFormat: 'FULL_FRAME' as const,
   format: '35mm',
-  mountType: null,
   year: 2025,
 }
 
@@ -62,39 +61,6 @@ console.log('a recorded camera and a recorded film both fill their card')
     'neither side dwarfs the other',
     Math.abs(camera.length - film.length) <= 1,
     `camera ${camera.length} (${camera.join(', ')}) vs film ${film.length} (${film.join(', ')})`
-  )
-}
-
-console.log('a fixed lens is an answer, not a blank')
-{
-  const chips = cameraSpecs(SNAPIC)
-  check('a compact says its lens is fixed', chips.includes('Fixed lens'), chips.join(', '))
-  check(
-    'a body that could take lenses says nothing until it is known',
-    !cameraSpecs({ bodyType: 'SLR', format: '35mm' }).includes('Fixed lens')
-  )
-  check(
-    'a recorded mount is printed as recorded',
-    cameraSpecs({ bodyType: 'SLR', mountType: 'Canon FD' }).includes('Canon FD')
-  )
-  // A mount used by exactly one body is named after it, so the XPan carried a
-  // chip reading "Hasselblad XPan" directly under a heading reading
-  // "Hasselblad XPan". The record keeps the mount either way.
-  check(
-    'a mount the name already says is not repeated as a chip',
-    !cameraSpecs({
-      name: 'Hasselblad XPan',
-      bodyType: 'RANGEFINDER',
-      mount: { name: 'Hasselblad XPan' },
-    }).includes('Hasselblad XPan')
-  )
-  check(
-    'a mount the name does not say is still printed',
-    cameraSpecs({
-      name: 'Canon AE-1 Program',
-      bodyType: 'SLR',
-      mount: { name: 'Canon FD' },
-    }).includes('Canon FD')
   )
 }
 

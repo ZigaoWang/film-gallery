@@ -10,8 +10,6 @@ import {
   BODY_TYPE_LABELS,
   FRAME_FORMATS,
   FRAME_FORMAT_LABELS,
-  bodyTypeLabel,
-  toBodyType,
 } from '@/lib/cameraFields'
 import { COLOR_BALANCES, FILM_PROCESSES } from '@/lib/filmFields'
 import {
@@ -102,8 +100,6 @@ export default function CatalogFields({
 }) {
   const isCamera = type === 'camera'
   const [brands, setBrands] = useState<string[]>([])
-  /** The mount list, so the field is a choice rather than a typed string. */
-  const [mounts, setMounts] = useState<Array<{ id: string; name: string }>>([])
 
   // Every name in this catalog leads with its maker, so the maker is almost
   // always already sitting in the name. Reading it back saves retyping it, and
@@ -122,17 +118,6 @@ export default function CatalogFields({
     return () => { cancelled = true }
   }, [])
 
-  // Only for a camera, and only once. A film form has no use for the list.
-  useEffect(() => {
-    if (!isCamera) return
-    let cancelled = false
-    fetch('/api/mounts')
-      .then(r => (r.ok ? r.json() : []))
-      .then(rows => { if (!cancelled && Array.isArray(rows)) setMounts(rows) })
-      .catch(() => {})
-    return () => { cancelled = true }
-  }, [isCamera])
-
   /** The brand a name starts with, longest first so "Yes!Star" beats "Yes". */
   const makerInName = (value: string): string | null => {
     const lower = value.trim().toLowerCase()
@@ -150,9 +135,6 @@ export default function CatalogFields({
     onChange(found ? { name: value, maker: found } : { name: value })
   }
   const isDisposable = draft.bodyType === 'DISPOSABLE'
-  // Matches lensMount's rule, so the form asks exactly what the page cannot
-  // work out for itself.
-  const fixedByBodyType = ['COMPACT', 'DISPOSABLE', 'INSTANT'].includes(draft.bodyType)
   const noun = isCamera ? 'camera' : 'film'
   const id = (field: string) => `${idPrefix}-${field}`
 
@@ -377,31 +359,6 @@ export default function CatalogFields({
               </FieldHint>
             </div>
 
-            {/* Always rendered.
-                This was hidden whenever the body type implied a fixed lens,
-                which is most of the catalog, so for most cameras the field
-                somebody went looking for was simply not on the page. Hiding a
-                field does not answer it, it just makes it unfindable. The
-                implication is said in words underneath instead, where it can
-                be read and overridden. */}
-            <div>
-                <FieldLabel htmlFor={id('mountId')}>Lens mount</FieldLabel>
-                <select
-                  id={id('mountId')}
-                  value={draft.mountId}
-                  onChange={e => onChange({ mountId: e.target.value })}
-                  disabled={disabled}
-                  className={fieldClass}
-                >
-                  <option value="">Not sure</option>
-                  {mounts.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                </select>
-                <FieldHint>
-                  {fixedByBodyType
-                    ? `A ${(bodyTypeLabel(toBodyType(draft.bodyType)) ?? 'camera').toLowerCase()} has its lens built in, so this reads as Fixed lens on its own. Set it only to say otherwise.`
-                    : 'Chosen from the list so two people entering the same mount agree. If the lens does not come off, pick Fixed lens.'}
-                </FieldHint>
-            </div>
           </div>
 
           {isDisposable && (

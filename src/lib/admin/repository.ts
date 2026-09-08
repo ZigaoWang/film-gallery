@@ -153,7 +153,7 @@ export async function listResource(resource: ResourceName, params: ListParams): 
         rows: rows.map(c => ({
           id: c.id, name: c.name, brand: c.brand, aliases: c.aliases,
           bodyType: c.bodyType, frameFormat: c.frameFormat,
-          format: c.format, mountType: c.mountType, year: c.year,
+          format: c.format, year: c.year,
           description: c.description, imageStatus: c.imageStatus,
           imageUrl: c.imageUrl, photoCount: c._count.photos, slug: c.slug,
         })),
@@ -229,23 +229,6 @@ export async function listResource(resource: ResourceName, params: ListParams): 
           // built around, and one "films: 11" against Kodak throws it away.
           filmsSold: b._count.filmStocks,
           filmsMade: b._count.manufacturedFilms,
-        })),
-      }
-    }
-
-    case 'mounts': {
-      const [rows, total] = await Promise.all([
-        prisma.lensMount.findMany({
-          where, orderBy, skip, take,
-          include: { _count: { select: { cameras: true } } },
-        }),
-        prisma.lensMount.count({ where }),
-      ])
-      return {
-        total,
-        rows: rows.map(m => ({
-          id: m.id, name: m.name, aliases: m.aliases, fixed: m.fixed,
-          referenceUrl: m.referenceUrl, cameras: m._count.cameras,
         })),
       }
     }
@@ -434,7 +417,6 @@ export async function updateResource(
       case 'photos': await prisma.photo.update({ where: { id }, data }); break
       case 'comments': await prisma.comment.update({ where: { id }, data }); break
       case 'brands': await prisma.brand.update({ where: { id }, data }); break
-      case 'mounts': await prisma.lensMount.update({ where: { id }, data }); break
       case 'albums': await prisma.collection.update({ where: { id }, data }); break
       case 'notes': await prisma.communityNote.update({ where: { id }, data }); break
       case 'reports': await prisma.report.update({ where: { id }, data }); break
@@ -496,13 +478,6 @@ export async function createResource(
         const taken = new Set((await prisma.brand.findMany({ select: { slug: true } })).map(b => b.slug))
         const row = await prisma.brand.create({
           data: { ...coerced.data, slug: uniqueSlug(slugify(name), taken) } as Prisma.BrandCreateInput,
-        })
-        return { id: row.id }
-      }
-      case 'mounts': {
-        const taken = new Set((await prisma.lensMount.findMany({ select: { slug: true } })).map(m => m.slug))
-        const row = await prisma.lensMount.create({
-          data: { ...coerced.data, slug: uniqueSlug(slugify(name), taken) } as Prisma.LensMountCreateInput,
         })
         return { id: row.id }
       }
@@ -607,7 +582,6 @@ export async function bulkUpdateResource(
       case 'notes': return { updated: (await prisma.communityNote.updateMany({ where, data })).count }
       case 'reports': return { updated: (await prisma.report.updateMany({ where, data })).count }
       case 'brands': return { updated: (await prisma.brand.updateMany({ where, data })).count }
-      case 'mounts': return { updated: (await prisma.lensMount.updateMany({ where, data })).count }
     }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -663,7 +637,6 @@ export async function bulkDeleteResource(
       case 'cameras': return { deleted: (await prisma.camera.deleteMany({ where })).count }
       case 'films': return { deleted: (await prisma.filmStock.deleteMany({ where })).count }
       case 'brands': return { deleted: (await prisma.brand.deleteMany({ where })).count }
-      case 'mounts': return { deleted: (await prisma.lensMount.deleteMany({ where })).count }
       case 'albums': return { deleted: (await prisma.collection.deleteMany({ where })).count }
       case 'notes': return { deleted: (await prisma.communityNote.deleteMany({ where })).count }
       case 'reports': return { deleted: (await prisma.report.deleteMany({ where })).count }
@@ -719,7 +692,6 @@ export async function deleteResource(
       case 'cameras': await prisma.camera.delete({ where: { id } }); return { ok: true }
       case 'films': await prisma.filmStock.delete({ where: { id } }); return { ok: true }
       case 'brands': await prisma.brand.delete({ where: { id } }); return { ok: true }
-      case 'mounts': await prisma.lensMount.delete({ where: { id } }); return { ok: true }
       case 'albums': await prisma.collection.delete({ where: { id } }); return { ok: true }
       case 'notes': await prisma.communityNote.delete({ where: { id } }); return { ok: true }
       case 'reports': await prisma.report.delete({ where: { id } }); return { ok: true }

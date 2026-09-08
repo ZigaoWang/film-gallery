@@ -12,7 +12,6 @@
 import { PrismaClient } from '@prisma/client'
 import { filmFormatLabel } from '../src/lib/filmFields'
 import { displayName } from '../src/lib/seo/alt'
-import { lensMount } from '../src/lib/cameraFields'
 
 const prisma = new PrismaClient()
 
@@ -120,7 +119,6 @@ async function main() {
     ['bodyType', c => c.bodyType],
     ['frameFormat', c => c.frameFormat],
     ['format', c => c.format],
-    ['mountType', c => c.mountType],
     ['year', c => c.year],
     ['aliases', c => c.aliases],
     ['description', c => c.description],
@@ -143,11 +141,7 @@ async function main() {
     for (const [field, get] of CAMERA_FIELDS) {
       const value = fmt(get(c))
       if (!value) {
-        // A compact has no mount to record, so an empty column there is the
-        // answer rather than a gap. research-brief.md has said so in prose
-        // since before any code checked it, and the brief kept listing it.
-        const answered = field === 'mountType' && lensMount(c) !== null
-        if (!OPTIONAL.has(field) && !answered) missing.push(field)
+        if (!OPTIONAL.has(field)) missing.push(field)
         continue
       }
       const state = cite(field)

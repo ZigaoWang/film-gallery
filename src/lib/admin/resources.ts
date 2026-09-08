@@ -24,7 +24,7 @@ export type FieldKind =
   | 'reference'
 
 /** Which catalog a `reference` field picks from. */
-export type ReferenceSource = 'cameras' | 'films' | 'brands' | 'mounts'
+export type ReferenceSource = 'cameras' | 'films' | 'brands'
 
 export interface FieldSpec {
   kind: FieldKind
@@ -279,7 +279,7 @@ export const ADMIN_RESOURCES = {
     plural: 'Cameras',
     description: 'The camera catalog. Edits here apply immediately.',
     columns: ['name', 'brand', 'bodyType', 'format', 'year', 'photoCount', 'imageStatus'],
-    searchFields: ['name', 'brand', 'mountType'],
+    searchFields: ['name', 'brand'],
     orderBy: { name: 'asc' },
     deletable: true,
     editable: {
@@ -288,7 +288,6 @@ export const ADMIN_RESOURCES = {
       bodyType: { kind: 'enum', label: 'Body type', options: CAMERA_BODY_TYPES, help: 'The mechanism. Leave unset if none of these fit.' },
       frameFormat: { kind: 'enum', label: 'Frame format', options: FRAME_FORMAT_VALUES, help: 'Native frame geometry. Unset until checked.' },
       format: { kind: 'text', label: 'Format', maxLength: 60 },
-      mountId: { kind: 'reference', label: 'Mount', source: 'mounts', help: 'Chosen from the list, not typed. A body whose lens does not come off takes "Fixed lens"; a compact or disposable derives that on its own and can be left blank.' },
       aliases: { kind: 'stringList', label: 'Also known as', help: 'Comma separated. Names this body is sold under in other markets.' },
       year: { kind: 'number', label: 'Year', min: 1800, max: 2100 },
       lensName: { kind: 'text', label: 'Lens name', maxLength: 60, help: 'The name on the barrel: G.Zuiko, Hexanon, Fujinon.' },
@@ -376,25 +375,6 @@ export const ADMIN_RESOURCES = {
     },
   },
 
-  mounts: {
-    label: 'Lens mount',
-    plural: 'Lens mounts',
-    description:
-      'What a camera can be given as its mount. Most of these are seeded options with no camera on them yet, ' +
-      'which is the point: the field is a picker so two people cataloguing the same mount write it the same way.',
-    columns: ['name', 'aliases', 'fixed', 'cameras'],
-    searchFields: ['name'],
-    orderBy: { name: 'asc' },
-    deletable: true,
-    creatable: true,
-    editable: {
-      name: { kind: 'text', label: 'Name', maxLength: 60, required: true, help: 'As a picker shows it: "Canon FD", "M42 screw", "Fixed lens".' },
-      aliases: { kind: 'stringList', label: 'Also known as', help: 'Comma separated. "FD" for Canon FD.' },
-      fixed: { kind: 'boolean', label: 'Is the fixed-lens answer', help: 'Exactly one row should have this on: the "Fixed lens" choice for bodies whose lens does not come off.' },
-      referenceUrl: { kind: 'text', label: 'Reference', maxLength: 300, help: 'Where this mount is documented.' },
-    },
-  },
-
   albums: {
     label: 'Album',
     plural: 'Albums',
@@ -473,7 +453,7 @@ export type ResourceName = keyof typeof ADMIN_RESOURCES
  */
 export const FIELD_GROUPS: Partial<Record<ResourceName, readonly { title: string; fields: readonly string[] }[]>> = {
   cameras: [
-    { title: 'Identity', fields: ['name', 'brand', 'aliases', 'bodyType', 'frameFormat', 'format', 'mountId', 'year'] },
+    { title: 'Identity', fields: ['name', 'brand', 'aliases', 'bodyType', 'frameFormat', 'format', 'year'] },
     { title: 'Lens', fields: ['lensName', 'focalMinMm', 'focalMaxMm', 'apertureMaxWide', 'apertureMaxTele', 'lensElements', 'lensGroups', 'closeFocusMm'] },
     { title: 'Exposure', fields: ['focusType', 'meteringPattern', 'exposureModes', 'shutterType', 'shutterSlowestSec', 'shutterFastestSec', 'filmSpeedMin', 'filmSpeedMax'] },
     { title: 'Body', fields: ['flash', 'batteryType', 'weightGrams'] },
@@ -504,7 +484,6 @@ export const UNIQUE_FIELDS: Partial<Record<ResourceName, readonly string[]>> = {
   films: ['name'],
   cameras: ['name'],
   brands: ['name'],
-  mounts: ['name'],
 }
 
 export function isResourceName(value: string): value is ResourceName {
@@ -512,7 +491,7 @@ export function isResourceName(value: string): value is ResourceName {
 }
 
 export const RESOURCE_ORDER: readonly ResourceName[] = [
-  'reports', 'photos', 'users', 'comments', 'cameras', 'films', 'brands', 'mounts', 'albums', 'notes',
+  'reports', 'photos', 'users', 'comments', 'cameras', 'films', 'brands', 'albums', 'notes',
 ]
 
 /**
