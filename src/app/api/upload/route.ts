@@ -4,7 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { processImage } from '@/lib/image'
 import { randomUUID } from 'crypto'
-import { safeExtension } from '@/lib/ossUtils'
+import { deleteFromOSS } from '@/lib/oss'
+import { extractKeyFromUrl, safeExtension } from '@/lib/ossUtils'
 import { isTooLarge } from '@/lib/sharpConfig'
 import { validateFileSize, validateImageType, VALIDATION_LIMITS } from '@/lib/validation'
 import { enforceLimit } from '@/lib/rateLimit'
@@ -121,10 +122,25 @@ export async function POST(req: NextRequest) {
       continue
     }
 
+    /**
+     * What processImage put in the bucket, so a failure after it can take it
+     * back out.
+     *
+     * The three derivatives are uploaded before the row that accounts for them
+     * exists, and nothing between those two steps is atomic. A create that
+     * throws — a dropped connection, a constraint, this box running out of
+     * memory partway through a drop of thirty — used to report the failure to
+     * the uploader and leave an original, a medium and a thumbnail in storage
+     * with nothing pointing at them. They were reclaimable only by an
+     * administrator remembering to run the orphan sweep.
+     */
+    let stored: string[] = []
+
     try {
       const buffer = Buffer.from(await file.arrayBuffer())
       const { originalPath, mediumPath, thumbnailPath, width, height, blurHash, originalBytes } =
         await processImage(buffer, id, ext)
+      stored = [originalPath, mediumPath, thumbnailPath]
 
       const photo = await prisma.photo.create({
         data: {
@@ -146,6 +162,18 @@ export async function POST(req: NextRequest) {
       photos.push(photo)
     } catch (error) {
       console.error(`[Upload] Failed to process "${file.name}":`, error)
+
+      // Best effort, and swallowed per key on purpose: this runs while an
+      // upload is already failing, and a delete that cannot find its object
+      // has nothing to report. What matters is not adding storage nobody can
+      // account for on top of the error being returned.
+      await Promise.all(
+        stored
+          .map(extractKeyFromUrl)
+          .filter((key): key is string => key !== null)
+          .map(key => deleteFromOSS(key).catch(() => {}))
+      )
+
       failed.push({ name: file.name, error: describeUploadError(error) })
     }
   }

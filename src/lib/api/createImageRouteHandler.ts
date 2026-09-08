@@ -108,6 +108,18 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
   ) => {
+    /**
+     * What this request put in the bucket, hoisted above the try so the catch
+     * can take it back out.
+     *
+     * The image is uploaded before the row that accounts for it exists -- a
+     * Revision and, for an image, a ModerationSubmission -- and nothing
+     * between those steps is atomic. A failure in between used to answer 500
+     * and leave the object behind with nothing referencing it, waiting for an
+     * administrator to run the orphan sweep.
+     */
+    let proposedImageUrl: string | null = null
+
     try {
       // Auth check
       const session = await getServerSession(authOptions)
@@ -231,7 +243,6 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
       Object.assign(proposedData, categorizationData)
 
       // Process image if uploaded (to temporary location for non-admins)
-      let proposedImageUrl: string | null = null
       if (file) {
         try {
           const buffer = Buffer.from(await file.arrayBuffer())
@@ -391,6 +402,16 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
 
     } catch (error) {
       console.error(`[${config.resourceDisplayName}] Update error:`, error)
+
+      // Best effort, and swallowed on purpose: this runs while the request is
+      // already failing, and a delete that cannot find its object has nothing
+      // to report. The point is not to add storage nobody can account for on
+      // top of the error being returned.
+      if (proposedImageUrl) {
+        const key = extractKeyFromUrl(proposedImageUrl)
+        if (key) await deleteFromOSS(key).catch(() => {})
+      }
+
       return NextResponse.json(
         { success: false, error: 'Failed to save changes. Please try again.' } as ApiResponse,
         { status: 500 }
