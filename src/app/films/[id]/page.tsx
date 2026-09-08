@@ -465,12 +465,11 @@ export default async function FilmDetailPage({ params }: Params) {
                     ))}
                 </div>
 
-                {/* Alternate names and product codes. Useful to a reader who
-                    knows the stock as "5219", and it puts that string on the
-                    page for anyone searching it. */}
+                {/* The single-use cameras that arrive with this stock inside,
+                    which is how most people meet it. */}
                 {loadedList.length > 0 && (
                   <p className="mt-3 text-sm text-neutral-500">
-                    {loadedList.length === 1 ? 'Loaded in' : 'Loaded in'}{' '}
+                    Loaded in{' '}
                     {loadedList.map((c, i) => (
                       <span key={c.id}>
                         {i > 0 && ', '}
@@ -482,6 +481,9 @@ export default async function FilmDetailPage({ params }: Params) {
                   </p>
                 )}
 
+                {/* Alternate names and product codes. Useful to a reader who
+                    knows the stock as "5219", and it puts that string on the
+                    page for anyone searching it. */}
                 {alternateNames.length > 0 && (
                   <p className="mt-3 text-sm text-neutral-500">
                     Also known as{' '}
