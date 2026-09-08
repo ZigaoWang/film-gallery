@@ -340,7 +340,7 @@ export default function ResourceTable<F extends string>({ resource, filters, def
           onChange={e => setSearchInput(e.target.value)}
           placeholder={`Search ${spec.plural.toLowerCase()}…`}
           aria-label={`Search ${spec.plural}`}
-          className="flex-1 min-w-[200px] bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-white
+          className="flex-1 min-w-[200px] bg-neutral-900 border border-neutral-800 px-3 py-2 text-base sm:text-sm text-white
                      placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600"
         />
         <label className="flex items-center gap-2 text-xs text-neutral-500">

@@ -90,7 +90,12 @@ export function groupFields(resource: ResourceName, fields: [string, FieldSpec][
 }
 
 export const inputClass =
-  'w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white ' +
+  // text-base on a phone, text-sm from sm up, for the reason Field.tsx states
+  // at length: iOS Safari zooms the whole page in when you focus an input
+  // under 16px, and text-sm is 14px. The public forms were fixed and these
+  // were not, so editing a camera from a phone lurched sideways on every
+  // field and admin was the one place left doing it.
+  'w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-base sm:text-sm text-white ' +
   'placeholder:text-neutral-700 focus:outline-none focus:border-neutral-600'
 
 export function FieldInput({
