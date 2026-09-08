@@ -69,19 +69,19 @@ export default function GearCard(props: GearCardProps) {
                  focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
                  focus-visible:outline-brand"
     >
-      {/* Identity on one row, specifications on the next, indented to line up
-          under the name.
-          Two constraints pulling against each other, and the indent is what
-          satisfies both. The chips cannot go *inside* the name's column: that
-          left them about 270px, four did not fit, and the last one wrapped
-          alone under the other three with the rest of the card empty beside
-          it. But a full-bleed row starts under the picture, so its left edge
-          did not line up with anything and the card read as two unrelated
-          blocks stacked up. Their own row, pushed right by exactly the
-          picture's width plus the gap (w-20 + gap-4 = 6rem), so they begin
-          where the name begins and still have the rest of the card to wrap
-          into. Only from sm up: on a phone the 6rem is worth more as chip
-          width than as alignment. */}
+      {/* Picture, then a column holding the name with its chips under it.
+          The chips belong to the name, so they sit in its column and start
+          where it starts. Two earlier arrangements were worse: a full-bleed
+          row underneath began at the card's left edge under the picture, so
+          nothing lined up and the card read as two unrelated blocks; indenting
+          that row to match the name fixed the alignment but left the gap the
+          picture's height creates between them, which is dead space with
+          chips floating in it.
+          The cost is that in a half-width card the column is narrow enough
+          that four chips wrap, which is what the previous note here objected
+          to. A wrap inside the column is the honest behaviour, and the row is
+          centred against the picture either way, so it costs no height until
+          it actually wraps. */}
       <div className="flex items-center gap-4">
         <div className="relative flex h-16 w-20 shrink-0 items-center justify-center">
           {image ? (
@@ -100,6 +100,16 @@ export default function GearCard(props: GearCardProps) {
           <div className="truncate font-semibold text-white transition-colors group-hover:text-brand">
             {gear.name}
           </div>
+
+          {/* gap-2, matching the detail pages. This row was gap-1.5, which is
+              the drift that comes of three copies of the same idea. */}
+          {specs.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {specs.map(s => (
+                <SpecChip key={s}>{s}</SpecChip>
+              ))}
+            </div>
+          )}
         </div>
 
         <svg
@@ -109,16 +119,6 @@ export default function GearCard(props: GearCardProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
-
-      {/* gap-2, matching the detail pages. This row was gap-1.5, which is the
-          drift that comes of three copies of the same idea. */}
-      {specs.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 sm:pl-24">
-          {specs.map(s => (
-            <SpecChip key={s}>{s}</SpecChip>
-          ))}
-        </div>
-      )}
     </Link>
   )
 }
