@@ -12,6 +12,7 @@ import {
 } from '@/lib/profileView'
 import { formatLongDate } from '@/lib/formatDate'
 import { BRAND_RED } from '@/lib/constants'
+import EmptyState from '@/components/ui/EmptyState'
 
 interface PhotoThumb {
   id: string
@@ -723,9 +724,7 @@ function StatsPanel({ totalPhotos, photoDays, cameraStats, filmStats, totalLikes
       )}
 
       {cameraStats.length === 0 && filmStats.length === 0 && totalPhotos > 0 && (
-        <div className="py-12 border border-dashed border-neutral-800 text-center">
-          <p className="text-neutral-600 text-sm">Tag photos with cameras and film stocks to see gear stats</p>
-        </div>
+        <EmptyState size="compact" message="Tag photos with cameras and film stocks to see gear stats" />
       )}
     </div>
   )

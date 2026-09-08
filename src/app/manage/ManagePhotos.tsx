@@ -2,13 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import Combobox from '@/components/Combobox'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
 import type { FilmStockOption } from '@/lib/filmSearch'
-import { textLinkClass } from '@/components/ui/TextLink'
+import EmptyState from '@/components/ui/EmptyState'
 
 interface Photo {
   id: string
@@ -254,14 +253,10 @@ export default function ManagePhotos() {
       </div>
 
       {!loading && photos.length === 0 && (
-        <div className="border border-dashed border-neutral-800 py-20 text-center">
-          <p className="text-neutral-500 mb-4">
-            {search || filter ? 'No photos match this view.' : 'You have not uploaded any photos yet.'}
-          </p>
-          {!search && !filter && (
-            <Link href="/upload" className={`${textLinkClass} text-sm`}>Upload your first roll</Link>
-          )}
-        </div>
+        <EmptyState
+          message={search || filter ? 'No photos match this view.' : 'You have not uploaded any photos yet.'}
+          action={search || filter ? undefined : { href: '/upload', label: 'Upload your first roll' }}
+        />
       )}
 
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">

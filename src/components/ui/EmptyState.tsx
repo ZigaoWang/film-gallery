@@ -12,18 +12,33 @@ import { ButtonLink } from './Button'
 export default function EmptyState({
   icon,
   message,
+  hint,
   action,
+  size = 'default',
 }: {
   /** Optional glyph. Omitted where the surrounding page already has one. */
   icon?: React.ReactNode
   message: string
+  /** A second line, for the states that have advice as well as a fact. */
+  hint?: string
   /** The way forward. An empty state without one is a dead end. */
   action?: { href: string; label: string }
+  /**
+   * `compact` for a state that stands in for a section rather than a page.
+   * Same box, less air: a full-height one inside the notes panel or a stats
+   * strip reads as though the page failed to load.
+   */
+  size?: 'default' | 'compact'
 }) {
   return (
-    <div className="border border-dashed border-neutral-800 py-24 text-center">
+    <div
+      className={`border border-dashed border-neutral-800 px-4 text-center ${
+        size === 'compact' ? 'py-12' : 'py-24'
+      }`}
+    >
       {icon && <div className="mx-auto mb-4 flex justify-center text-neutral-700">{icon}</div>}
-      <p className="mb-4 text-neutral-500">{message}</p>
+      <p className={`text-neutral-500 ${hint ? 'mb-2' : action ? 'mb-4' : ''}`}>{message}</p>
+      {hint && <p className={`text-sm text-neutral-600 ${action ? 'mb-4' : ''}`}>{hint}</p>}
       {action && (
         <ButtonLink href={action.href} variant="outline" size="sm">
           {action.label}
@@ -38,6 +53,15 @@ export function FilmIcon() {
   return (
     <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+    </svg>
+  )
+}
+
+/** The photo stack used wherever a list of photographs is empty. */
+export function PhotoIcon() {
+  return (
+    <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   )
 }

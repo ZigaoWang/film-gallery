@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { apiErrorMessage } from '@/lib/apiError'
 import { useToast } from '@/components/ui/Toast'
 import { textLinkClass } from '@/components/ui/TextLink'
+import EmptyState from '@/components/ui/EmptyState'
 
 /**
  * Working through proposed changes.
@@ -208,11 +209,7 @@ export default function RevisionQueue() {
   }
 
   if (revisions.length === 0) {
-    return (
-      <div className="border border-dashed border-neutral-800 px-4 py-12 text-center">
-        <p className="text-neutral-500 text-sm">Nothing waiting.</p>
-      </div>
-    )
+    return <EmptyState size="compact" message="Nothing waiting." />
   }
 
   return (

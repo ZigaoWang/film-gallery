@@ -15,6 +15,7 @@ import { hiddenFilter, hiddenUserIds } from '@/lib/blocks'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { displayName } from '@/lib/seo/alt'
+import EmptyState from '@/components/ui/EmptyState'
 export const metadata: Metadata = {
   title: 'Search',
   robots: { index: false, follow: false },
@@ -372,15 +373,16 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           </section>
         )}
 
-        {/* No results */}
         {photos.length === 0 && users.length === 0 && cameras.length === 0 && films.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-neutral-800">
-            <svg className="w-16 h-16 text-neutral-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p className="text-neutral-500 text-lg mb-2">No results found</p>
-            <p className="text-neutral-600 text-sm">Try a different search term</p>
-          </div>
+          <EmptyState
+            icon={
+              <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            }
+            message="No results found"
+            hint="Try a different search term"
+          />
         )}
       </main>
 
