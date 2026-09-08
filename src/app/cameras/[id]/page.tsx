@@ -101,30 +101,64 @@ export default async function CameraDetailPage({ params }: Params) {
   // page after the first.
   const hidden = await hiddenPhotoFilter(userId)
 
-  // Only the first screen; MasonryGrid pages the rest through /api/photos.
-  const photos = await prisma.photo.findMany({
-    where: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id },
-    // Matches the ordering /api/photos pages by; see the film page.
-    orderBy: feedOrderBy('recent'),
-    take: FEED_FIRST_PAGE + 1,
-    select: {
-      id: true,
-      thumbnailPath: true,
-      mediumPath: true,
-      width: true,
-      height: true,
-      blurHash: true,
-      caption: true,
-      takenDate: true,
-      filmStock: { select: { name: true, brand: true } },
-      user: { select: { name: true, username: true } },
-      _count: { select: { likes: true } },
-    },
-  })
+  // One round trip for everything the page can ask for at once.
+  //
+  // These four are independent of each other and were awaited in sequence, so
+  // the page paid four latencies before it could render anything. It is
+  // force-dynamic, so that is every request. Only the likes below genuinely
+  // wait, because it needs the ids the first query returns.
+  const [photos, totalPhotos, loadedFilm, pairedFilms] = await Promise.all([
+    // Only the first screen; MasonryGrid pages the rest through /api/photos.
+    prisma.photo.findMany({
+      where: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id },
+      // Matches the ordering /api/photos pages by; see the film page.
+      orderBy: feedOrderBy('recent'),
+      take: FEED_FIRST_PAGE + 1,
+      select: {
+        id: true,
+        thumbnailPath: true,
+        mediumPath: true,
+        width: true,
+        height: true,
+        blurHash: true,
+        caption: true,
+        takenDate: true,
+        filmStock: { select: { name: true, brand: true } },
+        user: { select: { name: true, username: true } },
+        _count: { select: { likes: true } },
+      },
+    }),
 
-  const totalPhotos = await prisma.photo.count({
-    where: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id },
-  })
+    prisma.photo.count({
+      where: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id },
+    }),
+
+    // Films actually shot on this body — the reverse side of the combo pages.
+    // A disposable arrives loaded, and the film in it is the whole reason its
+    // photographs look the way they do. Naming it here, and naming the camera
+    // on that film's page, is the one link the catalog could already store and
+    // never showed.
+    camera.defaultFilmStockId
+      ? prisma.filmStock.findUnique({
+          where: { id: camera.defaultFilmStockId },
+          select: { name: true, slug: true, id: true, brand: true },
+        })
+      : null,
+
+    // Blocked accounts excluded, so the counts here agree with the grid; see
+    // the film page for what the mismatch looked like.
+    prisma.filmStock.findMany({
+      where: { photos: { some: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id } } },
+      select: {
+        id: true,
+        name: true,
+        brand: true,
+        slug: true,
+        _count: { select: { photos: { where: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id } } } },
+      },
+      orderBy: { name: 'asc' },
+    }),
+  ])
 
   const userLikes = userId
     ? await prisma.like.findMany({
@@ -140,32 +174,6 @@ export default async function CameraDetailPage({ params }: Params) {
     camera: { name: camera.name, brand: camera.brand },
     liked: likedIds.has(p.id),
   }))
-
-  // Films actually shot on this body — the reverse side of the combo pages.
-  // A disposable arrives loaded, and the film in it is the whole reason its
-  // photographs look the way they do. Naming it here, and naming the camera on
-  // that film's page, is the one link the catalog could already store and
-  // never showed.
-  const loadedFilm = camera.defaultFilmStockId
-    ? await prisma.filmStock.findUnique({
-        where: { id: camera.defaultFilmStockId },
-        select: { name: true, slug: true, id: true, brand: true },
-      })
-    : null
-
-  // Blocked accounts excluded, so the counts here agree with the grid; see the
-  // film page for what the mismatch looked like.
-  const pairedFilms = await prisma.filmStock.findMany({
-    where: { photos: { some: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id } } },
-    select: {
-      id: true,
-      name: true,
-      brand: true,
-      slug: true,
-      _count: { select: { photos: { where: { ...PUBLIC_PHOTO, ...hidden, cameraId: camera.id } } } },
-    },
-    orderBy: { name: 'asc' },
-  })
 
   const name = displayName(camera) ?? camera.name
   // Aliases that add something the name does not already say.
