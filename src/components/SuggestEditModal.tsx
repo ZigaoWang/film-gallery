@@ -296,25 +296,10 @@ export default function SuggestEditModal({
             showRenameNote
           />
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {currentImage && (
-              <div>
-                <FieldLabel>Current image</FieldLabel>
-                <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
-                  <Image src={currentImage} alt={name} fill className="object-contain" />
-                </div>
-              </div>
-            )}
-            {previewUrl && (
-              <div>
-                <FieldLabel>Replacement</FieldLabel>
-                <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
-                  <Image src={previewUrl} alt="" fill className="object-contain" />
-                </div>
-              </div>
-            )}
-          </div>
-
+          {/* Picker first, then what you chose, matching the add dialog. The
+              two forms share every other field and reordered only here, so
+              adding a camera and then correcting it met the same step twice
+              in two places. */}
           <div>
             <FieldLabel htmlFor={`${fieldId}-image`}>
               {currentImage ? 'Replace the photo' : `Photo of the ${type === 'camera' ? 'camera' : 'film stock'}`}
@@ -333,6 +318,25 @@ export default function SuggestEditModal({
                 disabled:opacity-50"
             />
             <FieldHint>The product itself, not a photo taken with it. A plain background works best.</FieldHint>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {currentImage && (
+              <div>
+                <FieldLabel>Current image</FieldLabel>
+                <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
+                  <Image src={currentImage} alt={name} fill className="object-contain" />
+                </div>
+              </div>
+            )}
+            {previewUrl && (
+              <div>
+                <FieldLabel>Replacement</FieldLabel>
+                <div className="relative aspect-square w-full max-w-[200px] bg-neutral-800">
+                  <Image src={previewUrl} alt="" fill className="object-contain" />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Info */}
