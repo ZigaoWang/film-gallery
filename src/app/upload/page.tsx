@@ -20,6 +20,7 @@ import { apiErrorMessage } from '@/lib/apiError'
 import Link from 'next/link'
 import { useToast } from '@/components/ui/Toast'
 import { IMAGE_FILE_ACCEPT } from '@/lib/validation'
+import { focusRing } from '@/components/ui/focus'
 
 type Camera = { id: string; name: string; brand: string | null; imageUrl?: string | null; cameraType?: string | null; defaultFilmStockId?: string | null }
 const RULES_DISMISSED_KEY = 'avoidxray.uploadRulesDismissed'
@@ -760,7 +761,10 @@ function UploadPageContent() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-5 gap-2">
+                {/* Three across on a phone, not five. Five was fixed at every
+                    width, so on a 375px screen each frame was 56px — smaller
+                    than the Remove button sitting on top of it. */}
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
                   {previews.map((url, i) => (
                     <PhotoTile
                       key={url}
@@ -932,21 +936,34 @@ function UploadPageContent() {
                           </div>
                           <div className="flex items-center justify-between py-2">
                             <div>
-                              <span className="block text-neutral-400 text-xs uppercase tracking-wider">Public Album</span>
+                              <span id={`${fid}-album-public`} className="block text-neutral-400 text-xs uppercase tracking-wider">Public Album</span>
                               <span className="text-neutral-500 text-xs">Others can discover and view</span>
                             </div>
+                            {/* A switch, said out loud. This decides whether an
+                                album is public, and it was a bare button whose
+                                entire state was a background colour: nothing
+                                announced what it was, whether it was on, or
+                                that it had changed. The pill is still 40x20;
+                                the button around it is 44 tall. */}
                             <button
                               type="button"
+                              role="switch"
+                              aria-checked={albumPublic}
+                              aria-labelledby={`${fid}-album-public`}
                               onClick={() => setAlbumPublic(!albumPublic)}
-                              className={`relative w-10 h-5 rounded-full transition-colors ${
-                                albumPublic ? 'bg-brand' : 'bg-neutral-700'
-                              }`}
+                              className={`-my-3 -mr-2 grid h-11 flex-shrink-0 place-items-center px-2 ${focusRing}`}
                             >
                               <span
-                                className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                                  albumPublic ? 'left-5' : 'left-0.5'
+                                className={`relative block h-5 w-10 rounded-full transition-colors ${
+                                  albumPublic ? 'bg-brand' : 'bg-neutral-700'
                                 }`}
-                              />
+                              >
+                                <span
+                                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                                    albumPublic ? 'left-5' : 'left-0.5'
+                                  }`}
+                                />
+                              </span>
                             </button>
                           </div>
                         </>
