@@ -69,13 +69,19 @@ export default function GearCard(props: GearCardProps) {
                  focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2
                  focus-visible:outline-brand"
     >
-      {/* Identity on one row, specifications on the next.
-          These used to share a column with the picture and the chevron, which
-          left the chips about 270px to work in. Four of them do not fit that,
-          so the last one wrapped alone under the other three with the rest of
-          the card empty beside it. Given the full width they sit on one line,
-          and the wrap when there are five is a real second row rather than an
-          orphan. */}
+      {/* Identity on one row, specifications on the next, indented to line up
+          under the name.
+          Two constraints pulling against each other, and the indent is what
+          satisfies both. The chips cannot go *inside* the name's column: that
+          left them about 270px, four did not fit, and the last one wrapped
+          alone under the other three with the rest of the card empty beside
+          it. But a full-bleed row starts under the picture, so its left edge
+          did not line up with anything and the card read as two unrelated
+          blocks stacked up. Their own row, pushed right by exactly the
+          picture's width plus the gap (w-20 + gap-4 = 6rem), so they begin
+          where the name begins and still have the rest of the card to wrap
+          into. Only from sm up: on a phone the 6rem is worth more as chip
+          width than as alignment. */}
       <div className="flex items-center gap-4">
         <div className="relative flex h-16 w-20 shrink-0 items-center justify-center">
           {image ? (
@@ -107,7 +113,7 @@ export default function GearCard(props: GearCardProps) {
       {/* gap-2, matching the detail pages. This row was gap-1.5, which is the
           drift that comes of three copies of the same idea. */}
       {specs.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2 sm:pl-24">
           {specs.map(s => (
             <SpecChip key={s}>{s}</SpecChip>
           ))}
