@@ -132,7 +132,19 @@ export async function GET(req: NextRequest) {
   if (activeTab === 'popular') {
     const photos = await prisma.photo.findMany({
       where,
-      include: { user: { select: bylineUserSelect }, filmStock: true, camera: true, _count: { select: { likes: true } } },
+      include: {
+      user: { select: bylineUserSelect },
+      // Narrowed to what the grid reads. `filmStock: true, camera: true`
+      // shipped all 33 and 41 columns per photo, summary and the
+      // multi-paragraph description included, thirty times a scroll page --
+      // about nine times the bytes for the same rendering. `manufacturer` is
+      // in the list because displayName prefers it over brand for a film, and
+      // dropping it would quietly change the alt text, which is the only
+      // thing describing a scan to an image crawler.
+      filmStock: { select: { name: true, brand: true, manufacturer: true } },
+      camera: { select: { name: true, brand: true } },
+      _count: { select: { likes: true } },
+    },
       orderBy: feedOrderBy('popular'),
       skip: offset,
       take: limit + 1
@@ -149,7 +161,19 @@ export async function GET(req: NextRequest) {
   // Recent/Following: order by createdAt
   const photos = await prisma.photo.findMany({
     where,
-    include: { user: { select: bylineUserSelect }, filmStock: true, camera: true, _count: { select: { likes: true } } },
+    include: {
+      user: { select: bylineUserSelect },
+      // Narrowed to what the grid reads. `filmStock: true, camera: true`
+      // shipped all 33 and 41 columns per photo, summary and the
+      // multi-paragraph description included, thirty times a scroll page --
+      // about nine times the bytes for the same rendering. `manufacturer` is
+      // in the list because displayName prefers it over brand for a film, and
+      // dropping it would quietly change the alt text, which is the only
+      // thing describing a scan to an image crawler.
+      filmStock: { select: { name: true, brand: true, manufacturer: true } },
+      camera: { select: { name: true, brand: true } },
+      _count: { select: { likes: true } },
+    },
     orderBy: feedOrderBy(activeTab),
     skip: offset,
     take: limit + 1

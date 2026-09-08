@@ -85,7 +85,19 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     // from the pages /api/photos serves after it.
     photos = await prisma.photo.findMany({
       where: feedWhere(activeTab, followingIds, {}, hidden),
-      include: { user: { select: bylineUserSelect }, filmStock: true, camera: true, _count: { select: { likes: true } } },
+      include: {
+      user: { select: bylineUserSelect },
+      // Narrowed to what the grid reads. `filmStock: true, camera: true`
+      // shipped all 33 and 41 columns per photo, summary and the
+      // multi-paragraph description included, thirty times a scroll page --
+      // about nine times the bytes for the same rendering. `manufacturer` is
+      // in the list because displayName prefers it over brand for a film, and
+      // dropping it would quietly change the alt text, which is the only
+      // thing describing a scan to an image crawler.
+      filmStock: { select: { name: true, brand: true, manufacturer: true } },
+      camera: { select: { name: true, brand: true } },
+      _count: { select: { likes: true } },
+    },
       orderBy: feedOrderBy(activeTab),
       take: 21
     })

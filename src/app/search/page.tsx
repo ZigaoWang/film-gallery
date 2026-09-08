@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { bylineUserSelect } from '@/lib/publicUser'
+
 import type { Metadata } from 'next'
 import { SITE_URL } from '@/lib/seo/site'
 import { canonicalCameraPath, canonicalFilmPath } from '@/lib/seo/resolve'
@@ -81,7 +81,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const [photos, users, cameras, films] = await Promise.all([
     type === 'all' || type === 'photos' ? prisma.photo.findMany({
       where: photoWhere,
-      include: { user: { select: bylineUserSelect }, filmStock: true, camera: true, _count: { select: { likes: true } } },
+      // The tiles below render a thumbnail, a link and the caption as alt
+      // text. They never touched the photographer, the film, the camera or
+      // the like count, all four of which were being fetched in full.
+      select: { id: true, thumbnailPath: true, caption: true },
       orderBy: photoOrderBy,
       take: 50
     }) : [],
