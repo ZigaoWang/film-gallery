@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { focusRingInset } from './focus'
 
 /**
  * Form controls. One look for every input, textarea and select on the site.
@@ -106,9 +107,15 @@ export function PasswordInput({
       <input
         type={revealed ? 'text' : 'password'}
         // Room for the button, so a long password does not run underneath it.
-        className={`${SINGLE_LINE} pr-16 ${className}`.trim()}
+        className={`${SINGLE_LINE} pr-10 ${className}`.trim()}
         {...props}
       />
+      {/* An eye, not the words "Show" and "Hide".
+          Uppercase label text set inside a field read as a second, competing
+          control — the sign-up form had two of them stacked, and each was
+          wider than the value beside it. An icon is what this control is
+          everywhere else, and the square makes it a 40px target rather than
+          a line of 12px text. */}
       <button
         type="button"
         onClick={() => setRevealed(v => !v)}
@@ -116,13 +123,29 @@ export function PasswordInput({
         aria-label={revealed ? 'Hide password' : 'Show password'}
         // Disabled with the field, so a form mid-submit cannot be poked at.
         disabled={props.disabled}
-        className="absolute inset-y-0 right-0 px-3 text-xs font-medium uppercase tracking-wide
+        className={`absolute inset-y-0 right-0 grid w-10 place-items-center
                    text-neutral-500 transition-colors hover:text-neutral-300
-                   disabled:cursor-not-allowed disabled:text-neutral-700
-                   focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-[-2px]
-                   focus-visible:outline-brand"
+                   disabled:cursor-not-allowed disabled:text-neutral-700 ${focusRingInset}`}
       >
-        {revealed ? 'Hide' : 'Show'}
+        <svg
+          className="h-[18px] w-[18px]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 24 24"
+          aria-hidden
+        >
+          {revealed ? (
+            <path d="M3.98 8.22A10.48 10.48 0 001.93 12C3.23 16.34 7.24 19.5 12 19.5c.99 0 1.95-.14 2.86-.4M6.23 6.23A10.45 10.45 0 0112 4.5c4.76 0 8.77 3.16 10.07 7.5a10.52 10.52 0 01-4.3 5.77M6.23 6.23L3 3m3.23 3.23l3.65 3.65m7.89 7.89L21 21m-3.23-3.23l-3.65-3.65m0 0a3 3 0 10-4.24-4.24" />
+          ) : (
+            <>
+              <path d="M2.04 12.32a1.01 1.01 0 010-.64C3.42 7.51 7.36 4.5 12 4.5c4.64 0 8.58 3.01 9.96 7.18.07.2.07.44 0 .64C20.58 16.49 16.64 19.5 12 19.5c-4.64 0-8.58-3.01-9.96-7.18z" />
+              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </>
+          )}
+        </svg>
       </button>
     </div>
   )
