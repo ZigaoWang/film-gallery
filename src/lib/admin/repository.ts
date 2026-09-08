@@ -223,8 +223,12 @@ export async function listResource(resource: ResourceName, params: ListParams): 
         total,
         rows: rows.map(b => ({
           id: b.id, name: b.name, aliases: b.aliases, description: b.description,
-          cameraCount: b._count.cameras,
-          filmCount: b._count.filmStocks + b._count.manufacturedFilms,
+          cameras: b._count.cameras,
+          // Kept apart, never summed. A brand's own films and the films it
+          // coats for somebody else are the distinction the film pages are
+          // built around, and one "films: 11" against Kodak throws it away.
+          filmsSold: b._count.filmStocks,
+          filmsMade: b._count.manufacturedFilms,
         })),
       }
     }
@@ -241,7 +245,7 @@ export async function listResource(resource: ResourceName, params: ListParams): 
         total,
         rows: rows.map(m => ({
           id: m.id, name: m.name, aliases: m.aliases, fixed: m.fixed,
-          referenceUrl: m.referenceUrl, cameraCount: m._count.cameras,
+          referenceUrl: m.referenceUrl, cameras: m._count.cameras,
         })),
       }
     }

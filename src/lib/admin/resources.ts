@@ -361,8 +361,10 @@ export const ADMIN_RESOURCES = {
   brands: {
     label: 'Brand',
     plural: 'Brands',
-    description: 'The makers a camera or film stock can point at. Add one here before it can be chosen elsewhere.',
-    columns: ['name', 'aliases', 'cameraCount', 'filmCount'],
+    description:
+      'The makers a camera or film stock can point at. One list, because a company like Kodak really does make both. ' +
+      'Films sold is what carries the name on the box; films made is what it coats for somebody else.',
+    columns: ['name', 'aliases', 'cameras', 'filmsSold', 'filmsMade'],
     searchFields: ['name'],
     orderBy: { name: 'asc' },
     deletable: true,
@@ -377,8 +379,10 @@ export const ADMIN_RESOURCES = {
   mounts: {
     label: 'Lens mount',
     plural: 'Lens mounts',
-    description: 'What a camera can be given as its mount. Add one here before it can be chosen elsewhere.',
-    columns: ['name', 'aliases', 'fixed', 'cameraCount'],
+    description:
+      'What a camera can be given as its mount. Most of these are seeded options with no camera on them yet, ' +
+      'which is the point: the field is a picker so two people cataloguing the same mount write it the same way.',
+    columns: ['name', 'aliases', 'fixed', 'cameras'],
     searchFields: ['name'],
     orderBy: { name: 'asc' },
     deletable: true,
