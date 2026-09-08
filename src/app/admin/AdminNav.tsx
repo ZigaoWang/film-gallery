@@ -6,9 +6,10 @@ import { ADMIN_RESOURCES, RESOURCE_ORDER } from '@/lib/admin/resources'
 
 const EXTRA = [
   { href: '/admin/revisions', label: 'Proposed changes' },
-  // Kept while the old queue still holds unresolved items and in-flight images.
-  // Removed with the table itself; see docs/db-objects.md.
-  { href: '/admin/moderation', label: 'Moderation (old)' },
+  // Not legacy in the way the label suggests: this is the only screen that can
+  // approve a contributor's proposed image, because a revision carries field
+  // values and an image is a file. See docs/db-objects.md.
+  { href: '/admin/moderation', label: 'Images awaiting review' },
   { href: '/admin/feedback', label: 'Feedback' },
   { href: '/admin/maintenance', label: 'Maintenance' },
 ] as const

@@ -275,13 +275,6 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
         if (value !== undefined) originalData[field] = display(field, value)
       }
 
-      // Display-formatted, for the ModerationSubmission diff only. Never the
-      // revision payload: see submitRevision below.
-      const proposedForReview: Record<string, string | number | boolean | null> = {}
-      for (const [field, value] of Object.entries(proposedData)) {
-        proposedForReview[field] = display(field, value)
-      }
-
       // An admin's edit goes through the revision pipeline like everyone
       // else's, approved in the same transaction so it is still one action.
       // This was the last direct write path: the admin table was unified

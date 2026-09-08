@@ -121,7 +121,7 @@ contradicting the fields it is built from.
 
 | Object | Replaced by | Remove after |
 |---|---|---|
-| `ModerationSubmission` | `Revision` | **2026-12-01** |
+| `ModerationSubmission` | `Revision`, once it can carry an image | **blocked, see below** |
 
 ## Scheduled tightenings
 
@@ -135,11 +135,28 @@ the constraint exists to prevent. The length cap applies now; the NOT NULL waits
 until every record has one that was written rather than generated to fill a
 column.
 
-Read-only from the day `Revision` shipped: nothing new lands in it, so the
-overlap ends rather than refilling. It still holds the proposed image for an
-in-flight edit and a handful of already-resolved rows. Resolve what remains by
-hand, then drop it in a contract migration. A table with no pending items and no
-removal date is how a site ends up with two review screens for a year.
+This said "read-only from the day `Revision` shipped: nothing new lands in it"
+and that was not true. `src/lib/api/createImageRouteHandler.ts` still creates a
+row on every contributor edit that carries an image, because a revision has
+nowhere to put one: `Revision.payload` holds field values, and an image is a
+file. So the table is not a residue to be swept, it is the live record of a
+proposed image, and `/admin/moderation` is the only screen that can approve one
+onto a record.
+
+Field values on such an edit go to `Revision`, the image to
+`ModerationSubmission`, which is why an image-only edit produces a row in each.
+
+Removing it therefore needs the image to have a home first: a column on
+`Revision`, or a small table keyed to it, plus the review UI to apply it. Until
+then the removal is blocked rather than pending, and three things depend on the
+table meanwhile — `/admin/moderation`, the two approve routes under
+`/api/admin/moderation`, and `referencedKeys()` in the object-storage sweep,
+which reads `proposedImage` to keep the `moderation/` prefix from being
+classified as orphaned and hard-deleted.
+
+The date that used to sit in the table above implied somebody only had to tidy
+up. Anyone dropping it on that basis would silently discard in-flight image
+edits and hand the orphan sweep permission to delete the files behind them.
 
 ## Partial indexes
 
