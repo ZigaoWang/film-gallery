@@ -336,31 +336,39 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
         } as ApiResponse<T>)
       }
 
-      // A contributor's edit becomes a revision, the same shape an
+      // A contributor's field edit becomes a revision, the same shape an
       // administrator's and an automated writer's take. ModerationSubmission is
       // read-only from here: nothing new lands in it, so the overlap between the
       // two queues ends rather than refilling indefinitely. Its remaining items
       // are resolved by hand and the table is dropped on the date recorded in
       // docs/db-objects.md.
-      const submission = await submitRevision({
-        entityType: config.resourceType === 'filmstock' ? 'FILM_STOCK' : 'CAMERA',
-        entityId: resourceId,
-        // The coerced values, not the display-formatted ones. A revision
-        // payload is what gets written to the column if it is approved, and
-        // the reviewer's coercion checks it against the same allowlist the
-        // admin form uses. Sending the labels meant a contributor proposing
-        // "C-41" or "Point & shoot" filed a revision that could never be
-        // approved, because the column takes C41 and COMPACT. The admin branch
-        // above already submits proposedData; the two now agree.
-        payload: proposedData,
-        source: 'USER',
-        submittedById: userId,
-      })
+      //
+      // Guarded, because an image on its own changes no field. Filing a
+      // revision for it put an empty payload in the review queue, which a
+      // reviewer could only dismiss.
+      let filedId: string | null = null
+      if (Object.keys(proposedData).length > 0) {
+        const revision = await submitRevision({
+          entityType: config.resourceType === 'filmstock' ? 'FILM_STOCK' : 'CAMERA',
+          entityId: resourceId,
+          // The coerced values, not the display-formatted ones. A revision
+          // payload is what gets written to the column if it is approved, and
+          // the reviewer's coercion checks it against the same allowlist the
+          // admin form uses. Sending the labels meant a contributor proposing
+          // "C-41" or "Point & shoot" filed a revision that could never be
+          // approved, because the column takes C41 and COMPACT. The admin branch
+          // above already submits proposedData; the two now agree.
+          payload: proposedData,
+          source: 'USER',
+          submittedById: userId,
+        })
+        filedId = revision.id
+      }
 
       // The proposed image is not part of the revision payload, which carries
       // field values. It stays where the review screen already looks for it.
       if (proposedImageUrl) {
-        await prisma.moderationSubmission.create({
+        const submission = await prisma.moderationSubmission.create({
           data: {
             resourceType: config.resourceType,
             resourceId,
@@ -372,6 +380,7 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
             originalData: originalData,
           },
         })
+        filedId ??= submission.id
       }
 
       // Send admin notification
@@ -390,7 +399,7 @@ export function createImageRouteHandler<T extends Camera | FilmStock>(
       return NextResponse.json({
         success: true,
         message: 'Changes submitted successfully. Waiting for admin review.',
-        data: { submissionId: submission.id }
+        data: { submissionId: filedId }
       } as ApiResponse)
 
     } catch (error) {
