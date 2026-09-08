@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { signOut } from 'next-auth/react'
+import { focusRingInset } from '@/components/ui/focus'
 
 type UserMenuProps = {
   username: string
@@ -62,7 +63,7 @@ export default function UserMenu({ username, name, avatar }: UserMenuProps) {
 
   const itemClass =
     'block px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-neutral-800 hover:text-white ' +
-    'focus:bg-neutral-800 focus:text-white focus:outline-none'
+    `focus:bg-neutral-800 focus:text-white ${focusRingInset}`
 
   return (
     <div ref={ref} className="relative">
@@ -125,9 +126,9 @@ export default function UserMenu({ username, name, avatar }: UserMenuProps) {
               type="button"
               role="menuitem"
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="block w-full px-4 py-2 text-left text-sm text-neutral-400 transition-colors
+              className={`block w-full px-4 py-2 text-left text-sm text-neutral-400 transition-colors
                          hover:bg-neutral-800 hover:text-brand
-                         focus:bg-neutral-800 focus:text-brand focus:outline-none"
+                         focus:bg-neutral-800 focus:text-brand ${focusRingInset}`}
             >
               Sign out
             </button>

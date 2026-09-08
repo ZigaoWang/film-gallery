@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { focusRingInset } from './focus'
 
 export interface MenuItem {
   label: string
@@ -175,7 +176,7 @@ export default function OverflowMenu({
                 tabIndex={index === active ? 0 : -1}
                 onClick={() => choose(item)}
                 onMouseEnter={() => setActive(index)}
-                className={`block w-full px-4 py-2 text-left text-sm transition-colors focus:outline-none ${
+                className={`block w-full px-4 py-2 text-left text-sm transition-colors ${focusRingInset} ${
                   item.destructive
                     ? 'text-[#EF5350] hover:bg-brand/10 focus:bg-brand/10'
                     : 'text-neutral-300 hover:bg-neutral-800 hover:text-white focus:bg-neutral-800 focus:text-white'

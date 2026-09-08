@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatDate } from '@/lib/formatDate'
+import { focusRingInset } from '@/components/ui/focus'
 
 interface Notification {
   id: string
@@ -233,7 +234,7 @@ export default function NotificationBell() {
                       href={n.photo ? `/photos/${n.photo.id}` : `/${n.actor!.username}`}
                       onClick={() => setOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-neutral-800
-                                  focus-visible:bg-neutral-800 focus-visible:outline-none
+                                  focus-visible:bg-neutral-800 ${focusRingInset}
                                   ${!n.read ? 'bg-neutral-800/50' : ''}`}
                     >
                       <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden bg-neutral-800 text-xs font-bold">

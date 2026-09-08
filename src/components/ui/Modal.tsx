@@ -4,6 +4,7 @@ import { useId, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useDialogBehavior } from './dialog'
+import { focusRingInset } from './focus'
 
 /**
  * An overlay dialog, with the behavior a dialog has to have.
@@ -99,8 +100,8 @@ export function UserRow({
     <Link
       href={`/${user.username}`}
       onClick={onNavigate}
-      className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-neutral-800
-                 focus-visible:bg-neutral-800 focus-visible:outline-none"
+      className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-neutral-800
+                 focus-visible:bg-neutral-800 ${focusRingInset}`}
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden bg-neutral-700 text-sm font-bold">
         {user.avatar ? (

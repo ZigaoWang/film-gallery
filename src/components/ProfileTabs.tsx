@@ -12,6 +12,7 @@ import {
 } from '@/lib/profileView'
 import { formatLongDate } from '@/lib/formatDate'
 import { BRAND_RED } from '@/lib/constants'
+import { focusRingInset } from '@/components/ui/focus'
 import EmptyState from '@/components/ui/EmptyState'
 
 interface PhotoThumb {
@@ -188,7 +189,7 @@ export default function ProfileTabs({ photos, initialOffset, username, totalPhot
                 aria-selected={activeTab === t}
                 onClick={() => setActiveTab(t)}
                 className={`py-3.5 px-4 text-sm font-medium capitalize transition-colors border-b-2
-                            focus-visible:outline-none focus-visible:bg-neutral-900 ${
+                            ${focusRingInset} ${
                   activeTab === t
                     ? 'text-white border-brand'
                     : 'text-neutral-500 hover:text-white border-transparent'
