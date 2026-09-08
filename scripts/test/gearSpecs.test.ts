@@ -77,6 +77,25 @@ console.log('a fixed lens is an answer, not a blank')
     'a recorded mount is printed as recorded',
     cameraSpecs({ bodyType: 'SLR', mountType: 'Canon FD' }).includes('Canon FD')
   )
+  // A mount used by exactly one body is named after it, so the XPan carried a
+  // chip reading "Hasselblad XPan" directly under a heading reading
+  // "Hasselblad XPan". The record keeps the mount either way.
+  check(
+    'a mount the name already says is not repeated as a chip',
+    !cameraSpecs({
+      name: 'Hasselblad XPan',
+      bodyType: 'RANGEFINDER',
+      mount: { name: 'Hasselblad XPan' },
+    }).includes('Hasselblad XPan')
+  )
+  check(
+    'a mount the name does not say is still printed',
+    cameraSpecs({
+      name: 'Canon AE-1 Program',
+      bodyType: 'SLR',
+      mount: { name: 'Canon FD' },
+    }).includes('Canon FD')
+  )
 }
 
 console.log('what the pages suppress stays suppressed')

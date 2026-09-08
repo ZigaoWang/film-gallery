@@ -147,6 +147,27 @@ export function lensMount(camera: {
   return camera.bodyType && FIXED_LENS_BODIES.has(camera.bodyType) ? 'Fixed lens' : null
 }
 
+/**
+ * The mount, unless the camera's own name already says it.
+ *
+ * The XPan's lens mount is used by the XPan and nothing else, so it is
+ * recorded as "Hasselblad XPan" and printed a chip's width under a heading
+ * reading "Hasselblad XPan". A reader learns nothing from the second one.
+ *
+ * Same rule and same shape as `makerAside`, which drops the maker on the
+ * bodies whose names lead with it. The value stays on the record either way:
+ * this decides what is worth printing, not what is true.
+ */
+export function mountAside(camera: CameraSpecSource & { name?: string | null }): string | null {
+  const mount = lensMount(camera)
+  if (!mount) return null
+  // Unlike makerAside, a missing name means print it: the mount stands on its
+  // own, and having nothing to compare against is not a reason to hide it.
+  const name = camera.name?.trim()
+  if (!name) return mount
+  return name.toLowerCase().includes(mount.toLowerCase()) ? null : mount
+}
+
 /** What a camera card shows about a camera. See `cameraSpecs`. */
 export interface CameraSpecSource {
   bodyType?: CameraBodyType | null
@@ -172,14 +193,14 @@ export interface CameraSpecSource {
  * omits it: nearly every 35mm body is full frame, so printing it on all of them
  * is noise, and half-frame or panoramic is the thing a reader needs told.
  */
-export function cameraSpecs(camera: CameraSpecSource): string[] {
+export function cameraSpecs(camera: CameraSpecSource & { name?: string | null }): string[] {
   return [
     bodyTypeLabel(camera.bodyType),
     camera.frameFormat && camera.frameFormat !== 'FULL_FRAME'
       ? frameFormatLabel(camera.frameFormat)
       : null,
     camera.format?.trim() || null,
-    lensMount(camera),
+    mountAside(camera),
     camera.year ? String(camera.year) : null,
   ].filter((s): s is string => Boolean(s))
 }
