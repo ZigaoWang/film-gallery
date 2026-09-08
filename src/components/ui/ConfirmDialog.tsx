@@ -22,6 +22,8 @@ export default function ConfirmDialog({
   confirmLabel,
   busyLabel,
   destructive = false,
+  confirmDisabled = false,
+  initialFocus,
   onConfirm,
   onClose,
   children,
@@ -32,6 +34,17 @@ export default function ConfirmDialog({
   /** Shown while onConfirm is in flight. Defaults to the confirm label. */
   busyLabel?: string
   destructive?: boolean
+  /**
+   * Holds the confirm button closed until the body says it may open, for the
+   * dialogs that ask for something to be typed back before they will act.
+   */
+  confirmDisabled?: boolean
+  /**
+   * What to focus instead of Cancel. Only for a dialog whose body asks for
+   * input: putting the cursor in the box is the point, and there is nothing
+   * to fire a stray Enter at until it matches.
+   */
+  initialFocus?: React.RefObject<HTMLElement | null>
   onConfirm: () => void | Promise<void>
   onClose: () => void
   children: React.ReactNode
@@ -43,7 +56,7 @@ export default function ConfirmDialog({
   const panelRef = useDialogBehavior({
     open,
     onClose: () => { if (!busy) onClose() },
-    initialFocus: cancelRef,
+    initialFocus: initialFocus ?? cancelRef,
   })
 
   if (!open) return null
@@ -92,7 +105,7 @@ export default function ConfirmDialog({
             size="sm"
             variant={destructive ? 'primary' : 'secondary'}
             onClick={confirm}
-            disabled={busy}
+            disabled={busy || confirmDisabled}
           >
             {busy ? (busyLabel ?? confirmLabel) : confirmLabel}
           </Button>

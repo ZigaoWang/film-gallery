@@ -632,7 +632,6 @@ export default function ResourceTable<F extends string>({ resource, filters, def
         <ConfirmBulkDelete
           resource={resource}
           count={selected.size}
-          busy={busy}
           onCancel={() => setConfirmingBulkDelete(false)}
           onConfirm={bulkRemove}
         />
@@ -642,7 +641,6 @@ export default function ResourceTable<F extends string>({ resource, filters, def
         <ConfirmDelete
           resource={resource}
           row={confirming}
-          busy={busy}
           onCancel={() => setConfirming(null)}
           onConfirm={() => remove(confirming)}
         />
@@ -658,72 +656,57 @@ export default function ResourceTable<F extends string>({ resource, filters, def
  * screen and names what is about to go. A selection does not: it is a number,
  * possibly gathered across several pages, and every one of these takes storage
  * with it. Typing the count is the one thing that cannot be done by reflex.
+ *
+ * Built on ConfirmDialog rather than its own overlay. Both dialogs in this file
+ * used to draw their own, which meant they were the two dialogs on the site
+ * where Escape did nothing, the page behind kept scrolling and focus never
+ * came back to where it started.
  */
 function ConfirmBulkDelete({
-  resource, count, busy, onCancel, onConfirm,
+  resource, count, onCancel, onConfirm,
 }: {
   resource: ResourceName
   count: number
-  busy: boolean
   onCancel: () => void
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
 }) {
   const spec: ResourceSpec = ADMIN_RESOURCES[resource]
   const [typed, setTyped] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
   const expected = String(count)
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={onCancel}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-bulk-delete-title"
-        className="bg-neutral-900 border border-neutral-800 max-w-md w-full p-6"
-        onClick={e => e.stopPropagation()}
-      >
-        <h2 id="confirm-bulk-delete-title" className="text-lg font-bold text-white mb-2">
-          Delete {count} {count === 1 ? spec.label.toLowerCase() : spec.plural.toLowerCase()}?
-        </h2>
+    <ConfirmDialog
+      open
+      title={`Delete ${count} ${count === 1 ? spec.label.toLowerCase() : spec.plural.toLowerCase()}?`}
+      confirmLabel={`Delete ${count}`}
+      busyLabel="Deleting…"
+      destructive
+      confirmDisabled={typed.trim() !== expected}
+      initialFocus={inputRef}
+      onConfirm={onConfirm}
+      onClose={onCancel}
+    >
+      <p className="text-[#ff8a80] mb-4">
+        {resource === 'photos' && 'The original, medium and thumbnail files are deleted from storage too. '}
+        {resource === 'users' && 'This also removes their photos, albums, comments and likes, and the image files behind them. '}
+        This cannot be undone.
+      </p>
 
-        <p className="text-[#ff8a80] text-sm mb-4">
-          {resource === 'photos' && 'The original, medium and thumbnail files are deleted from storage too. '}
-          {resource === 'users' && 'This also removes their photos, albums, comments and likes, and the image files behind them. '}
-          This cannot be undone.
-        </p>
-
-        <label className="block mb-4">
-          <span className="text-xs uppercase tracking-wide text-neutral-500">
-            Type <span className="text-white font-mono">{expected}</span> to confirm
-          </span>
-          <input
-            value={typed}
-            onChange={e => setTyped(e.target.value)}
-            inputMode="numeric"
-            className="mt-1 w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white
-                       focus:outline-none focus:border-neutral-600"
-            autoFocus
-          />
-        </label>
-
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            disabled={busy}
-            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-40"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={busy || typed.trim() !== expected}
-            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark
-                       disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {busy ? 'Deleting…' : `Delete ${count}`}
-          </button>
-        </div>
-      </div>
-    </div>
+      <label className="block">
+        <span className="text-xs uppercase tracking-wide text-neutral-500">
+          Type <span className="text-white font-mono">{expected}</span> to confirm
+        </span>
+        <input
+          ref={inputRef}
+          value={typed}
+          onChange={e => setTyped(e.target.value)}
+          inputMode="numeric"
+          className="mt-1 w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white
+                     focus:outline-none focus:border-neutral-600"
+        />
+      </label>
+    </ConfirmDialog>
   )
 }
 
@@ -868,13 +851,12 @@ function Cell({ column, row }: { column: string; row: Row }) {
  * cases. A one-click confirm on a table row is how the wrong row goes.
  */
 function ConfirmDelete({
-  resource, row, busy, onCancel, onConfirm,
+  resource, row, onCancel, onConfirm,
 }: {
   resource: ResourceName
   row: Row
-  busy: boolean
   onCancel: () => void
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
 }) {
   // Widened from the const-asserted literal: the table treats every resource
   // the same way, and optional members like quickActions are only visible
@@ -885,74 +867,56 @@ function ConfirmDelete({
   // camera or film stock is referenced by other people's uploads.
   const heavy = resource === 'users'
   const [typed, setTyped] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
   const expected = String(row.username ?? row.id ?? '')
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={onCancel}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-delete-title"
-        className="bg-neutral-900 border border-neutral-800 max-w-md w-full p-6"
-        onClick={e => e.stopPropagation()}
-      >
-        <h2 id="confirm-delete-title" className="text-lg font-bold text-white mb-2">
-          Delete this {spec.label.toLowerCase()}?
-        </h2>
-        <p className="text-neutral-400 text-sm mb-4 break-words">
-          <span className="text-neutral-300">{label.slice(0, 140) || '(untitled)'}</span>
+    <ConfirmDialog
+      open
+      title={`Delete this ${spec.label.toLowerCase()}?`}
+      confirmLabel="Delete"
+      busyLabel="Deleting…"
+      destructive
+      confirmDisabled={heavy && typed !== expected}
+      initialFocus={heavy ? inputRef : undefined}
+      onConfirm={onConfirm}
+      onClose={onCancel}
+    >
+      <p className="mb-4 break-words">
+        <span className="text-neutral-300">{label.slice(0, 140) || '(untitled)'}</span>
+      </p>
+
+      {resource === 'users' && (
+        <p className="text-[#ff8a80] mb-4">
+          This also removes their photos, albums, comments and likes, and the image files behind them.
+          It cannot be undone.
         </p>
+      )}
+      {(resource === 'cameras' || resource === 'films') && (
+        <p className="mb-4">
+          Photos referencing this will keep their other details but lose the link.
+        </p>
+      )}
+      {resource === 'photos' && (
+        <p className="mb-4">
+          The original, medium and thumbnail files are deleted from storage too.
+        </p>
+      )}
 
-        {resource === 'users' && (
-          <p className="text-[#ff8a80] text-sm mb-4">
-            This also removes their photos, albums, comments and likes, and the image files behind them.
-            It cannot be undone.
-          </p>
-        )}
-        {(resource === 'cameras' || resource === 'films') && (
-          <p className="text-neutral-400 text-sm mb-4">
-            Photos referencing this will keep their other details but lose the link.
-          </p>
-        )}
-        {resource === 'photos' && (
-          <p className="text-neutral-400 text-sm mb-4">
-            The original, medium and thumbnail files are deleted from storage too.
-          </p>
-        )}
-
-        {heavy && (
-          <label className="block mb-4">
-            <span className="text-xs uppercase tracking-wide text-neutral-500">
-              Type <span className="text-white font-mono">{expected}</span> to confirm
-            </span>
-            <input
-              value={typed}
-              onChange={e => setTyped(e.target.value)}
-              className="mt-1 w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white
-                         focus:outline-none focus:border-neutral-600"
-              autoFocus
-            />
-          </label>
-        )}
-
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            disabled={busy}
-            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-40"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={busy || (heavy && typed !== expected)}
-            className="px-4 h-9 text-xs uppercase tracking-wide font-bold bg-brand text-white hover:bg-brand-dark
-                       disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {busy ? 'Deleting…' : 'Delete'}
-          </button>
-        </div>
-      </div>
-    </div>
+      {heavy && (
+        <label className="block">
+          <span className="text-xs uppercase tracking-wide text-neutral-500">
+            Type <span className="text-white font-mono">{expected}</span> to confirm
+          </span>
+          <input
+            ref={inputRef}
+            value={typed}
+            onChange={e => setTyped(e.target.value)}
+            className="mt-1 w-full bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-white
+                       focus:outline-none focus:border-neutral-600"
+          />
+        </label>
+      )}
+    </ConfirmDialog>
   )
 }
